@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
             $table->foreignId('partner_id')->constrained('partners')->cascadeOnDelete();
+            $table->enum('role', ['funder', 'implementer'])->nullable();
             $table->unique(['project_id', 'partner_id']);
             $table->timestamps();
         });

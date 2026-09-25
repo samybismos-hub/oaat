@@ -14,7 +14,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['domain_id', 'title', 'slug', 'status', 'country', 'city', 'start_date', 'end_date', 'objectives', 'beneficiaries', 'results', 'is_featured', 'published_at'])]
+#[Fillable(['domain_id', 'title', 'slug', 'status', 'country', 'city', 'start_date', 'end_date', 'objectives', 'beneficiaries', 'results', 'budget_amount', 'budget_currency', 'beneficiaries_count', 'beneficiaries_unit', 'is_featured', 'published_at'])]
 #[Translatable('title', 'objectives', 'beneficiaries', 'results')]
 class Project extends Model implements HasMedia
 {
@@ -27,6 +27,8 @@ class Project extends Model implements HasMedia
             'end_date' => 'date',
             'published_at' => 'datetime',
             'is_featured' => 'boolean',
+            'budget_amount' => 'decimal:2',       // ← sort toujours avec 2 décimales
+            'beneficiaries_count' => 'integer',    // ← force le type entier
         ];
     }
 
@@ -43,7 +45,7 @@ class Project extends Model implements HasMedia
 
     public function partners(): BelongsToMany
     {
-        return $this->belongsToMany(Partner::class, 'project_partner')->withTimestamps();
+        return $this->belongsToMany(Partner::class, 'project_partner')->withTimestamps()->withPivot('role');
     }
 
     public function albums(): HasMany

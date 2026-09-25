@@ -30,6 +30,6 @@ class Partner extends Model implements HasMedia
      */
     public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(Project::class, 'project_partner')->withTimestamps();
+        return $this->belongsToMany(Project::class, 'project_partner')->withTimestamps()->withPivot('role');
     }
 }

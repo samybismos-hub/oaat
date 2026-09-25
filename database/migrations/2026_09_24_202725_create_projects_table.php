@@ -20,6 +20,10 @@ return new class extends Migration {
             $table->json('objectives')->nullable();
             $table->json('beneficiaries')->nullable();
             $table->json('results')->nullable();
+            $table->decimal('budget_amount', 15, 2)->nullable();
+            $table->string('budget_currency', 3)->nullable();
+            $table->unsignedInteger('beneficiaries_count')->nullable();
+            $table->string('beneficiaries_unit')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->timestamp('published_at')->nullable()->index();
             $table->timestamps();
