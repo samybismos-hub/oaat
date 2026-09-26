@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('domain_id')->constrained('domains')->restrictOnDelete();
             $table->json('title');
             $table->string('slug')->unique();
-            $table->enum('status', ['planned', 'ongoing', 'completed'])->default('planned');
+            $table->enum('status', ['planned', 'ongoing', 'completed', 'awaiting_funding'])->default('planned');
             $table->string('country')->nullable();
             $table->string('city')->nullable();
             $table->date('start_date')->nullable();
