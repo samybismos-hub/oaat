@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Projects;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Projects\RelationManagers\PartnersRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
 use App\Models\Project;
@@ -75,10 +76,14 @@ class ProjectResource extends Resource
         return ProjectsTable::configure($table);
     }
 
+    /**
+     * Les onglets affichés sous la fiche projet : les partenaires et leur rôle
+     * (bailleur / exécutant), stocké dans la table pivot.
+     */
     public static function getRelations(): array
     {
         return [
-            //
+            PartnersRelationManager::class,
         ];
     }
 

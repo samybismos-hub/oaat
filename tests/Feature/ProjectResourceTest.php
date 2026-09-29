@@ -7,8 +7,8 @@ use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Filament\Resources\Projects\ProjectResource;
+use App\Filament\Resources\Projects\RelationManagers\PartnersRelationManager;
 use App\Models\Domain;
-use App\Models\Partner;
 use App\Models\Project;
 use App\Models\User;
 use Filament\Facades\Filament;
@@ -196,7 +196,6 @@ class ProjectResourceTest extends TestCase
             ->assertFormFieldExists('status')
             ->assertFormFieldExists('is_featured')
             ->assertFormFieldExists('published_at')
-            ->assertFormFieldExists('partners')
             ->assertFormFieldExists('cover')
             ->assertFormFieldExists('photos')
             ->assertSee('Français')
@@ -280,21 +279,22 @@ class ProjectResourceTest extends TestCase
         Storage::disk('public')->assertExists($cover->getPathRelativeToRoot());
     }
 
-    public function test_les_partenaires_sont_associes_au_projet_depuis_le_formulaire(): void
+    /**
+     * Les partenaires d'un projet ne se gèrent plus dans le formulaire principal,
+     * mais dans l'onglet « Partenaires & rôles » (gestionnaire de relations) :
+     * seul ce dernier permet de saisir le rôle de chacun, et il évite qu'un
+     * enregistrement du formulaire, resté sur une liste périmée, ne détache un
+     * partenaire ajouté entre-temps depuis l'onglet.
+     */
+    public function test_les_partenaires_du_projet_se_gerent_dans_l_onglet_dedie_et_non_dans_le_formulaire(): void
     {
         $domain = $this->makeDomain();
         $project = $this->makeProject($domain);
 
-        $partner = Partner::create(['name' => 'PNUD']);
-
         Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
-            ->fillForm(['partners' => [$partner->id]])
-            ->call('save')
-            ->assertHasNoFormErrors();
+            ->assertOk()
+            ->assertFormFieldDoesNotExist('partners');
 
-        $project = $project->refresh();
-
-        $this->assertCount(1, $project->partners);
-        $this->assertSame('PNUD', $project->partners->first()->name);
+        $this->assertContains(PartnersRelationManager::class, ProjectResource::getRelations());
     }
 }

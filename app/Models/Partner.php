@@ -25,11 +25,12 @@ class Partner extends Model implements HasMedia
         $this->addMediaCollection('logo')->singleFile();
     }
 
-    /**
-     * Les projets de ce partenaire (relation N vers N).
-     */
+
     public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(Project::class, 'project_partner')->withTimestamps()->withPivot('role');
+        return $this->belongsToMany(Project::class, 'project_partner')
+            ->using(ProjectPartner::class)
+            ->withTimestamps()
+            ->withPivot('role');
     }
 }

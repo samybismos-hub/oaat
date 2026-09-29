@@ -45,9 +45,18 @@ class Project extends Model implements HasMedia
         return $this->belongsTo(Domain::class);
     }
 
+    /**
+     * Les partenaires de ce projet (relation N vers N).
+     *
+     * Le rôle (bailleur / exécutant) vit dans la table pivot : voir la classe
+     * ProjectPartner, qui le convertit en enum PartnerRole.
+     */
     public function partners(): BelongsToMany
     {
-        return $this->belongsToMany(Partner::class, 'project_partner')->withTimestamps()->withPivot('role');
+        return $this->belongsToMany(Partner::class, 'project_partner')
+            ->using(ProjectPartner::class)
+            ->withTimestamps()
+            ->withPivot('role');
     }
 
     public function albums(): HasMany

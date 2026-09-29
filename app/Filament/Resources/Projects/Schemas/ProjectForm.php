@@ -187,20 +187,13 @@ class ProjectForm
                             ->helperText('Laissez vide tant que la fiche n\'est pas prête : le site public n\'affiche que les projets datés et passés.'),
                     ]),
 
-                // 6. Les partenaires du projet (relation N vers N).
-                Section::make('Partenaires')
-                    ->description('Bailleurs de fonds et partenaires d\'exécution associés à ce projet.')
-                    ->schema([
-                        Select::make('partners')
-                            ->label('Partenaires')
-                            ->relationship('partners', 'name')
-                            ->multiple()
-                            // Ici la recherche est fiable : la colonne "name" des partenaires
-                            // est une vraie colonne texte (et non du JSON).
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Un ou plusieurs partenaires. Leur rôle (bailleur / exécutant) se précise depuis la fiche du partenaire.'),
-                    ]),
+                // 6. Les partenaires du projet ne se gèrent plus ici, mais dans l'onglet
+                //    « Partenaires & rôles » de la fiche (gestionnaire de relations).
+                //    Raison : chaque partenaire porte un rôle (bailleur / exécutant) qui
+                //    vit dans la table pivot et qu'un simple menu déroulant multiple ne
+                //    peut pas saisir. Un seul endroit gère donc la liste, ce qui évite
+                //    qu'un enregistrement du formulaire, resté sur une liste périmée,
+                //    ne détache un partenaire ajouté entre-temps depuis l'onglet.
 
                 // 7. Les photos : une de couverture, puis la galerie.
                 Section::make('Photos & illustrations')
