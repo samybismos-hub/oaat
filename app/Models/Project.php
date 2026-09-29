@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProjectStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +30,7 @@ class Project extends Model implements HasMedia
             'is_featured' => 'boolean',
             'budget_amount' => 'decimal:2',       // ← sort toujours avec 2 décimales
             'beneficiaries_count' => 'integer',    // ← force le type entier
+            'status' => ProjectStatus::class,      // ← 'ongoing' devient une valeur de l'enum
         ];
     }
 
