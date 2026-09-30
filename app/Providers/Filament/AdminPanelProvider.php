@@ -33,6 +33,17 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            // L'ordre des dossiers du menu de gauche. Sans cette liste, Filament
+            // les classerait dans l'ordre où il découvre les ressources, ce qui
+            // change au moindre ajout : le menu « bougerait » sans raison.
+            ->navigationGroups([
+                'Structure & Programmes',
+                'Partenaires',
+                'Contenu Institutionnel',
+                'Médias & documents',
+                'Organisation',
+                'Demandes reçues',
+            ])
             ->pages([
                 Dashboard::class,
             ])

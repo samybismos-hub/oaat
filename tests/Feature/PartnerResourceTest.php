@@ -300,7 +300,7 @@ class PartnerResourceTest extends TestCase
             ->assertOk()
             // Pour viser une action de l'en-tête du tableau (et non une action de
             // page), il faut le dire explicitement avec TestAction::…->table().
-            ->(TestAction::make('attach')->table());
+            ->assertActionVisible(TestAction::make('attach')->table())
             // Le champ « role » du formulaire d'association porte le nom d'une colonne
             // pivot : Filament le transmet donc à attach() comme donnée de pivot.
             ->callAction(TestAction::make('attach')->table(), [
