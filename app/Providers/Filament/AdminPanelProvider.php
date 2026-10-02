@@ -40,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 'Structure & Programmes',
                 'Partenaires',
                 'Contenu Institutionnel',
+                'Communication',
                 'Médias & documents',
                 'Organisation',
                 'Demandes reçues',
