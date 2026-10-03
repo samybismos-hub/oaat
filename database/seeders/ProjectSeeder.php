@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Domain;
 use App\Models\Partner;
 use App\Models\Project;
@@ -49,7 +48,7 @@ class ProjectSeeder extends Seeder
                 'published_at' => '2007-05-01 00:00:00',
                 'partners' => [
                     'PNUD' => 'funder',
-                ]
+                ],
             ],
             [
                 'slug' => 'eau-potable-sebele-fizi',

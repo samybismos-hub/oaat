@@ -15,8 +15,9 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 /**
- * Documents & publications : les PDF que le visiteur peut télécharger depuis
- * le site (rapports, attestations, catalogues de projets…).
+ * Actualités : les nouvelles publiées sur le site (vie de l'association,
+ * appels à financement, communiqués). Une actualité est un article daté :
+ * le site public ne l'affiche qu'à partir de sa date de publication.
  */
 class ActualityResource extends Resource
 {
@@ -26,9 +27,12 @@ class ActualityResource extends Resource
 
     protected static ?string $navigationLabel = 'Actualités';
 
-    protected static ?string $modelLabel = 'Actualités';
+    // Filament assemble ses libellés (« Créer un(e) … », « … supprimée ») à
+    // partir de ces deux mots : ils doivent rester au singulier et au pluriel
+    // naturels, sans majuscule (le libellé du menu, lui, est navigationLabel).
+    protected static ?string $modelLabel = 'actualité';
 
-    protected static ?string $pluralModelLabel = 'Actualités';
+    protected static ?string $pluralModelLabel = 'actualités';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Communication';
 
@@ -39,13 +43,14 @@ class ActualityResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * Compteur du menu : le nombre de documents réellement en ligne.
-     * Le scope published() du modèle Document applique la même règle que le
-     * site public (date de publication renseignée et déjà passée).
+     * Compteur du menu : le nombre d'actualités réellement en ligne.
+     * Le scope published() du modèle Actuality applique la même règle que le
+     * site public : date de publication renseignée ET déjà passée. Les
+     * brouillons et les actualités programmées ne sont donc pas comptés.
      */
     public static function getNavigationBadge(): ?string
     {
-        $count = Actuality::query()->published()->count() ?? null;
+        $count = Actuality::query()->published()->count();
 
         return $count > 0 ? (string) $count : null;
     }

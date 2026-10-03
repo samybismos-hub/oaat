@@ -2,17 +2,13 @@
 
 namespace App\Filament\Resources\Actualities\Tables;
 
-use App\Enums\ActualityType;
 use App\Models\Actuality;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -66,12 +62,16 @@ class ActualitiesTable
                 TextColumn::make('updated_at')
                     ->label('Dernière modif.')
                     ->dateTime('d/m/Y H:i')
-                    ->placeholder("-")
+                    ->placeholder('-')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('published_at', 'desc')
             ->filters([
+                // Un filtre à trois états. Le TernaryFilter des autres listes ne
+                // suffirait pas ici : il ne distingue que « daté » et « non daté »,
+                // alors que « programmée » et « en ligne » sont deux situations
+                // différentes pour le client (l'une n'est pas encore visible).
                 SelectFilter::make('etat')
                     ->label('État')
                     ->options(['brouillon' => 'Brouillon', 'programmee' => 'Programmée', 'enligne' => 'En ligne'])
@@ -83,27 +83,11 @@ class ActualitiesTable
                             default => $query,
                         };
                     }),
-
-                TernaryFilter::make('published_at')
-                    ->label('Publication')
-                    ->nullable()
-                    ->placeholder('Publiées et brouillons')
-                    ->trueLabel('En ligne et programmées')
-                    ->falseLabel('Brouillons (sans date)'),
             ])
             ->recordActions([
                 EditAction::make(),
-
-                Action::make('telecharger')
-                    ->label('Télécharger')
-                    ->icon(Heroicon::OutlinedArrowDownTray)
-                    // getFirstMedia('file') renvoie le fichier de la collection
-                    // « file » ; en l'absence de fichier, le bouton n'existe pas.
-                    ->url(fn (Actuality $record): ?string => $record->hasMedia('file')
-                        ? $record->getFirstMedia('file')->getUrl()
-                        : null)
-                    ->openUrlInNewTab()
-                    ->visible(fn (Actuality $record): bool => $record->hasMedia('file')),
+                // Pas de bouton « Télécharger » ici, contrairement aux documents :
+                // une actualité est un article, pas un fichier à récupérer.
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

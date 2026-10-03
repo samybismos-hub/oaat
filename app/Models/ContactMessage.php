@@ -6,6 +6,4 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['name', 'email', 'subject', 'message'])]
-class ContactMessage extends Model
-{
-}
+class ContactMessage extends Model {}

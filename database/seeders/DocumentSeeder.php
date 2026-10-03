@@ -37,7 +37,7 @@ class DocumentSeeder extends Seeder
             ],
             [
                 'title' => [
-                    'fr' => "Projets en attente de financement : catalogue",
+                    'fr' => 'Projets en attente de financement : catalogue',
                     'en' => 'Projects awaiting funding: catalogue',
                 ],
                 'type' => 'etude',

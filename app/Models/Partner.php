@@ -25,7 +25,6 @@ class Partner extends Model implements HasMedia
         $this->addMediaCollection('logo')->singleFile();
     }
 
-
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class, 'project_partner')

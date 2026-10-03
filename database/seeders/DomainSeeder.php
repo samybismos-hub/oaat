@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Domain;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DomainSeeder extends Seeder
@@ -114,7 +113,7 @@ class DomainSeeder extends Seeder
                 'position' => 7,
             ],
             [
-                'slug' =>'environnement',
+                'slug' => 'environnement',
                 'name' => ['fr' => 'Environnement', 'en' => 'Environment'],
                 'objectives' => [
                     'fr' => 'Promouvoir la protection de l\'environnement et la gestion durable des ressources naturelles dans les communautés ciblées.',
