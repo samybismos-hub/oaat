@@ -11,6 +11,7 @@ use App\Models\User;
 use Database\Seeders\ActualitySeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -202,12 +203,10 @@ class ActualityResourceTest extends TestCase
 
         $actuality = $this->makeActuality();
 
-        $actuality->addMediaFromString('premiere-image')
-            ->usingFileName('couverture-1.jpg')
+        $actuality->addMedia(UploadedFile::fake()->image('couverture-1.jpg', 100, 100))
             ->toMediaCollection('cover');
 
-        $actuality->addMediaFromString('seconde-image')
-            ->usingFileName('couverture-2.jpg')
+        $actuality->addMedia(UploadedFile::fake()->image('couverture-2.jpg', 100, 100))
             ->toMediaCollection('cover');
 
         $actuality = $actuality->refresh();

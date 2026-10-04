@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
@@ -20,6 +21,15 @@ class Album extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('photos');
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(200)->height(150)->nonQueued();
+
+        $this->addMediaConversion('card')
+            ->width(800)->height(600)->nonQueued();
     }
 
     public function project(): BelongsTo

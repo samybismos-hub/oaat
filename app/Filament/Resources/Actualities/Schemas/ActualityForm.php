@@ -6,6 +6,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -79,6 +80,13 @@ class ActualityForm
                             ->seconds(false)
                             ->displayFormat('d/m/Y H:i')
                             ->helperText("Laisser vide = brouillon (invisible sur le site). Une date future = actualité programmée, qui s'affichera d'elle-même le moment venu."),
+
+                        // « À la une » : les actualités ainsi marquées peuvent être mises
+                        // en avant sur la page d'accueil du site public (les 3 plus récentes
+                        // parmi les « à la une »). Même pattern que le modèle Project.
+                        Toggle::make('is_featured')
+                            ->label('À la une')
+                            ->helperText("Cocher pour mettre cette actualité en avant sur la page d'accueil."),
                     ]),
 
                 // 4. Le slug : l'adresse de l'actualité sur le site public.

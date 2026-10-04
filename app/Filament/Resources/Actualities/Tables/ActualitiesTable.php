@@ -6,6 +6,7 @@ use App\Models\Actuality;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -58,6 +59,12 @@ class ActualitiesTable
                     ->dateTime('d/m/Y')
                     ->placeholder('-')
                     ->sortable(),
+
+                IconColumn::make('is_featured')
+                    ->label('À la une')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('updated_at')
                     ->label('Dernière modif.')

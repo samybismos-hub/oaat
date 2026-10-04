@@ -11,6 +11,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -55,6 +56,15 @@ class ContactMessagesTable
                     ->label('Reçu le')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
+
+                IconColumn::make('read_at')
+                    ->label('Lu')
+                    ->state(fn (ContactMessage $record): bool => $record->read_at !== null)
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-clock')
+                    ->trueColor('success')
+                    ->falseColor('warning')
+                    ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -91,8 +101,17 @@ class ContactMessagesTable
                         TextEntry::make('email')->label('Adresse e-mail'),
                         TextEntry::make('subject')->label('Objet')->placeholder('Sans objet'),
                         TextEntry::make('created_at')->label('Reçu le')->dateTime('d/m/Y à H:i'),
+                        TextEntry::make('read_at')->label('Lu le')->dateTime('d/m/Y à H:i')->placeholder('Pas encore lu'),
                         TextEntry::make('message')->label('Message'),
                     ]),
+
+                // Marquer le message comme lu (bouton visible seulement s'il ne l'est pas).
+                // Un clic met read_at à l'instant présent et rafraîchit la ligne.
+                Action::make('marquerLu')
+                    ->label('Marquer comme lu')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->visible(fn (ContactMessage $record): bool => $record->read_at === null)
+                    ->action(fn (ContactMessage $record): mixed => $record->update(['read_at' => now()])),
 
                 // Répondre ouvre le logiciel de messagerie de l'utilisateur,
                 // avec l'adresse du visiteur et l'objet déjà remplis.

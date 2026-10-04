@@ -55,21 +55,22 @@ class ContactMessageResource extends Resource
     }
 
     /**
-     * Compteur du menu : le nombre de messages conservés.
+     * Compteur du menu : le nombre de messages non lus.
      *
-     * La table ne comporte pas de colonne « lu / non lu » : le badge ne peut
-     * donc pas signaler du courrier en attente, seulement le volume reçu.
+     * La colonne read_at (timestamp nullable) indique si un message a été
+     * ouvert. Si elle est NULL, le message est considéré comme non lu.
+     * Le badge passe en orange tant qu'il y a du courrier en attente.
      */
     public static function getNavigationBadge(): ?string
     {
-        $count = ContactMessage::query()->count();
+        $count = ContactMessage::query()->whereNull('read_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'gray';
+        return ContactMessage::query()->whereNull('read_at')->exists() ? 'warning' : 'gray';
     }
 
     public static function table(Table $table): Table

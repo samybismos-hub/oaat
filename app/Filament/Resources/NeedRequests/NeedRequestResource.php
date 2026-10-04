@@ -54,14 +54,14 @@ class NeedRequestResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = NeedRequest::query()->count();
+        $count = NeedRequest::query()->whereNull('read_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'gray';
+        return NeedRequest::query()->whereNull('read_at')->exists() ? 'warning' : 'gray';
     }
 
     public static function table(Table $table): Table

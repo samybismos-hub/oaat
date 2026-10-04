@@ -6,4 +6,12 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['organization', 'contact_name', 'email', 'phone', 'need_type', 'description', 'location'])]
-class NeedRequest extends Model {}
+class NeedRequest extends Model
+{
+    protected function casts(): array
+    {
+        return [
+            'read_at' => 'datetime',
+        ];
+    }
+}
