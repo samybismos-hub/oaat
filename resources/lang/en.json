@@ -1,0 +1,111 @@
+{
+    "meta": {
+        "suffix": "OAAT | 31 years of action in DRC",
+        "description": "African Organization for the Development of Territories — Bukavu, DR Congo"
+    },
+    "menu": {
+        "accueil": "Home",
+        "organisation": "About us",
+        "domaines": "Areas of intervention",
+        "projets": "Projects",
+        "actualites": "News",
+        "documents": "Resources",
+        "galerie": "Gallery",
+        "partenaires": "Partners",
+        "contact": "Contact",
+        "besoin": "Submit a need"
+    },
+    "home": {
+        "hero_title": "Bridging the gap between technological development and the needs of underserved populations",
+        "cta_projets": "View our projects",
+        "cta_contact": "Contact us",
+        "section_stats": "Key figures",
+        "stat_annees": "Years of activity",
+        "stat_territoires": "Territories",
+        "stat_projets": "Projects completed",
+        "stat_beneficiaires": "Beneficiaries reached",
+        "section_domaines": "Our areas of intervention",
+        "section_projets": "Featured projects",
+        "section_actus": "Latest news",
+        "section_partenaires": "Our supporters",
+        "voir_tous": "View all projects",
+        "voir_toutes_actus": "View all news"
+    },
+    "organisation": {
+        "title": "About us",
+        "team": "Our team",
+        "history": "History",
+        "reconnaissances": "Official recognition"
+    },
+    "domain": {
+        "title": "Areas of intervention",
+        "projects_count": "{count} project(s)",
+        "voir_projets": "View projects"
+    },
+    "project": {
+        "title": "Projects",
+        "budget": "Budget",
+        "status": "Status",
+        "start_date": "Start date",
+        "end_date": "End date",
+        "partners": "Partners",
+        "results": "Results",
+        "domain": "Domain",
+        "status_ongoing": "Ongoing",
+        "status_completed": "Completed",
+        "status_suspended": "Suspended",
+        "status_evaluation": "Under evaluation"
+    },
+    "actuality": {
+        "title": "News",
+        "read_more": "Read more",
+        "published_at": "Published on",
+        "share": "Share"
+    },
+    "document": {
+        "title": "Resources",
+        "download": "Download",
+        "type": "Type",
+        "no_documents": "No documents available"
+    },
+    "galerie": {
+        "title": "Gallery",
+        "voir_album": "View album"
+    },
+    "partner": {
+        "title": "Partners",
+        "financial": "Financial partners",
+        "technical": "Technical partners"
+    },
+    "contact": {
+        "title": "Contact us",
+        "name": "Full name",
+        "email": "Email address",
+        "subject": "Subject",
+        "message": "Your message",
+        "submit": "Send",
+        "success": "Message sent successfully. We will get back to you shortly.",
+        "error": "An error occurred. Please try again."
+    },
+    "besoin": {
+        "title": "Submit a need",
+        "description": "Describe your need and we will contact you",
+        "name": "Full name",
+        "email": "Email address",
+        "organization": "Organization (optional)",
+        "message": "Need description",
+        "submit": "Submit",
+        "success": "Your need has been submitted successfully.",
+        "error": "An error occurred. Please try again."
+    },
+    "footer": {
+        "description": "The African Organization for the Development of Territories has been working for 31 years for the integrated development of the Democratic Republic of Congo.",
+        "liens_rapides": "Quick links",
+        "contact": "Contact",
+        "address": "Bukavu, South-Kivu, DR Congo",
+        "phone": "+243 993 537 069",
+        "email": "oaatrdc2000@gmail.com",
+        "suivez_nous": "Follow us",
+        "copyright": "All rights reserved."
+    }
+}

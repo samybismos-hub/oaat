@@ -1,0 +1,111 @@
+{
+    "meta": {
+        "suffix": "OAAT | 31 ans d'action en RDC",
+        "description": "Organisation Africaine pour l'Aménagement des Territoires — Bukavu, RD Congo"
+    },
+    "menu": {
+        "accueil": "Accueil",
+        "organisation": "Notre organisation",
+        "domaines": "Domaines d'intervention",
+        "projets": "Projets",
+        "actualites": "Actualités",
+        "documents": "Documents",
+        "galerie": "Galerie",
+        "partenaires": "Partenaires",
+        "contact": "Contact",
+        "besoin": "Soumettre un besoin"
+    },
+    "home": {
+        "hero_title": "Renouer le lien entre le développement technologique et les besoins des populations défavorisées",
+        "cta_projets": "Découvrir nos projets",
+        "cta_contact": "Contactez-nous",
+        "section_stats": "Chiffres clés",
+        "stat_annees": "Années d'activité",
+        "stat_territoires": "Nombre de territoires",
+        "stat_projets": "Projets menés",
+        "stat_beneficiaires": "Bénéficiaires touchés",
+        "section_domaines": "Nos domaines d'intervention",
+        "section_projets": "Projets à la une",
+        "section_actus": "Dernières actualités",
+        "section_partenaires": "Ils nous soutiennent",
+        "voir_tous": "Voir tous les projets",
+        "voir_toutes_actus": "Voir toutes les actualités"
+    },
+    "organisation": {
+        "title": "Notre organisation",
+        "team": "Notre équipe",
+        "history": "Historique",
+        "reconnaissances": "Reconnaissances officielles"
+    },
+    "domain": {
+        "title": "Domaines d'intervention",
+        "projects_count": "{count} projet(s)",
+        "voir_projets": "Voir les projets"
+    },
+    "project": {
+        "title": "Projets",
+        "budget": "Budget",
+        "status": "Statut",
+        "start_date": "Date de début",
+        "end_date": "Date de fin",
+        "partners": "Partenaires",
+        "results": "Résultats",
+        "domain": "Domaine",
+        "status_ongoing": "En cours",
+        "status_completed": "Terminé",
+        "status_suspended": "Suspendu",
+        "status_evaluation": "En évaluation"
+    },
+    "actuality": {
+        "title": "Actualités",
+        "read_more": "Lire la suite",
+        "published_at": "Publié le",
+        "share": "Partager"
+    },
+    "document": {
+        "title": "Documents",
+        "download": "Télécharger",
+        "type": "Type",
+        "no_documents": "Aucun document pour le moment"
+    },
+    "galerie": {
+        "title": "Galerie",
+        "voir_album": "Voir l'album"
+    },
+    "partner": {
+        "title": "Partenaires",
+        "financial": "Partenaires financiers",
+        "technical": "Partenaires techniques"
+    },
+    "contact": {
+        "title": "Contactez-nous",
+        "name": "Nom complet",
+        "email": "Adresse e-mail",
+        "subject": "Sujet",
+        "message": "Votre message",
+        "submit": "Envoyer",
+        "success": "Message envoyé avec succès. Nous vous répondrons dans les plus brefs délés.",
+        "error": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "besoin": {
+        "title": "Soumettre un besoin",
+        "description": "Décrivez votre besoin et nous vous contacterons",
+        "name": "Nom complet",
+        "email": "Adresse e-mail",
+        "organization": "Organisation (optionnel)",
+        "message": "Description du besoin",
+        "submit": "Soumettre",
+        "success": "Votre besoin a été soumis avec succès.",
+        "error": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "footer": {
+        "description": "L'Organisation Africaine pour l'Aménagement des Territoires œuvre depuis 31 ans pour le développement intégré de la République Démocratique du Congo.",
+        "liens_rapides": "Liens rapides",
+        "contact": "Contact",
+        "address": "Bukavu, Sud-Kivu, RD Congo",
+        "phone": "+243 993 537 069",
+        "email": "oaatrdc2000@gmail.com",
+        "suivez_nous": "Suivez-nous",
+        "copyright": "Tous droits réservés."
+    }
+}
