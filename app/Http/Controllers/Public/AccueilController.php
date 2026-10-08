@@ -50,7 +50,18 @@ class AccueilController
             ->take(3)
             ->get();
 
-        // ─── 4. Tous les projets publiés (pour les compteurs) ─
+        // ─── 4. Projet phare (bannière, priorité au statut fundraising) ─
+        $projetPhare = Project::query()
+            ->published()
+            ->where('status', 'fundraising')
+            ->with('domain')
+            ->latest('published_at')
+            ->first();
+        if (! $projetPhare) {
+            $projetPhare = $projets->first();
+        }
+
+        // ─── 5. Tous les projets publiés (pour les compteurs) ─
         $tousProjets = Project::query()
             ->published()
             ->with('domain')
@@ -62,32 +73,32 @@ class AccueilController
             $totalBeneficiaires += (int) ($p->beneficiaries_count ?? 0);
         }
 
-        // ─── 5. Actualités récentes (3 dernières publiées) ────
+        // ─── 6. Actualités récentes (3 dernières publiées) ────
         $actualites = Actuality::query()
             ->published()
             ->latest('published_at')
             ->take(3)
             ->get();
 
-        // ─── 6. Partenaires (tous, triés par nom) ─────────────
+        // ─── 7. Partenaires (tous, triés par nom) ─────────────
         $partenaires = Partner::query()
             ->orderBy('name')
             ->get();
 
-        // ─── 7. Membres de l'équipe (triés par position) ─────
+        // ─── 8. Membres de l'équipe (triés par position) ─────
         $equipe = TeamMember::query()
             ->orderBy('position')
             ->get();
 
-        // ─── 8. Années d'activité (calculée depuis la fondation) ─
+        // ─── 9. Années d'activité (calculée depuis la fondation) ─
         $yearsOfActivity = (int) now()->diffInYears(config('oaat.founded_at', '1995-05-10'), true);
 
-        // ─── 9. Page d'accueil pour le hero et le SEO ────────
+        // ─── 10. Page d'accueil pour le hero et le SEO ────────
         $organisation = Page::query()
             ->where('slug', 'accueil')
             ->first();
 
-        // ─── 10. Page Organisation pour la section Mission ─────
+        // ─── 11. Page Organisation pour la section Mission ─────
         $pageOrganisation = Page::query()
             ->where('slug', 'organisation')
             ->first();
@@ -120,6 +131,7 @@ class AccueilController
             'settings'           => $settings,
             'domaines'           => $domaines,
             'projets'            => $projets,
+            'projetPhare'        => $projetPhare,
             'tousProjets'        => $tousProjets,
             'totalBeneficiaires' => $totalBeneficiaires,
             'actualites'         => $actualites,

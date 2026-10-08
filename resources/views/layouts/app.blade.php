@@ -95,9 +95,8 @@
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
     {{--  Pied de page                                              --}}
-    {{--  @see  Étape 13 — partials/_footer.blade.php                --}}
     {{-- ═══════════════════════════════════════════════════════════ --}}
-    {{-- @include('partials._footer', ['settings' => $settings ?? null, 'locale' => $locale]) --}}
+    @include('partials._footer', ['settings' => $settings ?? null, 'locale' => $locale])
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
     {{--  Toast de notification (affiché via JavaScript)            --}}
