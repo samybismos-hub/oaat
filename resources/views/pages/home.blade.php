@@ -71,12 +71,6 @@
         'locale'            => $locale,
     ])
 
-    {{-- ═══════ CONTACT ═════════════════════════════════════════ --}}
-    @include('partials._contact', [
-        'settings'          => $settings,
-        'locale'            => $locale,
-    ])
-
 @stop
 
 {{-- ─── Scripts spécifiques ─────────────────────────────────────── --}}

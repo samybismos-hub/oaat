@@ -385,7 +385,7 @@ class ProjectSeeder extends Seeder
                 'beneficiaries_count' => 6349200,
                 'beneficiaries_unit' => 'habitants',
                 'is_featured' => true,
-                'published_at' => null,
+                'published_at' => '2025-01-01 00:00:00',
                 'partners' => [
                     'IPBS' => 'funder',
                     'NAMA Facility' => 'funder',

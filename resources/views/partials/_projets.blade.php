@@ -12,7 +12,7 @@
         return match ($s) {
             'completed'  => $t('Réalisé', 'Completed'),
             'ongoing'    => $t('En cours', 'Ongoing'),
-            'fundraising'=> $t('Recherche de financement', 'Seeking funding'),
+            'awaiting_funding'=> $t('Recherche de financement', 'Seeking funding'),
             default      => $t('En cours', 'Ongoing'),
         };
     };
@@ -42,7 +42,7 @@
     </div>
 
     {{-- 2 cartes à la une (côte-à-côte, largeur totale) --}}
-    <div id="pj" class="mt-10 grid gap-6 md:grid-cols-2">
+    <div id="pj" class="mt-10 grid gap-6 md:grid-cols-3">
         @forelse($projets ?? [] as $projet)
             @php
                 $cover   = $projet->getFirstMediaUrl('cover', 'card');
@@ -125,7 +125,7 @@
                          class="absolute inset-0 h-full w-full object-cover transition duration-1000 group-hover:scale-105">
                 @endif
                 <div class="absolute inset-0 bg-gradient-to-t from-deep/70 to-transparent"></div>
-                @if (($projetPhare->status?->value ?? '') === 'fundraising')
+                @if (($projetPhare->status?->value ?? '') === 'awaiting_funding')
                     {!! $pingBadge($t) !!}
                 @endif
             </div>
@@ -165,10 +165,10 @@
                     </div>
                 </dl>
                 <div class="mt-8 flex flex-wrap items-center gap-5">
-                    @if (($projetPhare->status?->value ?? '') === 'fundraising')
-                        <a href="#contact" data-pick="f"
+                    @if (($projetPhare->status?->value ?? '') === 'awaiting_funding')
+                        <a href="{{ route('contact', ['locale' => $locale]) }}"
                            class="relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%] bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl">
-                            {{ $t('Financer ce projet', 'Fund this project') }}
+                            {{ $t('Soutenir ce projet', 'Support this project') }}
                         </a>
                     @endif
                     <a href="{{ route('projets.show', [$locale, $projetPhare->slug]) }}"

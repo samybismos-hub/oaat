@@ -29,11 +29,11 @@
                               "Pan-African NGO active in Eastern DRC since 1995, working alongside the most vulnerable populations.") }}
                     </p>
                     <div class="mt-8 flex flex-wrap gap-3 transition duration-1000 delay-700">
-                        <a href="#organisation"
+                        <a href="{{ route('organisation', ['locale' => $locale]) }}"
                            class="rounded-full bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%]">
                             {{ $t("Découvrir l'OAAT", 'Discover OAAT') }}
                         </a>
-                        <a href="#contact"
+                        <a href="{{ route('contact', ['locale' => $locale]) }}"
                            class="rounded-full border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep">
                             {{ $t('Nous contacter', 'Contact us') }}
                         </a>
@@ -58,11 +58,11 @@
                               "Schools, health centers, bridges and farm-to-market roads built with UN agencies and our partners.") }}
                     </p>
                     <div class="mt-8 flex translate-y-8 opacity-0 flex-wrap gap-3 transition duration-1000 delay-700">
-                        <a href="#projets"
+                        <a href="{{ route('projets.index', ['locale' => $locale]) }}"
                            class="rounded-full bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%]">
                             {{ $t('Voir les projets', 'See projects') }}
                         </a>
-                        <a href="#contact"
+                        <a href="{{ route('contact', ['locale' => $locale]) }}"
                            class="rounded-full border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep">
                             {{ $t('Nous contacter', 'Contact us') }}
                         </a>
@@ -87,11 +87,11 @@
                               "Supporting farming households, displaced persons and returnees towards autonomy and peaceful coexistence.") }}
                     </p>
                     <div class="mt-8 flex translate-y-8 opacity-0 flex-wrap gap-3 transition duration-1000 delay-700">
-                        <a href="#domaines"
+                        <a href="{{ route('domaines.index', ['locale' => $locale]) }}"
                            class="rounded-full bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%]">
                             {{ $t("Nos domaines d'intervention", 'Our areas of intervention') }}
                         </a>
-                        <a href="#contact"
+                        <a href="{{ route('contact', ['locale' => $locale]) }}"
                            class="rounded-full border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep">
                             {{ $t('Nous contacter', 'Contact us') }}
                         </a>

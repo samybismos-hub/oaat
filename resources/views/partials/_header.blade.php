@@ -9,7 +9,7 @@
     <div id="hi" class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 transition-[padding] duration-300 lg:px-8">
 
         {{-- ═══ Logo OAAT ═══════════════════════════════════════ --}}
-        <a href="#accueil" class="flex items-center gap-3" aria-label="OAAT, {{ $t('accueil', 'home') }}">
+        <a href="{{ route('accueil', ['locale' => $locale]) }}" class="flex items-center gap-3" aria-label="OAAT, {{ $t('accueil', 'home') }}">
             <svg viewBox="0 0 40 40" class="h-11 w-11" aria-hidden="true">
                 <rect width="40" height="40" rx="9" fill="#17508F"/>
                 <path d="M5 27c6-9 11 3 17-6s8-5 13-9M5 21c5-8 10 2 15-5s9-4 15-8M5 33c7-8 12 3 18-5s7-4 12-7"
@@ -25,13 +25,13 @@
 
         {{-- ═══ Navigation desktop ═══════════════════════════════ --}}
         @php $navItems = [
-            ['#accueil',       $t('Accueil',                       'Home')],
-            ['#organisation',   $t("L'Organisation",               'Organisation')],
-            ['#domaines',      $t("Domaines d'intervention",       'Areas of intervention')],
-            ['#projets',       $t('Projets',                       'Projects')],
-            ['#actualites',    $t('Actualités',                    'News')],
-            ['#partenaires',   $t('Partenaires',                   'Partners')],
-            ['#contact',       $t('Contact',                       'Contact')],
+            [route('accueil', ['locale' => $locale]),              $t('Accueil',                       'Home')],
+            [route('organisation', ['locale' => $locale]),         $t("L'Organisation",               'Organisation')],
+            [route('domaines.index', ['locale' => $locale]),       $t("Domaines d'intervention",       'Areas of intervention')],
+            [route('projets.index', ['locale' => $locale]),        $t('Projets',                       'Projects')],
+            [route('actualites.index', ['locale' => $locale]),     $t('Actualités',                    'News')],
+            [route('partenaires', ['locale' => $locale]),          $t('Partenaires',                   'Partners')],
+            [route('contact', ['locale' => $locale]),              $t('Contact',                       'Contact')],
         ]; @endphp
 
         <nav id="nav" class="hidden items-center xl:flex"
@@ -45,7 +45,7 @@
         </nav>
 
         {{-- ═══ CTA « Devenir partenaire » ═══════════════════════ --}}
-        <a href="#contact" data-pick="p"
+        <a href="{{ route('contact', ['locale' => $locale]) }}"
            class="hidden rounded-full bg-lake px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-deep hover:shadow-lg 2xl:block relative overflow-hidden
                   before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%]">
             {{ $t('Devenir partenaire', 'Become a partner') }}

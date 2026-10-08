@@ -53,7 +53,7 @@ class AccueilController
         // ─── 4. Projet phare (bannière, priorité au statut fundraising) ─
         $projetPhare = Project::query()
             ->published()
-            ->where('status', 'fundraising')
+            ->where('status', 'awaiting_funding')
             ->with('domain')
             ->latest('published_at')
             ->first();

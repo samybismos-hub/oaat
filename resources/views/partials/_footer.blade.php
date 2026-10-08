@@ -8,12 +8,12 @@
 --}}
 @php
     $navLinks = [
-        ['#accueil',      $t('Accueil',        'Home')],
-        ['#organisation', $t("L'Organisation", 'Organisation')],
-        ['#domaines',     $t("Domaines d'intervention", 'Areas of intervention')],
-        ['#projets',      $t('Projets',        'Projects')],
-        ['#actualites',   $t('Actualités',     'News')],
-        ['#contact',      $t('Contact',        'Contact')],
+        [route('accueil', ['locale' => $locale]),      $t('Accueil',        'Home')],
+        [route('organisation', ['locale' => $locale]), $t("L'Organisation", 'Organisation')],
+        [route('domaines.index', ['locale' => $locale]),     $t("Domaines d'intervention", 'Areas of intervention')],
+        [route('projets.index', ['locale' => $locale]),      $t('Projets',        'Projects')],
+        [route('actualites.index', ['locale' => $locale]),   $t('Actualités',     'News')],
+        [route('contact', ['locale' => $locale]),      $t('Contact',        'Contact')],
     ];
 
     $socialIcons = [
@@ -35,7 +35,7 @@
         {{-- ═══ Colonne 1 : Logo + description + réseaux sociaux ── --}}
         <div class="lg:col-span-5">
 
-            <a href="#accueil" class="flex items-center gap-3 text-white">
+            <a href="{{ route('accueil', ['locale' => $locale]) }}" class="flex items-center gap-3 text-white">
                 @if (filled($logoUrl))
                     <img src="{{ $logoUrl }}" alt="OAAT"
                          class="h-12 w-12 rounded-lg object-contain">
