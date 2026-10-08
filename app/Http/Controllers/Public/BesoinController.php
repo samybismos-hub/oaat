@@ -19,7 +19,7 @@ class BesoinController
     public function send(string $locale): mixed
     {
         $validator = Validator::make([
-            'name' => ['required', 'string', 'max:255'],
+            'contact_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'organization' => ['string', 'max:255'],
             'description' => ['required', 'string', 'max:10000'],
@@ -34,7 +34,7 @@ class BesoinController
         }
 
         NeedRequest::create([
-            'name' => request('name'),
+            'contact_name' => request('contact_name'),
             'email' => request('email'),
             'organization' => request('organization'),
             'description' => request('description'),
