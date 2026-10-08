@@ -9,6 +9,10 @@
         $organisation, $pageOrganisation, $timeline, $recognitions,
         $yearsOfActivity, $locale
 --}}
+@php
+    $locale ??= 'fr';
+    $t = fn($fr, $en) => $locale === 'en' ? $en : $fr;
+@endphp
 @extends('layouts.app')
 
 {{-- ─── SEO : titre & description dynamiques ─────────────────── --}}
@@ -74,3 +78,8 @@
     ])
 
 @stop
+
+{{-- ─── Scripts spécifiques ─────────────────────────────────────── --}}
+@push('scripts')
+    <script src="{{ asset('js/oaat.js') }}"></script>
+@endpush

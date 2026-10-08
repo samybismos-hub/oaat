@@ -27,9 +27,12 @@
 
             {{-- Timeline historique --}}
             <div class="mt-8 border border-line bg-mist p-6">
-                <div id="tabs" class="flex flex-wrap gap-2">
+                <div id="tabs" class="flex flex-wrap gap-2" role="tablist">
                     @foreach ($timeline as $index => $h)
                         <button type="button"
+                                role="tab"
+                                data-tab="{{ $index }}"
+                                aria-selected="{{ $index === 2 ? 'true' : 'false' }}"
                                 class="rounded-full px-5 py-2 text-sm font-semibold transition
                                        {{ $index === 2 ? 'bg-lake text-white shadow' : 'bg-white text-ink/70 hover:bg-white hover:text-lake ring-1 ring-line' }}">
                             {{ $h[0] }}
@@ -37,12 +40,12 @@
                     @endforeach
                 </div>
                 <div id="tp" class="mt-5 min-h-[110px] transition duration-300">
-                    <h3 class="font-serif text-xl font-semibold text-lake">
-                        {{ $timeline[2][1] }}
-                    </h3>
-                    <p class="mt-2 leading-relaxed text-ink/75">
-                        {{ $timeline[2][2] }}
-                    </p>
+                    @foreach ($timeline as $index => $h)
+                        <div class="tl-panel {{ $index !== 2 ? 'hidden' : '' }}" data-panel="{{ $index }}">
+                            <h3 class="font-serif text-xl font-semibold text-lake">{{ $h[1] }}</h3>
+                            <p class="mt-2 leading-relaxed text-ink/75">{{ $h[2] }}</p>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 

@@ -99,6 +99,20 @@
     @include('partials._footer', ['settings' => $settings ?? null, 'locale' => $locale])
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
+    {{--  Bouton retour en haut (progress ring)                     --}}
+    {{-- ═══════════════════════════════════════════════════════════ --}}
+    <button id="up"
+            aria-label="{{ $t('Retour en haut', 'Back to top') }}"
+            class="pointer-events-none fixed bottom-5 right-5 z-40 grid h-12 w-12 translate-y-4 place-items-center rounded-full bg-deep text-white opacity-0 shadow-xl transition duration-300 hover:bg-lake">
+        <svg viewBox="0 0 48 48" class="absolute inset-0 -rotate-90" aria-hidden="true">
+            <circle cx="24" cy="24" r="22" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="2"/>
+            <circle id="rg" cx="24" cy="24" r="22" fill="none" stroke="#E3A82B" stroke-width="2"
+                    pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+        </svg>
+        <span class="relative">↑</span>
+    </button>
+
+    {{-- ═══════════════════════════════════════════════════════════ --}}
     {{--  Toast de notification (affiché via JavaScript)            --}}
     {{-- ═══════════════════════════════════════════════════════════ --}}
     <div id="ts"
