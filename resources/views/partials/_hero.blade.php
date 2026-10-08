@@ -10,7 +10,7 @@
          aria-roledescription="carrousel"
          aria-label="{{ $t('À la une', 'Highlights') }}">
 
-    {{-- ─── Conteneur des diapos ──────────────────────────────── --}}
+    {{-- ─── Conteneur des diapos (#sl) ─────────────────────────── --}}
     <div id="sl">
 
         {{-- ═══ Diapositive 1 — active par défaut ═══════════════ --}}
@@ -41,7 +41,8 @@
                 </div>
             </div>
         </div>
-{{-- ═══ Diapositive 2 : Projets ═════════════════════════ --}}
+
+        {{-- ═══ Diapositive 2 : Projets ═════════════════════════ --}}
         <div class="absolute inset-0 opacity-0 transition-opacity duration-1000">
             <img data-ph="Hero 2|165" alt=""
                  class="absolute inset-0 h-full w-full scale-110 object-cover transition-transform duration-[8000ms] ease-out">
@@ -98,6 +99,7 @@
                 </div>
             </div>
         </div>
+</div>
 {{-- ─── Lignes décoratives animées (dash) ────────────────── --}}
     <svg class="pointer-events-none absolute inset-0 z-[15] h-full w-full opacity-30"
          viewBox="0 0 1440 800"
@@ -118,7 +120,7 @@
     </svg>
 
     {{-- ─── Barre de contrôle (compteur, dots, prev/next) ───── --}}
-    <div class="absolute inset-x-0 bottom-0 z-20 pb-24 md:pb-28">
+    <div class="absolute inset-x-0 -bottom-[45px] z-20 pb-24 md:pb-28">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
             <div class="flex items-center gap-5">
                 <span id="cn" class="whitespace-nowrap font-serif text-lg tabular-nums text-white/80">
@@ -157,4 +159,3 @@
         </div>
     </div>
 </section>
-    </div>

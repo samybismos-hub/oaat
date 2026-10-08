@@ -41,8 +41,8 @@
         </a>
     </div>
 
-    {{-- 3 cartes à la une --}}
-    <div id="pj" class="mt-10 grid gap-6 md:grid-cols-3">
+    {{-- 2 cartes à la une (côte-à-côte, largeur totale) --}}
+    <div id="pj" class="mt-10 grid gap-6 md:grid-cols-2">
         @forelse($projets ?? [] as $projet)
             @php
                 $cover   = $projet->getFirstMediaUrl('cover', 'card');
@@ -54,11 +54,11 @@
                 <div class="overflow-hidden">
                     @if ($hasCover)
                         <img src="{{ $cover }}" alt="{{ $projet->title }}"
-                             class="h-52 w-full object-cover transition duration-700 group-hover:scale-105">
+                             class="h-64 w-full object-cover transition duration-700 group-hover:scale-105">
                     @else
                         <img data-ph="{{ $projet->domain?->name }}|160"
                              alt="{{ $projet->title }}"
-                             class="h-52 w-full object-cover transition duration-700 group-hover:scale-105">
+                             class="h-64 w-full object-cover transition duration-700 group-hover:scale-105">
                     @endif
                 </div>
                 <div class="p-6">
@@ -98,7 +98,7 @@
                 </div>
             </article>
         @empty
-            <p class="col-span-3 text-center text-sm text-ink/40 italic">
+            <p class="col-span-2 text-center text-sm text-ink/40 italic">
                 {{ $t('Aucun projet mis en avant pour le moment.', 'No featured projects yet.') }}
             </p>
         @endforelse
@@ -142,10 +142,11 @@
                 <dl class="mt-8 grid grid-cols-3 gap-4 border-y border-white/15 py-6">
                     <div>
                         <dt class="text-xs text-white/60">{{ $t('Budget', 'Budget') }}</dt>
-                        <dd class="mt-1 whitespace-nowrap font-serif text-xl font-semibold sm:text-2xl md:text-3xl">
+                        <dd class="mt-1 whitespace-rap font-serif text-xl font-semibold sm:text-2xl md:text-3xl">
                             @if ($budgetRaw > 0)
                                 <span data-n="{{ $budgetRaw }}">0</span>
-                                {{ str_starts_with($projetPhare->budget_currency ?? 'USD', 'EUR') ? 'M€' : 'M' . ($projetPhare->budget_currency ?? 'USD') }}
+                               {{str_starts_with($projetPhare->budget_currency ?? 'USD', 'EUR') ? '€' : '' . ($projetPhare->budget_currency ?? 'USD')}}
+
                             @endif
                         </dd>
                     </div>

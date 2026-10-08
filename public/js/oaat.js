@@ -27,16 +27,18 @@ if (bt && mn) {
 /* 4. Carrousel hero */
 const sl = $('#sl');
 if (sl) {
-  const s = $$(':scope>.absolute', sl), cn = $('#cn'), dt = $$('#dots button'), pv = $('#pv'), nx = $('#nx'), L = s.length; let cur = 0;
+  const s = $$(':scope>.absolute', sl), cn = $('#cn'), dt = $$('#dots button'), pv = $('#pv'), nx = $('#nx'), L = s.length; let cur = 0, timer = null;
   const go = n => {
-    cur = (n + L) % L;
+    cur = ((n % L) + L) % L;
     s.forEach((e, j) => { const on = j === cur, im = $('img', e); e.inert = !on; e.classList.toggle('opacity-100',on); e.classList.toggle('z-10',on); if(im){im.classList.toggle('scale-100',on);im.classList.toggle('scale-110',!on)}; $$('.t>*',e).forEach(c => {c.classList.toggle('opacity-0',!on);c.classList.toggle('translate-y-8',!on)}); });
     if (cn) cn.textContent = String(cur+1).padStart(2,'0')+' / 0'+L;
     dt.forEach((d, j) => { const b = $('i',d); if(!b)return; b.classList.remove('animate-bar'); b.style.width = j<cur?'100%':'0'; if(j===cur){void b.offsetWidth;b.style.width='';b.classList.add('animate-bar')} });
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => go(cur+1), 8000);
   };
-  dt.forEach((d, i) => { d.onclick=()=>go(i); const b = $('i',d); if(b) b.onanimationend=()=>go(cur+1); });
-  if (pv) pv.onclick = () => go(cur-1);
-  if (nx) nx.onclick = () => go(cur+1);
+  dt.forEach((d, i) => { d.addEventListener('click',()=>go(i)); });
+  if (pv) pv.addEventListener('click',()=>go(cur-1));
+  if (nx) nx.addEventListener('click',()=>go(cur+1));
   go(0);
 }
 
