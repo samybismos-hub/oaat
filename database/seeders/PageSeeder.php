@@ -35,8 +35,14 @@ class PageSeeder extends Seeder
 <div class="timeline-entry" data-year="2004" data-title="EAUR, Urbain et Rural">
 <p>L\'assemblée générale du 4 janvier 2004 ajoute la dimension rurale au nom de l\'organisation qui devient EAUR (Espace et Aménagement Urbain et Rural).</p>
 </div>
+<div class="timeline-entry" data-year="2006-2009" data-title="Reconnaissance et projets avec l\'ONU">
+<p>Autorisation de fonctionnement (2006), identification MINIPLAN (2007), enregistrement (2009) ; ponts et routes avec le PNUD, eau potable avec le Pooled Fund.</p>
+</div>
 <div class="timeline-entry" data-year="2013" data-title="OAAT, Organisation Africaine pour l\'Aménagement des Territoires">
 <p>À la demande de ses partenaires, l\'organisation élargit son rayon d\'action et adopte son nom actuel : Organisation Africaine pour l\'Aménagement des Territoires (OAAT).</p>
+</div>
+<div class="timeline-entry" data-year="2016-2024" data-title="Ouverture régionale et nouvelles réalisations">
+<p>Forum sur le carbone à Kigali (IPBS, NAMA Facility, UNFCCC), ateliers SAFE à Kigali et Nairobi ; entrepôt de riz, pisciculture avec la FAO, école de Karhale et foyer social de Saké.</p>
 </div>
 <!--/TIMELINE-->
 
@@ -56,10 +62,16 @@ Certificat de dépôt n° JUST.G.S. 112/S-KIVU/1592/2004 du 27 janvier 2004
 <div class="recognition-item" data-title="Autorisation de fonctionnement" data-authority="Territoire d\'Uvira, 20 janvier 2006">
 Autorisation de fonctionnement provisoire d\'une association du 20 janvier 2006
 </div>
-<div class="recognition-item" data-title="Identification d\'ONG" data-authority="MINIPLAN, 2007">
-Attestation provisoire d\'enregistrement n° TPI/PSK/DIV/69/2009
+<div class="recognition-item" data-title="Certificat d\'identification d\'ONG" data-authority="Ministère du Plan, 2007">
+Certificat d\'identification d\'ONG n° 69/MINIPLAN/DPP/NK/KMA/2007
 </div>
-<div class="recognition-item" data-title="Agrément provisoire" data-authority="Division des affaires humanitaires, 2013">
+<div class="recognition-item" data-title="Certificat d\'enregistrement" data-authority="2009">
+Certificat d\'enregistrement n° TPI/PSK/DIV/69/2009
+</div>
+<div class="recognition-item" data-title="Certificat d\'enregistrement" data-authority="Ministère du Plan et Budget, 2013">
+Certificat d\'enregistrement n° 21/013/GP/SK/CAB/MINIPLAN &amp; BUDGET/2013
+</div>
+<div class="recognition-item" data-title="Attestation provisoire d\'agrément" data-authority="Division des affaires humanitaires, 2013">
 Attestation provisoire d\'agrément n° 08/002/DIVAH-SN/2013
 </div>
 <!--/RECOGNITIONS-->',
@@ -70,8 +82,14 @@ Attestation provisoire d\'agrément n° 08/002/DIVAH-SN/2013
 <div class="timeline-entry" data-year="2004" data-title="EAUR, Urbain et Rural">
 <p>The General Assembly of 4 January 2004 added the rural dimension to the organisation\'s name, which became EAUR (Espace et Aménagement Urbain et Rural).</p>
 </div>
+<div class="timeline-entry" data-year="2006-2009" data-title="Recognition and projects with the UN">
+<p>Operating authorisation (2006), MINIPLAN identification (2007), registration (2009); bridges and roads with UNDP, drinking water with the Pooled Fund.</p>
+</div>
 <div class="timeline-entry" data-year="2013" data-title="OAAT, African Organisation for Land Planning">
 <p>At the request of its partners, the organisation expanded its scope and adopted its current name: African Organisation for Land Planning (OAAT).</p>
+</div>
+<div class="timeline-entry" data-year="2016-2024" data-title="Regional outreach and new achievements">
+<p>Carbon forum in Kigali (IPBS, NAMA Facility, UNFCCC), SAFE workshops in Kigali and Nairobi; rice warehouse, fish farming with FAO, Karhale school and Saké social home.</p>
 </div>
 <!--/TIMELINE-->
 
@@ -91,10 +109,16 @@ Deposit certificate No. JUST.G.S. 112/S-KIVU/1592/2004 of 27 January 2004
 <div class="recognition-item" data-title="Operating authorisation" data-authority="Uvira Territory, 20 January 2006">
 Provisional operating authorisation of 20 January 2006
 </div>
-<div class="recognition-item" data-title="NGO identification" data-authority="MINIPLAN, 2007">
-Provisional registration certificate No. TPI/PSK/DIV/69/2009
+<div class="recognition-item" data-title="NGO identification certificate" data-authority="Ministry of Planning, 2007">
+NGO identification certificate No. 69/MINIPLAN/DPP/NK/KMA/2007
 </div>
-<div class="recognition-item" data-title="Provisional accreditation" data-authority="Division of Humanitarian Affairs, 2013">
+<div class="recognition-item" data-title="Registration certificate" data-authority="2009">
+Registration certificate No. TPI/PSK/DIV/69/2009
+</div>
+<div class="recognition-item" data-title="Registration certificate" data-authority="Ministry of Planning and Budget, 2013">
+Registration certificate No. 21/013/GP/SK/CAB/MINIPLAN &amp; BUDGET/2013
+</div>
+<div class="recognition-item" data-title="Provisional accreditation certificate" data-authority="Division of Humanitarian Affairs, 2013">
 Provisional accreditation certificate No. 08/002/DIVAH-SN/2013
 </div>
 <!--/RECOGNITIONS-->',

@@ -20,6 +20,15 @@ class TeamMemberSeeder extends Seeder
                     'fr' => 'Représentant national',
                     'en' => 'National Representative',
                 ],
+                'bio' => [
+                    'fr' => 'Ingénieur, il fonde l\'organisation le 10 mai 1995 et la représente aujourd\'hui en qualité de Représentant national. Il est le responsable de l\'OAAT et l\'interlocuteur de ses partenaires.',
+                    'en' => 'An engineer, he founded the organisation on 10 May 1995 and represents it today as National Representative. He heads OAAT and is the point of contact for its partners.',
+                ],
+                'quote' => [
+                    'fr' => 'Ce n\'est pas normal qu\'il y ait toujours des gens pour demander et d\'autres pour donner.',
+                    'en' => 'It is not normal that there are always people asking and others giving.',
+                ],
+                'is_founder' => true,
                 'position' => 1,
             ],
         ];

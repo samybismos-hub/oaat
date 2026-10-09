@@ -11,8 +11,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['name', 'role', 'position'])]
-#[Translatable('role')]
+#[Fillable(['name', 'role', 'bio', 'quote', 'position', 'is_founder'])]
+#[Translatable('role', 'bio', 'quote')]
 class TeamMember extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, InteractsWithMedia;
