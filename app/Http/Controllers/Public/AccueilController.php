@@ -8,6 +8,7 @@ use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Project;
 use App\Models\Setting;
+use App\Models\TeamMember;
 
 /**
  * AccueilController — Page d'accueil du site public.
@@ -82,6 +83,11 @@ class AccueilController
             ->orderBy('name')
             ->get();
 
+        // ─── 8. Fondateur (membre marqué is_founder, pour _about) ─
+        $founder = TeamMember::query()
+            ->where('is_founder', true)
+            ->first();
+
         // ─── 9. Années d'activité (calculée depuis la fondation) ─
         $yearsOfActivity = (int) now()->diffInYears(config('oaat.founded_at', '1995-05-10'), true);
 
@@ -137,6 +143,7 @@ class AccueilController
             'zonesCount'         => $zonesCount,
             'actualites'         => $actualites,
             'partenaires'        => $partenaires,
+            'founder'            => $founder,
             'organisation'       => $organisation,
             'pageOrganisation'   => $pageOrganisation,
             'timeline'           => $timeline,

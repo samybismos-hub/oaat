@@ -6,6 +6,7 @@
         $pageOrganisation  (Page|null) — page slug='organisation' (body translatable)
         $timeline          (array) — jalons historiques extraits du body
         $recognitions      (array) — reconnaissances extraites du body
+        $founder           (TeamMember|null) — membre is_founder (portrait, bio, citation)
         $locale            (string)
         $t                 (helper)
 --}}
@@ -13,6 +14,14 @@
     // Onglet actif par défaut : index 2 (2006-2009) quand la timeline a ≥ 3
     // jalons, sinon le dernier disponible. Évite un état « aucun actif ».
     $tlActive = min(2, count($timeline ?? []) - 1);
+
+    // Données du fondateur (étape 12) : plus aucun texte en dur, tout vient
+    // du TeamMember marqué is_founder (géré dans l'admin Filament).
+    $founderQuote = $founder?->getTranslation('quote', $locale) ?? '';
+    $founderBio   = $founder?->getTranslation('bio', $locale) ?? '';
+    $founderRole  = $founder?->getTranslation('role', $locale);
+    $founderName  = $founder?->name ?? $t('Ir Roger Manema Cirhahingirwa', 'Ir Roger Manema Cirhahingirwa');
+    $founderPhoto = $founder?->getFirstMediaUrl('photo', 'card');
 @endphp
 <section id="organisation"
          class="mx-auto max-w-7xl scroll-mt-20 px-5 py-24 lg:px-8">
@@ -61,23 +70,34 @@
             </a>
         </div>
 
-        {{-- Colonne portrait fondateur --}}
+        {{-- Colonne portrait fondateur (données réelles du TeamMember) --}}
         <figure class="relative" data-r>
             <div class="overflow-hidden shadow-xl">
-                <img data-w
-                     data-ph="Portrait du fondateur|205"
-                     alt="{{ $t('Portrait de Roger Manema Cirhahingirwa, fondateur de l\'OAAT',
-                                 'Portrait of Roger Manema Cirhahingirwa, founder of OAAT') }}"
-                     class="aspect-[4/5] w-full object-cover">
+                @if ($founderPhoto)
+                    <img src="{{ $founderPhoto }}"
+                         alt="{{ $founderName }} — {{ $t('fondateur de l\'OAAT', 'founder of OAAT') }}"
+                         data-w
+                         class="aspect-[4/5] w-full object-cover">
+                @else
+                    <img data-w
+                         data-ph="Portrait du fondateur|205"
+                         alt="{{ $t('Portrait de Roger Manema Cirhahingirwa, fondateur de l\'OAAT',
+                                     'Portrait of Roger Manema Cirhahingirwa, founder of OAAT') }}"
+                         class="aspect-[4/5] w-full object-cover">
+                @endif
             </div>
             <figcaption class="absolute -bottom-8 left-4 right-4 border-l-4 border-ochre bg-deep p-6 text-white shadow-2xl md:left-auto md:right-[-1rem] md:max-w-sm lg:right-[-1.5rem]">
                 <p class="font-serif text-lg leading-snug">
-                    « {{ $t("Pour que le développement soit local, il faut que la force de développement soit aussi locale.",
+                    « {{ $founderQuote ?: $t("Pour que le développement soit local, il faut que la force de développement soit aussi locale.",
                             "For development to be local, the driving force of development must also be local.") }} »
                 </p>
-                <p class="mt-3 text-sm text-white/70">
-                    Ir Roger Manema Cirhahingirwa,
-                    <span>{{ $t('Fondateur et Représentant national', 'Founder and National Representative') }}</span>
+                @if ($founderBio)
+                    <p class="mt-3 text-sm leading-snug text-white/75 line-clamp-4">
+                        {{ $founderBio }}
+                    </p>
+                @endif
+                <p class="mt-3 text-sm text-white/80">
+                    {{ $founderName }}@if ($founderRole)<span class="text-white/60"> — {{ $founderRole }}</span>@endif
                 </p>
             </figcaption>
         </figure>

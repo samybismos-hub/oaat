@@ -5,7 +5,7 @@
     Assemble les 8 sections principales via @include.
     Variables disponibles (depuis AccueilController) :
         $settings, $domaines, $projets, $projetPhare, $projetsRealises,
-        $projetsAF, $zonesCount, $actualites, $partenaires,
+        $projetsAF, $zonesCount, $actualites, $partenaires, $founder,
         $organisation, $pageOrganisation, $timeline, $recognitions,
         $yearsOfActivity, $locale
 --}}
@@ -45,6 +45,7 @@
         'organisation'      => $organisation,
         'timeline'          => $timeline,
         'recognitions'      => $recognitions,
+        'founder'           => $founder,
         'locale'            => $locale,
     ])
 
