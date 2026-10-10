@@ -32,6 +32,15 @@ class PartnerSeeder extends Seeder
             ['name' => 'ATUNGA FIZI', 'description' => ['fr' => 'Organisation locale partenaire dans le territoire de Fizi. (à préciser)', 'en' => 'Local partner organisation in Fizi territory. (to be confirmed)']],
             ['name' => 'BETING', 'description' => ['fr' => "Partenaire intervenant notamment dans l'éducation. (à préciser)", 'en' => 'Partner involved notably in education. (to be confirmed)']],
             ['name' => 'IPBS', 'description' => ['fr' => 'Partenaire cité pour le financement climat. (à préciser)', 'en' => 'Partner cited for climate financing. (to be confirmed)']],
+            ['name' => 'COMRC', 'description' => ['fr' => 'Programme du PNUD à Uvira (gestion administrative et financière, reconstruction). (à préciser)', 'en' => 'UNDP programme in Uvira (administrative and financial management, reconstruction). (to be confirmed)']],
+            ['name' => 'USAID', 'description' => ['fr' => 'Agence des États-Unis pour le développement international.', 'en' => 'United States Agency for International Development.']],
+            ['name' => 'BARAKA', 'description' => ['fr' => 'Organisation partenaire citée pour l\'encadrement des jeunes. (à préciser)', 'en' => 'Partner organisation cited for youth mentoring. (to be confirmed)']],
+            ['name' => 'EDAP', 'description' => ['fr' => 'Partenaire cité pour la réhabilitation d\'écoles. (à préciser)', 'en' => 'Partner cited for school rehabilitation. (to be confirmed)']],
+            ['name' => 'PICAG', 'description' => ['fr' => 'Programme cité en appui aux riziculteurs. (à préciser)', 'en' => 'Programme cited in support of rice farmers. (to be confirmed)']],
+            ['name' => 'SPES', 'description' => ['fr' => 'Partenaire cité pour la scolarisation. (à préciser)', 'en' => 'Partner cited for schooling. (to be confirmed)']],
+            ['name' => 'AVEB', 'description' => ['fr' => 'Association burundaise partenaire. (à préciser)', 'en' => 'Burundian partner association. (to be confirmed)']],
+            ['name' => 'MONUC', 'description' => ['fr' => 'Mission de l\'Organisation des Nations Unies en RD Congo (désormais MONUSCO).', 'en' => 'United Nations Organization Mission in DR Congo (now MONUSCO).']],
+            ['name' => 'EPSP', 'description' => ['fr' => 'Ministère de l\'Enseignement Primaire, Secondaire et Professionnel (EPSP).', 'en' => 'Ministry of Primary, Secondary and Professional Education (EPSP).']],
         ];
 
         foreach ($partners as $partner) {
