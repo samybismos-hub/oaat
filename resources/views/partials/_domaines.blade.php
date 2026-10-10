@@ -29,7 +29,7 @@
         {{-- ─── En-tête ───────────────────────────────────────── --}}
         <div class="flex flex-wrap items-end justify-between gap-4" data-r>
             <h2 class="max-w-2xl font-serif text-4xl font-semibold text-lake md:text-5xl">
-                {{ $t('Neuf domaines d\'intervention', 'Nine areas of intervention') }}
+                {{ count($domaines ?? []) }} {{ $t("domaines d'intervention", 'areas of intervention') }}
             </h2>
             <a href="{{ route('domaines.index', ['locale' => $locale]) }}"
                class="font-semibold text-lake underline-offset-4 hover:underline">

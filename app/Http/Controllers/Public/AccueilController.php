@@ -8,19 +8,17 @@ use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Project;
 use App\Models\Setting;
-use App\Models\TeamMember;
 
 /**
  * AccueilController — Page d'accueil du site public.
  *
- * Rassemble les données de 8 tables :
+ * Rassemble les données de 7 tables :
  * - Domaines d'intervention     (les 9)
  * - Projets à la une            (is_featured = true, jusqu'à 3)
- * - Tous les projets            (pour les compteurs de la section chiffres)
+ * - Projet phare                (statut fundraising prioritaire)
  * - Actualités récentes         (les 3 dernières publiées)
  * - Partenaires                 (tous, triés par nom, pour les logos)
- * - Équipe                      (membres triés par position)
- * - Chiffres clés               (Settings : années, territoires, total projets, total bénéficiaires)
+ * - Chiffres clés               (Settings + comptages réels en base)
  * - Page d'accueil              (slug 'accueil', pour le hero et le SEO)
  */
 class AccueilController
@@ -61,17 +59,16 @@ class AccueilController
             $projetPhare = $projets->first();
         }
 
-        // ─── 5. Tous les projets publiés (pour les compteurs) ─
-        $tousProjets = Project::query()
+        // ─── 5. Compteurs pour la section "chiffres clés" (COUNT SQL) ─
+        $projetsRealises = Project::query()
             ->published()
-            ->with('domain')
-            ->get();
+            ->where('status', 'completed')
+            ->count();
 
-        // Total des bénéficiaires (somme sur tous les projets publiés)
-        $totalBeneficiaires = 0;
-        foreach ($tousProjets as $p) {
-            $totalBeneficiaires += (int) ($p->beneficiaries_count ?? 0);
-        }
+        $projetsAF = Project::query()
+            ->published()
+            ->where('status', 'awaiting_funding')
+            ->count();
 
         // ─── 6. Actualités récentes (3 dernières publiées) ────
         $actualites = Actuality::query()
@@ -83,11 +80,6 @@ class AccueilController
         // ─── 7. Partenaires (tous, triés par nom) ─────────────
         $partenaires = Partner::query()
             ->orderBy('name')
-            ->get();
-
-        // ─── 8. Membres de l'équipe (triés par position) ─────
-        $equipe = TeamMember::query()
-            ->orderBy('position')
             ->get();
 
         // ─── 9. Années d'activité (calculée depuis la fondation) ─
@@ -126,17 +118,25 @@ class AccueilController
             }
         }
 
-        // ─── 10. Rendu de la vue ───────────────────────────────
+        // ─── 12. Rendu de la vue ────────────────────────────────
+        // Zones : comptage réel (fallback si le chiffre officiel n'est pas saisi)
+        $zonesCount = 0;
+        if ($pageOrganisation) {
+            $zonesBody = $pageOrganisation->getTranslation('body', $locale) ?? '';
+            preg_match_all('/data-province="([^"]*)"/', $zonesBody, $zonesMatches);
+            $zonesCount = count($zonesMatches[1]);
+        }
+
         return view('pages.home', [
             'settings'           => $settings,
             'domaines'           => $domaines,
             'projets'            => $projets,
             'projetPhare'        => $projetPhare,
-            'tousProjets'        => $tousProjets,
-            'totalBeneficiaires' => $totalBeneficiaires,
+            'projetsRealises'    => $projetsRealises,
+            'projetsAF'          => $projetsAF,
+            'zonesCount'         => $zonesCount,
             'actualites'         => $actualites,
             'partenaires'        => $partenaires,
-            'equipe'             => $equipe,
             'organisation'       => $organisation,
             'pageOrganisation'   => $pageOrganisation,
             'timeline'           => $timeline,

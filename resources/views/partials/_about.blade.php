@@ -9,6 +9,11 @@
         $locale            (string)
         $t                 (helper)
 --}}
+@php
+    // Onglet actif par défaut : index 2 (2006-2009) quand la timeline a ≥ 3
+    // jalons, sinon le dernier disponible. Évite un état « aucun actif ».
+    $tlActive = min(2, count($timeline ?? []) - 1);
+@endphp
 <section id="organisation"
          class="mx-auto max-w-7xl scroll-mt-20 px-5 py-24 lg:px-8">
 
@@ -32,16 +37,16 @@
                         <button type="button"
                                 role="tab"
                                 data-tab="{{ $index }}"
-                                aria-selected="{{ $index === 2 ? 'true' : 'false' }}"
+                                aria-selected="{{ $index === $tlActive ? 'true' : 'false' }}"
                                 class="rounded-full px-5 py-2 text-sm font-semibold transition
-                                       {{ $index === 2 ? 'bg-lake text-white shadow' : 'bg-white text-ink/70 hover:bg-white hover:text-lake ring-1 ring-line' }}">
+                                       {{ $index === $tlActive ? 'bg-lake text-white shadow' : 'bg-white text-ink/70 hover:bg-white hover:text-lake ring-1 ring-line' }}">
                             {{ $h[0] }}
                         </button>
                     @endforeach
                 </div>
                 <div id="tp" class="mt-5 min-h-[110px] transition duration-300">
                     @foreach ($timeline as $index => $h)
-                        <div class="tl-panel {{ $index !== 2 ? 'hidden' : '' }}" data-panel="{{ $index }}">
+                        <div class="tl-panel {{ $index !== $tlActive ? 'hidden' : '' }}" data-panel="{{ $index }}">
                             <h3 class="font-serif text-xl font-semibold text-lake">{{ $h[1] }}</h3>
                             <p class="mt-2 leading-relaxed text-ink/75">{{ $h[2] }}</p>
                         </div>

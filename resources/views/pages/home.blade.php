@@ -4,8 +4,8 @@
     Hérite de layouts.app (topbar, header, footer, toast).
     Assemble les 8 sections principales via @include.
     Variables disponibles (depuis AccueilController) :
-        $settings, $domaines, $projets, $projetPhare, $tousProjets,
-        $totalBeneficiaires, $actualites, $partenaires, $equipe,
+        $settings, $domaines, $projets, $projetPhare, $projetsRealises,
+        $projetsAF, $zonesCount, $actualites, $partenaires,
         $organisation, $pageOrganisation, $timeline, $recognitions,
         $yearsOfActivity, $locale
 --}}
@@ -33,7 +33,9 @@
     @include('partials._chiffres', [
         'settings'          => $settings,
         'domaines'          => $domaines,
-        'tousProjets'       => $tousProjets,
+        'projetsRealises'   => $projetsRealises,
+        'projetsAF'         => $projetsAF,
+        'zonesCount'        => $zonesCount,
         'yearsOfActivity'   => $yearsOfActivity,
         'locale'            => $locale,
     ])
