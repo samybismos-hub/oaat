@@ -16,7 +16,14 @@
 <div data-r><dd class="font-serif text-4xl font-semibold"><span data-n="{{ $domainCount }}">0</span></dd><dt class="mt-1 text-sm text-white/65">{{ $t("domaines d'intervention","areas of intervention") }}</dt></div>
 </dl></div></section>
 {{-- SOUS-NAV --}}
-<div class="sticky top-[60px] z-30 border-b border-line bg-white/95 backdrop-blur"><nav id="sn" class="mx-auto flex max-w-7xl overflow-x-auto px-5 lg:px-8" aria-label="Sections"></nav></div>
+<div class="sticky top-[60px] z-30 border-b border-line bg-white/95 backdrop-blur"><nav id="sn" class="mx-auto flex max-w-7xl overflow-x-auto px-5 lg:px-8" aria-label="{{ $t('Sections','Sections') }}">
+<a href="#presentation" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-ochre text-lake">{{ $t('Présentation','Overview') }}</a>
+<a href="#mission" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-transparent text-ink/70 hover:text-lake">{{ $t('Mission et vision','Mission and vision') }}</a>
+<a href="#histoire" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-transparent text-ink/70 hover:text-lake">{{ $t('Histoire','History') }}</a>
+<a href="#fondateur" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-transparent text-ink/70 hover:text-lake">{{ $t('Fondateur','Founder') }}</a>
+<a href="#reconnaissance" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-transparent text-ink/70 hover:text-lake">{{ $t('Reconnaissance','Recognition') }}</a>
+<a href="#zones" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-transparent text-ink/70 hover:text-lake">{{ $t('Zones','Areas') }}</a>
+</nav></div>
 {{-- PRESENTATION --}}
 <section id="presentation" class="mx-auto max-w-7xl scroll-mt-32 px-5 py-24 lg:px-8">
 <div class="grid gap-14 lg:grid-cols-5">
@@ -110,8 +117,30 @@
 <div class="lg:col-span-2" data-r>
 <h2 class="font-serif text-4xl font-semibold leading-tight">{{ $t("La ou nous intervenons","Where we work") }}</h2>
 <p class="mt-4 text-white/70">{{ $t("Treize zones reparties entre le Sud-Kivu et le Nord-Kivu. Selectionnez une province.","Thirteen areas spread across South Kivu and North Kivu. Select a province.") }}</p>
-<div id="zt" class="mt-8 flex gap-2"></div></div>
-<div id="zp" class="grid gap-3 transition duration-300 sm:grid-cols-2 lg:col-span-3"></div>
+<div id="zt" class="mt-8 flex gap-2" role="tablist" aria-label="{{ $t('Provinces','Provinces') }}">
+@foreach ($zones as $province => $entries)
+@php
+$provLabel = match ($province) {
+    'Sud-Kivu'  => $t('Sud-Kivu', 'South Kivu'),
+    'Nord-Kivu' => $t('Nord-Kivu', 'North Kivu'),
+    default     => $province,
+};
+@endphp
+<button type="button" data-zt="{{ $province }}" role="tab" aria-selected="{{ $loop->first ? 'true' : 'false' }}" class="rounded-full px-5 py-2.5 text-sm font-semibold transition {{ $loop->first ? 'bg-ochre text-deep' : 'border border-white/30 hover:bg-white/10' }}">{{ $provLabel }}</button>
+@endforeach
+</div></div>
+@php $firstProvince = array_key_first($zones); @endphp
+<div id="zp" class="grid gap-3 transition duration-300 sm:grid-cols-2 lg:col-span-3">
+@forelse ($zones as $province => $entries)
+@foreach ($entries as $zone)
+<div data-zp="{{ $province }}" class="border border-white/15 bg-white/5 p-5 transition duration-300 hover:border-ochre hover:bg-white/10{{ $province === $firstProvince ? '' : ' hidden' }}">
+<b class="font-serif text-lg">{{ $zone[0] }}</b><p class="mt-1 text-sm text-white/65">{{ $zone[1] }}</p>
+</div>
+@endforeach
+@empty
+<p class="col-span-2 text-center text-sm italic text-white/40">{{ $t('Aucune zone pour le moment.','No areas yet.') }}</p>
+@endforelse
+</div>
 </div></section>
 {{-- CTA --}}
 <section class="bg-lake text-white">

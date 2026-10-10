@@ -66,6 +66,16 @@ class OrganisationController
             $recognitions[] = [$m[1], $m[2], trim(strip_tags($m[3]))];
         }
 
+        // ─── 7b. Zones d'intervention (depuis le body CMS) ────────
+        $zones = [];
+        preg_match_all(
+            '/<div class="zone-entry" data-province="([^"]*)" data-name="([^"]*)">\s*<p>(.*?)<\/p>/s',
+            $body, $zMatches, PREG_SET_ORDER
+        );
+        foreach ($zMatches as $m) {
+            $zones[$m[1]][] = [$m[2], trim(strip_tags($m[3]))];
+        }
+
         // ─── 8. Rendu de la vue ─────────────────────────────────
         return view('pages.organisation', [
             'pageOrganisation' => $pageOrganisation,
@@ -76,6 +86,7 @@ class OrganisationController
             'domainCount'      => $domainCount,
             'timeline'         => $timeline,
             'recognitions'     => $recognitions,
+            'zones'            => $zones,
             'locale'           => $locale,
         ]);
     }

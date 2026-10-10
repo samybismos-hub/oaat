@@ -53,7 +53,23 @@ class PageSeeder extends Seeder
 <p>Renouer le lien entre le développement technologique et les besoins exprimés par les populations les plus défavorisées en RD Congo, à travers des actions d\'aménagement des territoires urbains et ruraux et la réalisation de projets sociaux.</p>
 
 <h2>Zones d\'intervention</h2>
-<ul><li>Sud-Kivu : Fizi, Uvira, Walungu, Mwenga, Kabare, Kalehe, Shabunda</li><li>Nord-Kivu : Goma, Karisimbi, Nyiragongo, Masisi, Walikale, Lubero</li></ul>
+<!--ZONES-->
+<div class="zones-data">
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Fizi"><p>Lac Tanganyika, Mutambala, Ngandja, Kimbi-Lulenge</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Uvira"><p>Plaine de la Ruzizi et moyens plateaux</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Walungu"><p>Kaniola, Mulamba, Burhale, Karhongo, Luchiga</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Mwenga"><p>Itombwe, Luhwinja, Burhinyi, Wamuzimu</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Kabare"><p>Nindja, Mudake, Katana, Mumosho</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Kalehe"><p>Minova, Kalonge, Kalehe, Bunyakiri</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Shabunda"><p>Bamuguba Sud et Nord, Baliga</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Goma"><p>Ville de Goma</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Karisimbi"><p>Ville de Karisimbi</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Nyiragongo"><p>Nyiragongo</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Masisi"><p>Sake</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Walikale"><p>Walikale centre</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Lubero"><p>Beni et Butembo</p></div>
+</div>
+<!--/ZONES-->
 
 <!--RECOGNITIONS-->
 <div class="recognition-item" data-title="Certificat de dépôt" data-authority="Ministère de la Justice, 27 janvier 2004">
@@ -100,7 +116,23 @@ Attestation provisoire d\'agrément n° 08/002/DIVAH-SN/2013
 <p>To reconnect technological development with the needs expressed by the most disadvantaged populations in DR Congo, through land planning actions in urban and rural areas and the implementation of social projects.</p>
 
 <h2>Areas of intervention</h2>
-<ul><li>South Kivu: Fizi, Uvira, Walungu, Mwenga, Kabare, Kalehe, Shabunda</li><li>North Kivu: Goma, Karisimbi, Nyiragongo, Masisi, Walikale, Lubero</li></ul>
+<!--ZONES-->
+<div class="zones-data">
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Fizi"><p>Lake Tanganyika, Mutambala, Ngandja, Kimbi-Lulenge</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Uvira"><p>Ruzizi plain and middle plateaux</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Walungu"><p>Kaniola, Mulamba, Burhale, Karhongo, Luchiga</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Mwenga"><p>Itombwe, Luhwinja, Burhinyi, Wamuzimu</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Kabare"><p>Nindja, Mudake, Katana, Mumosho</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Kalehe"><p>Minova, Kalonge, Kalehe, Bunyakiri</p></div>
+<div class="zone-entry" data-province="Sud-Kivu" data-name="Shabunda"><p>Bamuguba South and North, Baliga</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Goma"><p>Goma city</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Karisimbi"><p>Karisimbi city</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Nyiragongo"><p>Nyiragongo</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Masisi"><p>Sake</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Walikale"><p>Walikale centre</p></div>
+<div class="zone-entry" data-province="Nord-Kivu" data-name="Lubero"><p>Beni and Butembo</p></div>
+</div>
+<!--/ZONES-->
 
 <!--RECOGNITIONS-->
 <div class="recognition-item" data-title="Deposit certificate" data-authority="Ministry of Justice, 27 January 2004">

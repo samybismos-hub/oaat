@@ -120,13 +120,13 @@
     </svg>
 
     {{-- ─── Barre de contrôle (compteur, dots, prev/next) ───── --}}
-    <div class="absolute inset-x-0 -bottom-[45px] z-20 pb-24 md:pb-28">
+    <div class="absolute inset-x-0 bottom-0 z-20 pb-24 md:pb-28">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
             <div class="flex items-center gap-5">
-                <span id="cn" class="whitespace-nowrap font-serif text-lg tabular-nums text-white/80">
+                <!--span id="cn" class="whitespace-nowrap font-serif text-lg tabular-nums text-white/80">
                     01 / 03
-                </span>
-                <div id="dots" class="flex gap-2">
+                </span-->
+                <!--div id="dots" class="flex gap-2">
                     <button aria-label="{{ $t('Diapositive 1', 'Slide 1') }}"
                             class="h-1.5 w-12 overflow-hidden rounded bg-white/30">
                         <i class="block h-full w-0 bg-ochre group-hover:[animation-play-state:paused]
@@ -142,7 +142,7 @@
                         <i class="block h-full w-0 bg-ochre group-hover:[animation-play-state:paused]
                                   motion-reduce:[animation-play-state:paused]"></i>
                     </button>
-                </div>
+                </div-->
             </div>
             <div class="flex gap-2">
                 <button id="pv"

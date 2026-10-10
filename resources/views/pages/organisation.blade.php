@@ -4,7 +4,8 @@
     Hérite de layouts.app (topbar, header, footer, toast).
     Variables disponibles (depuis OrganisationController) :
         $pageOrganisation, $settings, $founder, $yearsOfActivity,
-        $totalProjects, $domainCount, $timeline, $recognitions, $locale
+        $totalProjects, $domainCount, $timeline, $recognitions,
+        $zones, $locale
 --}}
 @php
     $locale ??= 'fr';
@@ -33,6 +34,7 @@
         'domainCount'      => $domainCount,
         'timeline'         => $timeline,
         'recognitions'     => $recognitions,
+        'zones'            => $zones,
         'locale'           => $locale,
     ])
 

@@ -27,7 +27,7 @@ const io=new IntersectionObserver(es=>es.forEach(entry=>{if(!entry.isIntersectin
 $$('[data-n],[data-w],[data-bar],[data-r]').forEach(e=>io.observe(e));
 
 /* 6 Scroll */
-const secs=$$('.nl').map(l=>$(l.getAttribute('href'))).filter(Boolean);const pg=$('#pg'),hd=$('#hd'),hi=$('#hi'),rg=$('#rg'),up=$('#up');const sc=()=>{const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;if(pg)pg.style.width=(y/h*100)+'%';if(hd)hd.classList.toggle('shadow-lg',y>20);if(hi){hi.classList.toggle('py-3',y<=20);hi.classList.toggle('py-2',y>20)};if(rg)rg.style.strokeDashoffset=1-(y/h);if(up){up.classList.toggle('opacity-0',y<700);up.classList.toggle('pointer-events-none',y<700);up.classList.toggle('translate-y-4',y<700)};let a=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<160)a=i});$$('.nl').forEach((l,i)=>{l.classList.toggle('text-lake',i==a);l.classList.toggle('after:scale-x-100',i==a)})};addEventListener('scroll',sc,{passive:true});sc();if(up)up.onclick=()=>scrollTo({top:0,behavior:'smooth'});
+const secs=$$('.nl').filter(l=>(l.getAttribute('href')||'')[0]==='#').map(l=>$(l.getAttribute('href'))).filter(Boolean),pg=$('#pg'),hd=$('#hd'),hi=$('#hi'),rg=$('#rg'),up=$('#up');const sc=()=>{const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;if(pg)pg.style.width=(y/h*100)+'%';if(hd)hd.classList.toggle('shadow-lg',y>20);if(hi){hi.classList.toggle('py-3',y<=20);hi.classList.toggle('py-2',y>20)};if(rg)rg.style.strokeDashoffset=1-(y/h);if(up){up.classList.toggle('opacity-0',y<700);up.classList.toggle('pointer-events-none',y<700);up.classList.toggle('translate-y-4',y<700)};let a=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<160)a=i});if(secs.length)$$('.nl').forEach((l,i)=>{l.classList.toggle('text-lake',i==a);l.classList.toggle('after:scale-x-100',i==a)})};addEventListener('scroll',sc,{passive:true});sc();if(up)up.onclick=()=>scrollTo({top:0,behavior:'smooth'});
 /* 7 Tabs timeline */
 $$('#tabs [data-tab]').forEach(btn=>btn.onclick=()=>{const i=btn.dataset.tab;$$('#tabs [data-tab]').forEach(b=>{const a=b===btn;b.setAttribute('aria-selected',a);b.className='rounded-full px-5 py-2 text-sm font-semibold transition '+(a?'bg-lake text-white shadow':'bg-white text-ink/70 hover:bg-white hover:text-lake ring-1 ring-line')});const p=$('#tp [data-panel="'+i+'"]');if(p){$$('#tp .tl-panel').forEach(x=>x.classList.add('hidden'));p.classList.remove('hidden')}})
 
@@ -43,5 +43,28 @@ const bf=$('#bf');if(bf)bf.onsubmit=e=>{const f=e.target,v=[f.contact_name.value
 
 /* 10 Spotlight */
 addEventListener('pointermove',e=>{const c=e.target.closest?.('.sp');if(c){const r=c.getBoundingClientRect();c.style.setProperty('--x',e.clientX-r.left+'px');c.style.setProperty('--y',e.clientY-r.top+'px')}});
+
+/* 11 Sous-nav organisation (scrollspy) */
+const sn=$('#sn');
+if(sn){
+  const sla=$$('#sn .snl');
+  const spy=()=>{let a=0;sla.forEach((l,i)=>{const s=$(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<200)a=i});sla.forEach((l,i)=>{const on=i===a;l.classList.toggle('border-ochre',on);l.classList.toggle('text-lake',on);l.classList.toggle('border-transparent',!on);l.classList.toggle('text-ink/70',!on)})};
+  addEventListener('scroll',spy,{passive:true});spy();
+}
+
+/* 12 Progression de la timeline */
+const tl=$('#tl'),tlp=$('#tlp');
+if(tl&&tlp){
+  const tf=()=>{const r=tl.getBoundingClientRect();tlp.style.height=Math.max(0,Math.min(1,(innerHeight*.65-r.top)/r.height))*100+'%'};
+  addEventListener('scroll',tf,{passive:true});tf();
+}
+
+/* 13 Onglets zones d'intervention */
+const ztb=$('#zt');
+if(ztb){
+  const ztbs=$$('#zt [data-zt]'),zp=$('#zp');
+  const za=b=>{const k=b.dataset.zt;ztbs.forEach(x=>{const on=x===b;x.className='rounded-full px-5 py-2.5 text-sm font-semibold transition '+(on?'bg-ochre text-deep':'border border-white/30 hover:bg-white/10');x.setAttribute('aria-selected',on)});if(!zp)return;zp.classList.add('opacity-0');setTimeout(()=>{$$('#zp [data-zp]').forEach(c=>c.classList.toggle('hidden',c.dataset.zp!==k));zp.classList.remove('opacity-0')},180)};
+  ztbs.forEach(b=>b.onclick=()=>za(b));
+}
 
 });
