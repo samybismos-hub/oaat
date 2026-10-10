@@ -19,7 +19,10 @@ class TeamMember extends Model implements HasMedia
 
     protected function casts(): array
     {
-        return ['position' => 'integer'];
+        return [
+            'position' => 'integer',
+            'is_founder' => 'boolean',
+        ];
     }
 
     public function registerMediaCollections(): void

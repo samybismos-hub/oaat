@@ -10,6 +10,7 @@ use App\Models\TeamMember;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -41,6 +42,15 @@ class TeamMemberResourceTest extends TestCase
                 'fr' => 'Représentant national',
                 'en' => 'National Representative',
             ],
+            'bio' => [
+                'fr' => 'Ingénieur et fondateur de l\'organisation.',
+                'en' => 'Engineer and founder of the organisation.',
+            ],
+            'quote' => [
+                'fr' => 'Une citation du fondateur.',
+                'en' => 'A quote from the founder.',
+            ],
+            'is_founder' => true,
             'position' => 1,
         ], $attributes));
     }
@@ -106,21 +116,36 @@ class TeamMemberResourceTest extends TestCase
             ->assertOk()
             ->assertFormFieldExists('name')
             ->assertFormFieldExists('position')
+            ->assertFormFieldExists('is_founder')
             ->assertFormFieldExists('role.fr')
             ->assertFormFieldExists('role.en')
+            ->assertFormFieldExists('bio.fr')
+            ->assertFormFieldExists('bio.en')
+            ->assertFormFieldExists('quote.fr')
+            ->assertFormFieldExists('quote.en')
             ->assertFormFieldExists('photo')
             ->assertSee('Français')
             ->assertSee('English')
-            ->assertSee('Portrait');
+            ->assertSee('Portrait')
+            ->assertSee('Biographie (FR)')
+            ->assertSee('Biography (EN)');
     }
 
-    public function test_un_membre_est_cree_avec_sa_fonction_dans_les_deux_langues(): void
+    public function test_un_membre_non_fondateur_est_cree_avec_sa_fonction_mais_sans_biographie_ni_citation(): void
     {
         Livewire::test(CreateTeamMember::class)
             ->fillForm([
                 'name' => 'BISIMWA Patrick',
                 'role.fr' => 'Chargé des finances',
                 'role.en' => 'Finance officer',
+                // On poste pourtant bio/quote : ces champs étant pilotés par le
+                // toggle « Fondateur » (dehydrated), ils ne doivent PAS être
+                // persistés pour un membre non fondateur.
+                'bio.fr' => 'Ne doit pas être enregistrée.',
+                'bio.en' => 'Should not be saved.',
+                'quote.fr' => 'Ni cette citation.',
+                'quote.en' => 'Neither this quote.',
+                'is_founder' => false,
                 'position' => 4,
             ])
             ->call('create')
@@ -131,7 +156,56 @@ class TeamMemberResourceTest extends TestCase
         $this->assertNotNull($membre, 'Le membre aurait dû être créé.');
         $this->assertSame('Chargé des finances', $membre->getTranslation('role', 'fr'));
         $this->assertSame('Finance officer', $membre->getTranslation('role', 'en'));
+        $this->assertNull($membre->getTranslation('bio', 'fr'));
+        $this->assertNull($membre->getTranslation('bio', 'en'));
+        $this->assertNull($membre->getTranslation('quote', 'fr'));
         $this->assertSame(4, $membre->position);
+    }
+
+    public function test_le_fondateur_seul_peut_renseigner_sa_biographie_et_sa_citation(): void
+    {
+        Livewire::test(CreateTeamMember::class)
+            ->fillForm([
+                'name' => 'Ir MANEMA CIRHAHINGIRWA Roger',
+                'role.fr' => 'Représentant national',
+                'role.en' => 'National Representative',
+                'bio.fr' => 'Fondateur de l\'organisation le 10 mai 1995.',
+                'bio.en' => 'Founder of the organisation on 10 May 1995.',
+                'quote.fr' => 'Ce n\'est pas normal qu\'il y ait toujours des gens pour demander et d\'autres pour donner.',
+                'quote.en' => 'It is not normal that there are always people asking and others giving.',
+                'is_founder' => true,
+                'position' => 1,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $membre = TeamMember::where('is_founder', true)->first();
+
+        $this->assertNotNull($membre, 'Le fondateur aurait dû être créé.');
+        $this->assertTrue($membre->is_founder);
+        $this->assertSame('Fondateur de l\'organisation le 10 mai 1995.', $membre->getTranslation('bio', 'fr'));
+        $this->assertSame('Founder of the organisation on 10 May 1995.', $membre->getTranslation('bio', 'en'));
+        $this->assertSame('Ce n\'est pas normal qu\'il y ait toujours des gens pour demander et d\'autres pour donner.', $membre->getTranslation('quote', 'fr'));
+        $this->assertSame('It is not normal that there are always people asking and others giving.', $membre->getTranslation('quote', 'en'));
+    }
+
+    public function test_il_ne_peut_y_avoir_qu_un_seul_fondateur(): void
+    {
+        $this->makeMember(); // Premier fondateur existant en base.
+
+        Livewire::test(CreateTeamMember::class)
+            ->fillForm([
+                'name' => 'Deuxième fondateur',
+                'is_founder' => true,
+                'position' => 2,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['is_founder']);
+
+        $this->assertNull(
+            TeamMember::where('name', 'Deuxième fondateur')->first(),
+            'Le second fondateur ne doit pas être créé.'
+        );
     }
 
     public function test_le_portrait_est_stocke_dans_sa_collection_et_remplace_le_precedent(): void
@@ -140,12 +214,10 @@ class TeamMemberResourceTest extends TestCase
 
         $membre = $this->makeMember();
 
-        $membre->addMediaFromString('premier-portrait')
-            ->usingFileName('manema-2025.jpg')
+        $membre->addMedia(UploadedFile::fake()->image('manema-2025.jpg')->size(32))
             ->toMediaCollection('photo');
 
-        $membre->addMediaFromString('second-portrait')
-            ->usingFileName('manema-2026.jpg')
+        $membre->addMedia(UploadedFile::fake()->image('manema-2026.jpg')->size(32))
             ->toMediaCollection('photo');
 
         $membre = $membre->refresh();
