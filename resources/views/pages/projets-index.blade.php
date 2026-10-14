@@ -76,29 +76,25 @@
                 <dd class="font-serif text-4xl font-semibold">
                     <span data-n="{{ $compteurs['realises'] ?? 0 }}">{{ $compteurs['realises'] ?? 0 }}</span>
                 </dd>
-                <dt class="mt-1 text-sm text-white/65"
-                    data-en="projects completed">{{ $t('projets réalisés', 'projects completed') }}</dt>
+                <dt class="mt-1 text-sm text-white/65">{{ $t('projets réalisés', 'projects completed') }}</dt>
             </div>
             <div data-r>
                 <dd class="font-serif text-4xl font-semibold">
                     <span data-n="{{ $compteurs['en_attente'] ?? 0 }}">{{ $compteurs['en_attente'] ?? 0 }}</span>
                 </dd>
-                <dt class="mt-1 text-sm text-white/65"
-                    data-en="projects ready for funding">{{ $t('projets prêts à financer', 'projects ready to fund') }}</dt>
+                <dt class="mt-1 text-sm text-white/65">{{ $t('projets prêts à financer', 'projects ready to fund') }}</dt>
             </div>
             <div data-r>
                 <dd class="font-serif text-4xl font-semibold">
                     <span data-n="{{ $compteurs['domaines'] ?? 0 }}">{{ $compteurs['domaines'] ?? 0 }}</span>
                 </dd>
-                <dt class="mt-1 text-sm text-white/65"
-                    data-en="areas of intervention">{{ $t('domaines d\'intervention', 'areas of intervention') }}</dt>
+                <dt class="mt-1 text-sm text-white/65">{{ $t('domaines d\'intervention', 'areas of intervention') }}</dt>
             </div>
             <div data-r>
                 <dd class="font-serif text-4xl font-semibold">
                     <span data-n="{{ $compteurs['zones'] ?? 0 }}">{{ $compteurs['zones'] ?? 0 }}</span>
                 </dd>
-                <dt class="mt-1 text-sm text-white/65"
-                    data-en="zones in South and North Kivu">{{ $t('zones couvertes', 'zones covered') }}</dt>
+                <dt class="mt-1 text-sm text-white/65">{{ $t('zones couvertes', 'zones covered') }}</dt>
             </div>
         </dl>
     </div>
@@ -306,5 +302,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ secure_asset('js/oaat.js') }}" defer></script>
+    {{-- asset() (et non secure_asset) : secure_asset force https, absent en local --}}
+    <script src="{{ asset('js/oaat.js') }}" defer></script>
 @endpush

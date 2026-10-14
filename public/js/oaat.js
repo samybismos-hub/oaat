@@ -23,7 +23,7 @@ const sl=$('#sl');if(sl){const s=$$(':scope>.absolute',sl),cn=$('#cn'),dt=$$('#d
 const cnt=e=>{const n=+e.dataset.n;let s=null;const f=t=>{s??=t;const p=Math.min((t-s)/1400,1);e.textContent=Math.round(n*(1-Math.pow(1-p,3))).toLocaleString(document.documentElement.lang=='en'?'en-US':'fr-FR');p<1&&requestAnimationFrame(f)};requestAnimationFrame(f)};
 if(!rm){$$('[data-w]').forEach(e=>e.classList.add('[clip-path:inset(0_0_100%_0)]'));$$('[data-r]').forEach((e,i)=>{e.classList.add('opacity-0','translate-y-6','transition','ease-out');e.style.transitionDuration='900ms';e.style.transitionDelay=(i%3)*90+'ms'})}
 $$('main section:not(#accueil) h2').forEach(h=>{h.classList.add('before:block','before:h-1','before:w-0','before:bg-ochre','before:mb-4','before:transition-all','before:duration-1000');h.dataset.bar=''});
-const io=new IntersectionObserver(es=>es.forEach(entry=>{if(!entry.isIntersecting)return;const t=entry.target;if(t.dataset.n!==undefined)cnt(t);else if(t.dataset.w!==undefined)t.classList.replace('[clip-path:inset(0_0_100%_0)]','[clip-path:inset(0)]');else if(t.dataset.bar!==undefined)t.classList.add('before:w-16');else{t.classList.remove('opacity-0','translate-y-6');setTimeout(()=>{t.style.transitionDelay='';t.style.transitionDuration=''},1300)};io.unobserve(t)}),{threshold:.15});
+const io=new IntersectionObserver(es=>es.forEach(entry=>{if(!entry.isIntersecting)return;const t=entry.target;if(t.dataset.n!==undefined){setTimeout(()=>cnt(t),200)}else if(t.dataset.w!==undefined)t.classList.replace('[clip-path:inset(0_0_100%_0)]','[clip-path:inset(0)]');else if(t.dataset.bar!==undefined)t.classList.add('before:w-16');else{t.classList.remove('opacity-0','translate-y-6');setTimeout(()=>{t.style.transitionDelay='';t.style.transitionDuration=''},1300)};io.unobserve(t)}),{threshold:.15});
 $$('[data-n],[data-w],[data-bar],[data-r]').forEach(e=>io.observe(e));
 
 /* 6 Scroll */
@@ -67,6 +67,37 @@ if(ztb){
   ztbs.forEach(b=>b.onclick=()=>za(b));
 }
 
+
+/* 14 Filtres projets — toggle mobile */
+const ftg=$('#ftg'),fb=$('#fb');
+if(ftg&&fb){
+    ftg.onclick=()=>{
+        const ouvert=fb.classList.toggle('hidden');
+        ftg.setAttribute('aria-expanded', !ouvert);
+    };
+}
+
+/* 15 Filtrage en direct cartes projets (#q) + compteur + état vide */
+const sq=$('#q'),rc=$('#rc'),em=$('#em');
+if(sq){
+    // data-q est slugifié (minuscules, sans accents, tirets) : on normalise
+    // le terme de recherche de la même façon pour que « eau potable » matche
+    // « eau-potable ».
+    const slug=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    const maj=()=>{
+        const terme=slug(sq.value);
+        const cartes=$$('#gr article');
+        let visibles=0;
+        cartes.forEach(c=>{
+            const hay=(c.dataset.q??'').toLowerCase();
+            const cache=terme!=='' && !hay.includes(terme);
+            c.classList.toggle('hidden',cache);
+            if(!cache)visibles++;
+        });
+        if(rc)rc.textContent=visibles+' '+(visibles>1?'projets':'projet');
+        if(em)em.classList.toggle('hidden',visibles>0);
+    };
+    sq.addEventListener('input',maj);
+}
+
 });
-/* 14 Filtres projets */
-$('#ftg').onclick=()=>{const h=$('#fb').classList.toggle('hidden');$('#ftg').setAttribute('aria-expanded',!h)};
