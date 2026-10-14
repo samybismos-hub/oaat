@@ -82,6 +82,115 @@ class Project extends Model implements HasMedia
         return $query->whereNotNull('published_at')->where('published_at', '<=', now());
     }
 
+    /**
+     * Durée du projet en années + mois, calculée entre start_date et end_date.
+     *
+     * Retourne null quand la durée n'est pas calculable (pas de date de début,
+     * ou projet toujours en cours sans date de fin).
+     *
+     * @return array{years: int, months: int}|null
+     */
+    public function durationParts(): ?array
+    {
+        if (! $this->start_date || ! $this->end_date) {
+            return null;
+        }
+
+        $diff = $this->start_date->diff($this->end_date);
+
+        // On arrondit à la quinzaine pour rester fidèle aux durées annoncées
+        // dans la présentation OAAT (ex. 1 janv. → 30 juin = « 6 mois »).
+        $totalMonths = ($diff->y * 12) + $diff->m + ($diff->d > 15 ? 1 : 0);
+
+        return [
+            'years'  => intdiv($totalMonths, 12),
+            'months' => $totalMonths % 12,
+        ];
+    }
+
+    /**
+     * Libellé localisé de la durée du projet (ex. « 1 an 4 mois »).
+     */
+    public function durationLabel(?string $locale = null): string
+    {
+        $parts = $this->durationParts();
+
+        if ($parts === null) {
+            return match ($locale ?? app()->getLocale()) {
+                'en' => 'To be determined',
+                default => 'À déterminer',
+            };
+        }
+
+        [$years, $months] = [$parts['years'], $parts['months']];
+        $lang = $locale ?? app()->getLocale();
+
+        if ($years === 0) {
+            return $lang === 'en'
+                ? ($months > 1 ? "{$months} months" : ($months === 1 ? '1 month' : 'In progress'))
+                : ($months > 1 ? "{$months} mois" : ($months === 1 ? '1 mois' : 'En cours'));
+        }
+
+        if ($months === 0) {
+            return $lang === 'en'
+                ? ($years > 1 ? "{$years} years" : '1 year')
+                : ($years > 1 ? "{$years} ans" : '1 an');
+        }
+
+        $yearLabel = $lang === 'en' ? ($years > 1 ? "{$years} years" : '1 year') : ($years > 1 ? "{$years} ans" : '1 an');
+        $monthLabel = $lang === 'en' ? ($months > 1 ? "{$months} months" : '1 month') : ($months > 1 ? "{$months} mois" : '1 mois');
+
+        return "{$yearLabel} {$monthLabel}";
+    }
+
+    /**
+     * Budget formaté selon la langue (ex. « 541 591 USD », « 450 000 000 € »).
+     */
+    public function budgetLabel(?string $locale = null): string
+    {
+        if ($this->budget_amount === null) {
+            return '—';
+        }
+
+        $amount = (float) $this->budget_amount;
+        $formatted = ($locale ?? app()->getLocale()) === 'en'
+            ? number_format($amount, 0, '.', ',')
+            : number_format($amount, 0, ',', ' ');
+
+        $currency = strtoupper((string) ($this->budget_currency ?? 'USD'));
+
+        if ($currency === 'EUR') {
+            return "{$formatted} €";
+        }
+
+        return "{$formatted} {$currency}";
+    }
+
+    /**
+     * Année d'affichage du projet (année de début, sinon année de fin).
+     * Utilisée pour le badge d'année des cartes « réalisés » de la maquette.
+     */
+    public function year(): ?int
+    {
+        return ($this->start_date ?? $this->end_date)?->year;
+    }
+
+    /**
+     * Code court du statut pour la grille de la maquette (data-st).
+     *
+     * La maquette ne connaît que deux familles visuelles :
+     *   - d → réalisé / en cours de réalisation (badge année, liseré moss) ;
+     *   - w → en attente de financement (badge « À financer », liseré ochre).
+     * planned et awaiting_funding rejoignent la famille w.
+     */
+    public function getStatutCourtAttribute(): string
+    {
+        return match ($this->status) {
+            ProjectStatus::Completed, ProjectStatus::Ongoing => 'd',
+            default => 'w',
+        };
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
