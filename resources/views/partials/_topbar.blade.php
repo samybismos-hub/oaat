@@ -30,18 +30,22 @@
             @endif
         </p>
 
-        {{-- ─── Sélecteur de langue ─────────────────────────────── --}}
+        {{-- ─── Sélecteur de langue : redirige vers la page courante dans l'autre langue ── --}}
+        @php
+            $currentPath = request()->getPathInfo();
+            $otherPath = preg_replace('#^/(' . $locale . ')(/|$)#', $locale === 'fr' ? '/en$2' : '/fr$2', $currentPath, 1);
+        @endphp
         <div role="group"
              aria-label="{{ $t('Langue', 'Language') }}"
              class="ml-auto flex divide-x divide-white/25 border border-white/25">
 
-            <a href="{{ route('accueil', ['locale' => 'fr']) }}"
+            <a href="{{ $otherPath }}"
                class="px-3 py-1 transition hover:text-ochre{{ $locale === 'fr' ? ' font-bold' : '' }}"
                aria-pressed="{{ $locale === 'fr' ? 'true' : 'false' }}">
                 Français
             </a>
 
-            <a href="{{ route('accueil', ['locale' => 'en']) }}"
+            <a href="{{ $otherPath }}"
                class="px-3 py-1 transition hover:text-ochre{{ $locale === 'en' ? ' font-bold' : '' }}"
                aria-pressed="{{ $locale === 'en' ? 'true' : 'false' }}">
                 English

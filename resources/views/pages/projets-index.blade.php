@@ -66,10 +66,10 @@
             {{ $t('Projets', 'Projects') }}
         </h1>
         <p class="mt-5 max-w-2xl text-lg text-white/75" data-r>
-            {{ $t(
+            {!! Str::markdown($pageProjets?->getTranslation('body', $locale) ?? $t(
                 "Trente ans de réalisations aux côtés des communautés, avec les agences des Nations Unies et des ONG internationales, et des projets prêts à être financés.",
                 "Thirty years of achievements alongside communities, with UN agencies and international NGOs, and projects ready for funding."
-            ) }}
+            )) !!}
         </p>
         <dl class="mt-12 grid max-w-4xl grid-cols-2 gap-8 border-t border-white/15 pt-8 md:grid-cols-4">
             <div data-r>
@@ -111,9 +111,7 @@
 
         {{-- ═══ SIDEBAR FILTRES ═══ --}}
         <aside class="lg:sticky lg:top-[84px] lg:self-start">
-            <button id="ftg" aria-expanded="false"
-                    class="flex w-full items-center justify-between border border-line bg-white px-4 py-3 font-semibold text-lake lg:hidden"
-                    data-en="Filters and search">
+            <button id="ftg" aria-expanded="false" class="flex w-full items-center justify-between border border-line bg-white px-4 py-3 font-semibold text-lake lg:hidden">
                 <span>{{ $t('Filtres et recherche', 'Filters and search') }}</span>
                 <span aria-hidden="true">▾</span>
             </button>

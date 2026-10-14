@@ -156,6 +156,17 @@ Provisional accreditation certificate No. 08/002/DIVAH-SN/2013
 <!--/RECOGNITIONS-->',
                 ],
             ],
+            [
+                'slug' => 'projets',
+                'title' => [
+                    'fr' => 'Projets - OAAT',
+                    'en' => 'Projects - OAAT',
+                ],
+                'body' => [
+                    'fr' => 'Trente ans de réalisations aux côtés des communautés, avec les agences des Nations Unies et des ONG internationales, et des projets prêts à être financés.',
+                    'en' => 'Thirty years of achievements alongside communities, with UN agencies and international NGOs, and projects ready for funding.',
+                ],
+            ],
         ];
 
         foreach ($pages as $page) {

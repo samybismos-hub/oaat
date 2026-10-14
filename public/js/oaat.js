@@ -68,3 +68,5 @@ if(ztb){
 }
 
 });
+/* 14 Filtres projets */
+$('#ftg').onclick=()=>{const h=$('#fb').classList.toggle('hidden');$('#ftg').setAttribute('aria-expanded',!h)};

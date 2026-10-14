@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Enums\ProjectStatus;
 use App\Models\Domain;
+use App\Models\Page;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -143,6 +144,9 @@ class ProjetController
             ['cle' => 'awaiting_funding', 'count' => $compteurs['en_attente']],
         ];
 
+        // ─── 4b. Page « projets » pour le sous-titre éditable ──────────
+        $pageProjets = Page::query()->where('slug', 'projets')->first();
+
         // ─── 5. Rendu de la vue ───────────────────────────────────────
         return view('pages.projets-index', [
             'projets'    => $projets,
@@ -154,6 +158,7 @@ class ProjetController
             'domaine'    => $domaine,
             'recherche'  => $recherche,
             'periode'    => $periode,
+            'pageProjets' => $pageProjets,
             'locale'     => $locale,
         ]);
     }
