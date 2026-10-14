@@ -176,6 +176,59 @@ class Project extends Model implements HasMedia
     }
 
     /**
+     * Bénéficiaires formatés pour la fiche (nombre + unité, sinon texte traduit).
+     *
+     * Règle de la maquette : on privilégie la valeur chiffrée (beneficiaries_count
+     * + unité) ; à défaut, le texte traduit (beneficiaries). S'il n'y a rien,
+     * on renvoie un tiret « — » (les 6 cases sont toujours affichées).
+     */
+    public function beneficiariesLabel(?string $locale = null): string
+    {
+        if ($this->beneficiaries_count !== null) {
+            $count = number_format($this->beneficiaries_count, 0, ',', ' ');
+            $unit = trim((string) $this->beneficiaries_unit);
+
+            return $unit !== '' ? "{$count} {$unit}" : $count;
+        }
+
+        $text = trim((string) $this->getTranslation('beneficiaries', $locale ?? app()->getLocale()));
+
+        return $text !== '' ? $text : '—';
+    }
+
+    /**
+     * Noms des partenaires du projet (relation N-N), séparés par des virgules.
+     * Renvoie « — » quand aucun partenaire n'est lié.
+     */
+    public function partnersLabel(?string $locale = null): string
+    {
+        if ($this->relationLoaded('partners') && $this->partners->isNotEmpty()) {
+            return $this->partners->map(fn ($p) => trim((string) $p->name))
+                ->filter()
+                ->implode(', ');
+        }
+
+        return '—';
+    }
+
+    /**
+     * Noms des partenaires chargés de la MISE EN ŒUVRE (rôle « implementer »
+     * dans la table pivot project_partner). Renvoie « — » quand aucun.
+     */
+    public function implementationPartnersLabel(?string $locale = null): string
+    {
+        if ($this->relationLoaded('partners')) {
+            $impl = $this->partners->filter(fn ($p) => ($p->pivot?->role?->value ?? null) === 'implementer');
+
+            if ($impl->isNotEmpty()) {
+                return $impl->map(fn ($p) => trim((string) $p->name))->filter()->implode(', ');
+            }
+        }
+
+        return '—';
+    }
+
+    /**
      * Code court du statut pour la grille de la maquette (data-st).
      *
      * La maquette ne connaît que deux familles visuelles :
