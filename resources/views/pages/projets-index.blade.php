@@ -120,18 +120,21 @@
             <div id="fb"
                  class="mt-4 hidden space-y-7 border border-line bg-white p-5 lg:mt-0 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
 
-                {{-- 1. Recherche --}}
-                <label class="relative block">
-                    <svg viewBox="0 0 24 24" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/50"
-                         fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <circle cx="11" cy="11" r="7"/>
-                        <path d="M21 21l-4-4"/>
-                    </svg>
-                    <input id="q" type="search" aria-label="Rechercher"
-                           placeholder="{{ $t('Rechercher un projet…', 'Search a project…') }}"
-                           value="{{ $recherche ?? '' }}"
-                           class="w-full border border-line py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-lake focus:ring-4 focus:ring-lake/15">
-                </label>
+                {{-- 1. Recherche enrobé dans un form GET pour soumettre ?q= --}}
+                <form method="GET" action="{{ route('projets.index', ['locale' => $locale]) }}">
+                    <input type="hidden" name="statut" value="{{ $statut }}">
+                    <input type="hidden" name="domaine" value="{{ $domaine }}">
+                    <label class="relative block">
+                        <svg viewBox="0 0 24 24" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/50" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="M21 21l-4-4"/>
+                        </svg>
+                        <input id="q" type="search" wire:model.live="search" name="q" aria-label="Rechercher"
+                               placeholder="{{ $t('Rechercher un projet', 'Search a project') }}"
+                               value="{{ $recherche }}"
+                               class="w-full border border-line py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-lake focus:ring-4 focus:ring-lake/15">
+                    </label>
+                </form>
 
                 {{-- 2. Statuts --}}
                 @php
@@ -180,6 +183,7 @@
                                     <span>{{ $d->getTranslation('name', $locale) }}</span>
                                     <span class="ml-auto text-xs text-ink/50">{{ $d->projects_count }}</span>
                                 </span>
+                                <i class="mt-1 block h-1 bg-mist"><b class="block h-full @php echo $d->barWidth >= 100 ? 'bg-ochre' : 'bg-lake/50'; @endphp" style="width: {{ $d->barWidth }}%"></b></i>
                             </a>
                         @endforeach
                     </div>
@@ -193,7 +197,7 @@
                         @foreach ($periodes as $i => $p)
                             <a href="{{ $mk(['periode' => $i]) }}"
                            class="border px-3 py-1.5 text-xs font-semibold transition
-                                  {{ $statut === 'periode' ? 'border-lake text-lake' : 'border-line text-ink/70 hover:border-lake hover:text-lake' }}">
+                                  {{ $periode == (string) $i ? 'border-lake text-lake' : 'border-line text-ink/70 hover:border-lake hover:text-lake' }}">
                                 {{ $p['label'] }}
                             </a>
                         @endforeach

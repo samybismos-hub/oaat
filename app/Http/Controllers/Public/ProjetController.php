@@ -40,6 +40,7 @@ class ProjetController
      */
     public function index(string $locale): mixed
     {
+
         // ─── 1. Filtres lus depuis les query strings GET ──────────────
         $statut = (string) request()->query('statut', 'all');
         $domaine = (string) request()->query('domaine', '');
@@ -47,6 +48,8 @@ class ProjetController
         // La maquette utilise #q pour la recherche (« q »). On accepte
         // « recherche » en alias pour rester explicite dans l'URL.
         $recherche = trim((string) request()->query('q', request()->query('recherche', '')));
+
+        $periode = (string) request()->query('periode', '');
 
         $statutsValides = ['all', 'completed', 'awaiting_funding'];
         if (! in_array($statut, $statutsValides, true)) {
@@ -75,6 +78,7 @@ class ProjetController
         // La notation « title->fr » est compilée par le query builder en
         // JSON_UNQUOTE(JSON_EXTRACT(...)) sur MySQL et json_extract(...) sur
         // SQLite : elle est portable sur les deux moteurs.
+        $q = trim(request()->input('q', ''));
         if ($recherche !== '') {
             $like = '%' . $recherche . '%';
 
@@ -85,6 +89,16 @@ class ProjetController
                     ->orWhere('city', 'like', $like)
                     ->orWhere('country', 'like', $like);
             });
+        }
+
+        // 2d. Filtre par période (4 plages d'années).
+        if (is_numeric($periode)) {
+            $tranches = $this->periodes();
+            $idx = (int) $periode;
+            if (isset($tranches[$idx])) {
+                $projets->whereYear('start_date', '>=', $tranches[$idx]['debut'])
+                        ->whereYear('start_date', '<=', $tranches[$idx]['fin']);
+            }
         }
 
         // Maquette : les projets « à financer » d'abord, puis les réalisés
@@ -106,6 +120,12 @@ class ProjetController
                 [fn (Domain $domain) => mb_strtolower($domain->getTranslation('name', $locale)), 'asc'],
             ])
             ->values();
+
+        // ─── 3b. Barres de progression pour les domaines ─────────────
+        $maxProjets = $domaines->max('projects_count') ?: 1;
+        foreach ($domaines as $d) {
+            $d->barWidth = round(($d->projects_count / $maxProjets) * 100);
+        }
 
         // ─── 4. Statuts pour la barre de filtres (compteurs réels) ────
         $compteurs = [
@@ -133,6 +153,7 @@ class ProjetController
             'statut'     => $statut,
             'domaine'    => $domaine,
             'recherche'  => $recherche,
+            'periode'    => $periode,
             'locale'     => $locale,
         ]);
     }
