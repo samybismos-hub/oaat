@@ -51,7 +51,14 @@ class Page extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('hero');
+        // Le disk « public » est indispensable : c'est lui qui est servi par
+        // le symlink public/storage. Sans cette ligne, le composant Filament
+        // utilise le disk par défaut de l'app (local → storage/app/private),
+        // les fichiers ne sont pas exposés publiquement, et les images ne
+        // s'affichent pas (on retombe sur les fallbacks fictifs).
+        $this->addMediaCollection('hero')
+            ->useDisk('public')
+            ->storeConversionsOnDisk('public');
     }
 
     public function registerMediaConversions(?Media $media = null): void

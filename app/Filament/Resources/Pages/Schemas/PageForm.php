@@ -51,12 +51,14 @@ class PageForm
                 // 2. Images du carrousel (héros) : plusieurs images possibles,
                 //    visibles dans l'ordre de leur numéro de fichier.
                 Section::make('Images du carrousel (héros)')
-                    ->description('Les images défileront dans l’ordre d’envoi. Déposez-en plusieurs pour créer un carrousel, une seule pour un héro fixe. Si aucune image n’est fournie, les anciens visuels fictifs apparaîtront en attendant.')
+                    ->description('Les images défileront dans l\'ordre d\'envoi. Déposez-en plusieurs pour créer un carrousel, une seule pour un héro fixe. Si aucune image n\'est fournie, les anciens visuels fictifs apparaîtront en attendant.')
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('hero')
                             ->label('Images du carrousel')
                             ->collection('hero')
+                            ->disk('public')
                             ->image()
+                            ->multiple()
                             ->maxSize(5120)
                             ->helperText('JPEG, PNG ou WebP, 5 Mo maximum par fichier. Largeur minimale conseillée : 1920 px.'),
                     ]),

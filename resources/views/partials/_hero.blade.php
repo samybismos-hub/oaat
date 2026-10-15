@@ -9,23 +9,21 @@
     remplacent les placeholders SVG fictifs (data-ph) diapo par diapo.
 --}}
 @php
-    $heros   = $page?->getMedia('hero') ?? [];
-    $heroUrl = fn(int $i): string => $heros[$i]?->getUrl('banner') ?? '';
+    $heros   = $page?->getMedia('hero') ?? collect();
+    $heroUrl = fn(int $i): string => (string) $heros->get($i)?->getUrl('banner');
 @endphp
 <section id="accueil"
          class="group relative h-[80vh] min-h-[560px] overflow-hidden bg-deep text-white"
          aria-roledescription="carrousel"
          aria-label="{{ $t('À la une', 'Highlights') }}">
-
     {{-- ─── Conteneur des diapos (#sl) ─────────────────────────── --}}
     <div id="sl">
-
         {{-- ═══ Diapositive 1 — active par défaut ═══════════════ --}}
         <div class="absolute inset-0 opacity-100 z-10 transition-opacity duration-1000">
             @php $h0 = $heroUrl(0); @endphp
             <img @if($h0) src="{{ $h0 }}" @else data-ph="Hero 1|195" @endif alt=""
                  class="absolute inset-0 h-full w-full scale-100 object-cover transition-transform duration-[8000ms] ease-out">
-            <div class="absolute inset-0 bg-gradient-to-r from-deep via-deep/75 to-deep/10"></div>
+                  <div class="absolute inset-0 bg-gradient-to-r from-deep via-deep/75 to-deep/10"></div>
             <div class="relative mx-auto flex h-full max-w-7xl items-center px-5 lg:px-8">
                 <div class="t max-w-2xl pb-16">
                     <h2 class="font-serif text-4xl font-semibold leading-[1.1] md:text-6xl transition duration-1000 delay-300">
@@ -111,7 +109,7 @@
         </div>
 </div>
 {{-- ─── Lignes décoratives animées (dash) ────────────────── --}}
-    <svg class="pointer-events-none absolute inset-0 z-[15] h-full w-full opacity-30"
+    <!--svg class="pointer-events-none absolute inset-0 z-[15] h-full w-full opacity-30"
          viewBox="0 0 1440 800"
          preserveAspectRatio="none"
          fill="none" stroke="#E3A82B" stroke-width="1.3" aria-hidden="true">
@@ -127,32 +125,30 @@
         <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"
               class="animate-dash motion-reduce:animate-none" style="animation-delay:1.5s"
               d="M-20 550C200 470 360 640 620 550S1040 420 1460 510"/>
-    </svg>
+    </!--svg-->
 
     {{-- ─── Barre de contrôle (compteur, dots, prev/next) ───── --}}
     <div class="absolute inset-x-0 bottom-0 z-20 pb-24 md:pb-28">
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 lg:px-8">
             <div class="flex items-center gap-5">
-                <!--span id="cn" class="whitespace-nowrap font-serif text-lg tabular-nums text-white/80">
-                    01 / 03
-                </span-->
-                <!--div id="dots" class="flex gap-2">
+                <!--span id="cn" class="whitespace-nowrap font-serif text-lg tabular-nums text-white/80">01 / 03</!--span-->
+                <div id="dots" class="flex gap-2">
                     <button aria-label="{{ $t('Diapositive 1', 'Slide 1') }}"
-                            class="h-1.5 w-12 overflow-hidden rounded bg-white/30">
+                            class="">
                         <i class="block h-full w-0 bg-ochre group-hover:[animation-play-state:paused]
                                   motion-reduce:[animation-play-state:paused]"></i>
                     </button>
                     <button aria-label="{{ $t('Diapositive 2', 'Slide 2') }}"
-                            class="h-1.5 w-12 overflow-hidden rounded bg-white/30">
+                            class="">
                         <i class="block h-full w-0 bg-ochre group-hover:[animation-play-state:paused]
                                   motion-reduce:[animation-play-state:paused]"></i>
                     </button>
                     <button aria-label="{{ $t('Diapositive 3', 'Slide 3') }}"
-                            class="h-1.5 w-12 overflow-hidden rounded bg-white/30">
+                            class=""><!--h-1.5 w-12 overflow-hidden rounded bg-white/30-->
                         <i class="block h-full w-0 bg-ochre group-hover:[animation-play-state:paused]
                                   motion-reduce:[animation-play-state:paused]"></i>
                     </button>
-                </div-->
+                </div>
             </div>
             <div class="flex gap-2">
                 <button id="pv"
