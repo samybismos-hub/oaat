@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
 #[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description'])]
 #[Translatable('title', 'body', 'meta_title', 'meta_description')]
-class Page extends Model
+class Page extends Model implements HasMedia
 {
-    use HasFactory, HasTranslations;
+    use HasTranslations, InteractsWithMedia;
 
     /**
      * Les pages dites "système" : leur adresse est utilisée par la navigation
@@ -45,6 +47,17 @@ class Page extends Model
     protected static function booted(): void
     {
         static::deleting(fn (Page $page): bool => ! $page->isSystem());
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('hero');
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('banner')
+            ->width(1920)->height(800)->nonQueued();
     }
 
     /**

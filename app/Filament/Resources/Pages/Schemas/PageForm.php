@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Pages\Schemas;
 
 use App\Models\Page;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
@@ -47,7 +48,20 @@ class PageForm
                     ])
                     ->columnSpanFull(),
 
-                // 2. Référencement (SEO) : textes destinés à Google et aux réseaux sociaux.
+                // 2. Images du carrousel (héros) : plusieurs images possibles,
+                //    visibles dans l'ordre de leur numéro de fichier.
+                Section::make('Images du carrousel (héros)')
+                    ->description('Les images défileront dans l’ordre d’envoi. Déposez-en plusieurs pour créer un carrousel, une seule pour un héro fixe. Si aucune image n’est fournie, les anciens visuels fictifs apparaîtront en attendant.')
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('hero')
+                            ->label('Images du carrousel')
+                            ->collection('hero')
+                            ->image()
+                            ->maxSize(5120)
+                            ->helperText('JPEG, PNG ou WebP, 5 Mo maximum par fichier. Largeur minimale conseillée : 1920 px.'),
+                    ]),
+
+                // 3. Référencement (SEO) : textes destinés à Google et aux réseaux sociaux.
                 Section::make('Référencement (SEO)')
                     ->description('Ces textes ne s\'affichent pas sur la page : ils servent aux moteurs de recherche (Google) et aux aperçus affichés lors d’un partage sur les réseaux sociaux. Si vous les laissez vides, le titre de la page et un extrait de son contenu sont utilisés automatiquement.')
                     ->columns(2)
