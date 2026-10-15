@@ -2,9 +2,16 @@
     _hero.blade.php — Section héro (carrousel 3 diapos).
     ────────────────────────────────────────────────────────────────
     Variables disponibles :
-        $locale   (string)
-        $t        (helper)
+        $page        (Page|null) — la page courante, porte ses images héros
+        $locale      (string)
+        $t           (helper)
+    Si la page a des images uploadées dans sa collection `hero`, elles
+    remplacent les placeholders SVG fictifs (data-ph) diapo par diapo.
 --}}
+@php
+    $heros   = $page?->getMedia('hero') ?? [];
+    $heroUrl = fn(int $i): string => $heros[$i]?->getUrl('banner') ?? '';
+@endphp
 <section id="accueil"
          class="group relative h-[80vh] min-h-[560px] overflow-hidden bg-deep text-white"
          aria-roledescription="carrousel"
@@ -15,7 +22,8 @@
 
         {{-- ═══ Diapositive 1 — active par défaut ═══════════════ --}}
         <div class="absolute inset-0 opacity-100 z-10 transition-opacity duration-1000">
-            <img data-ph="Hero 1|195" alt=""
+            @php $h0 = $heroUrl(0); @endphp
+            <img @if($h0) src="{{ $h0 }}" @else data-ph="Hero 1|195" @endif alt=""
                  class="absolute inset-0 h-full w-full scale-100 object-cover transition-transform duration-[8000ms] ease-out">
             <div class="absolute inset-0 bg-gradient-to-r from-deep via-deep/75 to-deep/10"></div>
             <div class="relative mx-auto flex h-full max-w-7xl items-center px-5 lg:px-8">
@@ -44,7 +52,8 @@
 
         {{-- ═══ Diapositive 2 : Projets ═════════════════════════ --}}
         <div class="absolute inset-0 opacity-0 transition-opacity duration-1000">
-            <img data-ph="Hero 2|165" alt=""
+            @php $h1 = $heroUrl(1); @endphp
+            <img @if($h1) src="{{ $h1 }}" @else data-ph="Hero 2|165" @endif alt=""
                  class="absolute inset-0 h-full w-full scale-110 object-cover transition-transform duration-[8000ms] ease-out">
             <div class="absolute inset-0 bg-gradient-to-r from-deep via-deep/75 to-deep/10"></div>
             <div class="relative mx-auto flex h-full max-w-7xl items-center px-5 lg:px-8">
@@ -73,7 +82,8 @@
 
         {{-- ═══ Diapositive 3 : Domaines ════════════════════════ --}}
         <div class="absolute inset-0 opacity-0 transition-opacity duration-1000">
-            <img data-ph="Hero 3|40" alt=""
+            @php $h2 = $heroUrl(2); @endphp
+            <img @if($h2) src="{{ $h2 }}" @else data-ph="Hero 3|40" @endif alt=""
                  class="absolute inset-0 h-full w-full scale-110 object-cover transition-transform duration-[8000ms] ease-out">
             <div class="absolute inset-0 bg-gradient-to-r from-deep via-deep/75 to-deep/10"></div>
             <div class="relative mx-auto flex h-full max-w-7xl items-center px-5 lg:px-8">

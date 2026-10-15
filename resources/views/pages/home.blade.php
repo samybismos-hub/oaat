@@ -27,7 +27,10 @@
 @section('content')
 
     {{-- ═══════ HERO : carrousel 3 diapos ═══════════════════════ --}}
-    @include('partials._hero', ['locale' => $locale])
+    @include('partials._hero', [
+        'page'   => $organisation,
+        'locale' => $locale,
+    ])
 
     {{-- ═══════ CHIFFRES CLÉS ═══════════════════════════════════ --}}
     @include('partials._chiffres', [
