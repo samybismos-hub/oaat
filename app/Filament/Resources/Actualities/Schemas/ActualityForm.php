@@ -67,6 +67,7 @@ class ActualityForm
                             // Le nom de la collection doit correspondre exactement à celui
                             // déclaré dans Actuality::registerMediaCollections().
                             ->collection('cover')
+                            ->disk('public')
                             ->image()
                             ->maxSize(5120)
                             ->helperText("L'image affichée en tête de l'actualité. Une seule image possible : un nouvel envoi remplace l'ancienne."),

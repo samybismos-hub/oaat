@@ -204,6 +204,7 @@ class ProjectForm
                             // Le nom de la collection doit correspondre exactement à celui
                             // déclaré dans Project::registerMediaCollections().
                             ->collection('cover')
+                            ->disk('public')
                             ->image()
                             ->maxSize(5120)
                             ->helperText('L\'image principale de la fiche : une seule photo possible (un nouvel envoi remplace l\'ancienne).'),
@@ -211,6 +212,7 @@ class ProjectForm
                         SpatieMediaLibraryFileUpload::make('photos')
                             ->label('Galerie photos')
                             ->collection('photos')
+                            ->disk('public')
                             ->image()
                             ->multiple()
                             ->reorderable()

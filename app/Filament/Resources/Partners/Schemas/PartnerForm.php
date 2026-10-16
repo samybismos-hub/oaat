@@ -38,6 +38,7 @@ class PartnerForm
                         SpatieMediaLibraryFileUpload::make('logo')
                             ->label('Logo')
                             ->collection('logo')
+                            ->disk('public')
                             ->image()
                             ->maxSize(2048)
                             ->helperText('PNG ou JPG, 2 Mo maximum. Un logo à fond transparent s\'intègre mieux au site.'),

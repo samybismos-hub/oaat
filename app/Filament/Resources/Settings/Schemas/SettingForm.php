@@ -52,6 +52,7 @@ class SettingForm
                             // Le nom de la collection doit correspondre exactement à celui
                             // déclaré dans Setting::registerMediaCollections().
                             ->collection('logo')
+                            ->disk('public')
                             ->image()
                             ->maxSize(2048)
                             ->helperText('PNG à fond transparent de préférence, 2 Mo maximum. Un nouvel envoi remplace le logo précédent.')

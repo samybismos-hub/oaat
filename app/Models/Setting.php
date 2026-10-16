@@ -39,7 +39,10 @@ class Setting extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('logo')->singleFile();
+        $this->addMediaCollection('logo')
+        ->singleFile()
+        ->useDisk('public')
+        ->storeConversionsOnDisk('public');
     }
 
     public static function current(): ?self

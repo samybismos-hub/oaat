@@ -53,6 +53,7 @@ class AlbumForm
                             // Le nom de la collection doit correspondre exactement à celui
                             // déclaré dans Album::registerMediaCollections().
                             ->collection('photos')
+                            ->disk('public')
                             ->image()
                             ->multiple()
                             // L'ordre choisi ici est celui de la galerie sur le site public.

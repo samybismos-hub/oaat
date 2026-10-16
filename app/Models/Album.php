@@ -20,7 +20,9 @@ class Album extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('photos');
+        $this->addMediaCollection('photos')
+            ->useDisk('public')
+            ->storeConversionsOnDisk('public');
     }
 
     public function registerMediaConversions(?Media $media = null): void

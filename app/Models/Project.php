@@ -37,8 +37,13 @@ class Project extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('cover')->singleFile();
-        $this->addMediaCollection('photos');
+        $this->addMediaCollection('cover')
+            ->singleFile()
+            ->useDisk('public')
+            ->storeConversionsOnDisk('public');
+        $this->addMediaCollection('photos')
+            ->useDisk('public')
+            ->storeConversionsOnDisk('public');
     }
 
     public function registerMediaConversions(?Media $media = null): void

@@ -31,7 +31,10 @@ class Document extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('file')->singleFile();
+        $this->addMediaCollection('file')
+            ->singleFile()
+            ->useDisk('public')
+            ->storeConversionsOnDisk('public');
     }
 
     public function scopePublished(Builder $query): Builder
