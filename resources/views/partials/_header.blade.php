@@ -5,20 +5,28 @@
         $locale   (string) — 'fr' ou 'en'
         $t        (helper) — traduction statique : $t('fr', 'en')
 --}}
+@php
+    $logoUrl = $settings?->getFirstMediaUrl('logo') ?? '';
+@endphp
 <header id="hd" class="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur transition-shadow duration-300">
     <div id="hi" class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 transition-[padding] duration-300 lg:px-8">
 
         {{-- ═══ Logo OAAT ═══════════════════════════════════════ --}}
         <a href="{{ route('accueil', ['locale' => $locale]) }}" class="flex items-center gap-3" aria-label="OAAT, {{ $t('accueil', 'home') }}">
-            <svg viewBox="0 0 40 40" class="h-11 w-11" aria-hidden="true">
-                <rect width="40" height="40" rx="9" fill="#17508F"/>
-                <path d="M5 27c6-9 11 3 17-6s8-5 13-9M5 21c5-8 10 2 15-5s9-4 15-8M5 33c7-8 12 3 18-5s7-4 12-7"
-                      fill="none" stroke="#E3A82B" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+            @if ($logoUrl)
+                <img src="{{ $logoUrl }}" alt="OAAT" class="h-11 w-11 rounded-lg object-contain">
+            @else
+                <svg viewBox="0 0 40 40" class="h-11 w-11" aria-hidden="true">
+                    <rect width="40" height="40" rx="9" fill="#17508F"/>
+                    <path d="M5 27c6-9 11 3 17-6s8-5 13-9M5 21c5-8 10 2 15-5s9-4 15-8M5 33c7-8 12 3 18-5s7-4 12-7"
+                        fill="none" stroke="#E3A82B" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            @endif
             <span class="leading-tight">
                 <b class="block font-serif text-xl text-lake">OAAT</b>
                 <span class="block max-w-[200px] text-[11px] text-ink/60">
-                    {{ $t("Organisation Africaine pour l'Aménagement des Territoires", 'African Organisation for Territorial Planning') }}
+                    {{ $settings?->organisation_name
+                        ?? $t("Organisation Africaine pour l'Aménagement des Territoires", 'African Organisation for Territorial Planning') }}
                 </span>
             </span>
         </a>

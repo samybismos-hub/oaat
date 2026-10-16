@@ -44,7 +44,11 @@
 {{-- ═══════════════════════════════════════════════════════════════════
     H E R O
 ═══════════════════════════════════════════════════════════════════ --}}
-<section id="top" class="relative overflow-hidden bg-gradient-to-br from-deep via-deep via-[#3B5D8A] to-[#1a4d7a] text-white">
+@include('partials._hero', [
+    'page' => $pageProjets,
+    'locale' => $locale
+    ])
+<!--section id="top" class="relative overflow-hidden bg-gradient-to-br from-deep via-deep via-[#3B5D8A] to-[#1a4d7a] text-white">
     <svg class="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-10" viewBox="0 0 1440 800"
          preserveAspectRatio="none" fill="none" stroke="#E3A82B" stroke-width="1.5" aria-hidden="true">
         <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"
@@ -98,7 +102,7 @@
             </div>
         </dl>
     </div>
-</section>
+</!--section-->
 {{-- ═══════════════════════════════════════════════════════════════════
     F I L T R E S   +   G R I L L E
 ═══════════════════════════════════════════════════════════════════ --}}

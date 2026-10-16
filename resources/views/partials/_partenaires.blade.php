@@ -52,14 +52,14 @@
         <div id="m1" class="flex w-max animate-marq motion-reduce:animate-none group-hover:[animation-play-state:paused]">
             @foreach ($row1 as $p)
                 <span class="mx-2 flex h-16 min-w-[190px] items-center justify-center gap-3 border border-line bg-white px-5 font-serif text-lg font-semibold text-ink/60 grayscale transition duration-300 hover:-translate-y-0.5 hover:border-ochre hover:text-lake hover:shadow-lg hover:grayscale-0">
-                    <img src="{{ $img($p) }}" data-f="{{ $fbk($p) }}"
+                    <img src="{{ $img($p) }}"
                          alt="{{ $p->name }}" class="h-9 w-9 object-contain"
                          loading="lazy" onerror="this.onerror=null;this.src=this.dataset.f">{{ $p->name }}
                 </span>
             @endforeach
             @foreach ($row1 as $p)
                 <span class="mx-2 flex h-16 min-w-[190px] items-center justify-center gap-3 border border-line bg-white px-5 font-serif text-lg font-semibold text-ink/60 grayscale transition duration-300 hover:-translate-y-0.5 hover:border-ochre hover:text-lake hover:shadow-lg hover:grayscale-0">
-                    <img src="{{ $img($p) }}" data-f="{{ $fbk($p) }}"
+                    <img src="{{ $img($p) }}"
                          alt="{{ $p->name }}" class="h-9 w-9 object-contain"
                          loading="lazy" onerror="this.onerror=null;this.src=this.dataset.f">{{ $p->name }}
                 </span>
@@ -69,14 +69,14 @@
         <div id="m2" class="flex w-max animate-marqr motion-reduce:animate-none group-hover:[animation-play-state:paused]">
             @foreach ($row2 as $p)
                 <span class="mx-2 flex h-16 min-w-[190px] items-center justify-center gap-3 border border-line bg-white px-5 font-serif text-lg font-semibold text-ink/60 grayscale transition duration-300 hover:-translate-y-0.5 hover:border-ochre hover:text-lake hover:shadow-lg hover:grayscale-0">
-                    <img src="{{ $img($p) }}" data-f="{{ $fbk($p) }}"
+                    <img src="{{ $img($p) }}"
                          alt="{{ $p->name }}" class="h-9 w-9 object-contain"
                          loading="lazy" onerror="this.onerror=null;this.src=this.dataset.f">{{ $p->name }}
                 </span>
             @endforeach
             @foreach ($row2 as $p)
                 <span class="mx-2 flex h-16 min-w-[190px] items-center justify-center gap-3 border border-line bg-white px-5 font-serif text-lg font-semibold text-ink/60 grayscale transition duration-300 hover:-translate-y-0.5 hover:border-ochre hover:text-lake hover:shadow-lg hover:grayscale-0">
-                    <img src="{{ $img($p) }}" data-f="{{ $fbk($p) }}"
+                    <img src="{{ $img($p) }}"
                          alt="{{ $p->name }}" class="h-9 w-9 object-contain"
                          loading="lazy" onerror="this.onerror=null;this.src=this.dataset.f">{{ $p->name }}
                 </span>

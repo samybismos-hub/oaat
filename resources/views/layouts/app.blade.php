@@ -84,7 +84,7 @@
     {{-- ═══════════════════════════════════════════════════════════ --}}
     {{--  En-tête (logo + navigation)                               --}}
     {{-- ═══════════════════════════════════════════════════════════ --}}
-    @include('partials._header', ['locale' => $locale])
+    @include('partials._header', ['settings' => $settings ?? null,'locale' => $locale])
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
     {{--  Contenu spécifique à chaque page                           --}}
