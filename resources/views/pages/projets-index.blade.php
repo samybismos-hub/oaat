@@ -44,65 +44,17 @@
 {{-- ═══════════════════════════════════════════════════════════════════
     H E R O
 ═══════════════════════════════════════════════════════════════════ --}}
-@include('partials._hero', [
-    'page' => $pageProjets,
-    'locale' => $locale
-    ])
-<!--section id="top" class="relative overflow-hidden bg-gradient-to-br from-deep via-deep via-[#3B5D8A] to-[#1a4d7a] text-white">
-    <svg class="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-10" viewBox="0 0 1440 800"
-         preserveAspectRatio="none" fill="none" stroke="#E3A82B" stroke-width="1.5" aria-hidden="true">
-        <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"
-              class="animate-dash motion-reduce:animate-none"
-              d="M-20 600C220 520 380 690 640 640S1060 580 1460 560"/>
-        <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"
-              class="animate-dash motion-reduce:animate-none" style="animation-delay:.5s"
-              d="M-20 650C240 580 400 730 680 650S1080 540 1460 620"/>
-        <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"
-              class="animate-dash motion-reduce:animate-none" style="animation-delay:1s"
-              d="M-20 700C260 640 420 770 700 700S1100 600 1460 660"/>
-        <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"
-              class="animate-dash motion-reduce:animate-none" style="animation-delay:1.5s"
-              d="M-20 550C200 470 360 640 620 550S1040 430 1460 510"/>
-    </svg>
-    <div class="relative z-10 mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
+@include('partials._hero_simple', [
+    'page'   => $pageProjets,
+    'stats'  => [
+        ['valeur' => $compteurs['realises'] ?? 0,   'fr' => 'projets réalisés',          'en' => 'projects completed'],
+        ['valeur' => $compteurs['en_attente'] ?? 0, 'fr' => 'projets prêts à financer',  'en' => 'projects ready to fund'],
+        ['valeur' => $compteurs['en_cours'] ?? 0,      'fr' => 'projets en cours',           'en' => 'projects in progress'],
+        ['valeur' => $compteurs['domaines'] ?? 0,   'fr' => "domaines d'intervention",   'en' => 'areas of intervention'],
 
-        <h1 class="mt-6 font-serif text-5xl font-semibold leading-tight md:text-6xl" data-r>
-            {{ $t('Projets', 'Projects') }}
-        </h1>
-        <p class="mt-5 max-w-2xl text-lg text-white/75" data-r>
-            {!! Str::markdown($pageProjets?->getTranslation('body', $locale) ?? $t(
-                "Trente ans de réalisations aux côtés des communautés, avec les agences des Nations Unies et des ONG internationales, et des projets prêts à être financés.",
-                "Thirty years of achievements alongside communities, with UN agencies and international NGOs, and projects ready for funding."
-            )) !!}
-        </p>
-        <dl class="mt-12 grid max-w-4xl grid-cols-2 gap-8 border-t border-white/15 pt-8 md:grid-cols-4">
-            <div data-r>
-                <dd class="font-serif text-4xl font-semibold">
-                    <span data-n="{{ $compteurs['realises'] ?? 0 }}">{{ $compteurs['realises'] ?? 0 }}</span>
-                </dd>
-                <dt class="mt-1 text-sm text-white/65">{{ $t('projets réalisés', 'projects completed') }}</dt>
-            </div>
-            <div data-r>
-                <dd class="font-serif text-4xl font-semibold">
-                    <span data-n="{{ $compteurs['en_attente'] ?? 0 }}">{{ $compteurs['en_attente'] ?? 0 }}</span>
-                </dd>
-                <dt class="mt-1 text-sm text-white/65">{{ $t('projets prêts à financer', 'projects ready to fund') }}</dt>
-            </div>
-            <div data-r>
-                <dd class="font-serif text-4xl font-semibold">
-                    <span data-n="{{ $compteurs['domaines'] ?? 0 }}">{{ $compteurs['domaines'] ?? 0 }}</span>
-                </dd>
-                <dt class="mt-1 text-sm text-white/65">{{ $t('domaines d\'intervention', 'areas of intervention') }}</dt>
-            </div>
-            <div data-r>
-                <dd class="font-serif text-4xl font-semibold">
-                    <span data-n="{{ $compteurs['zones'] ?? 0 }}">{{ $compteurs['zones'] ?? 0 }}</span>
-                </dd>
-                <dt class="mt-1 text-sm text-white/65">{{ $t('zones couvertes', 'zones covered') }}</dt>
-            </div>
-        </dl>
-    </div>
-</!--section-->
+    ],
+    'locale' => $locale,
+])
 {{-- ═══════════════════════════════════════════════════════════════════
     F I L T R E S   +   G R I L L E
 ═══════════════════════════════════════════════════════════════════ --}}
@@ -174,7 +126,7 @@
                         </a>
                         @foreach ($domaines as $d)
                             <a href="{{ $mk(['domaine' => $d->slug]) }}"
-                           data-d="{{ $d->slug }}"
+                                data-d="{{ $d->slug }}"
                            class="block w-full py-1.5 text-left text-sm transition
                                   {{ $domaine === $d->slug ? 'font-semibold text-lake' : 'text-ink/75 hover:text-lake' }}">
                                 <span class="flex justify-between gap-2">

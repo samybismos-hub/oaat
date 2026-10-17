@@ -24,6 +24,17 @@
 
 @section('content')
 
+    {{-- ═══════ Hero interne réutilisable ═══════════════════════════ --}}
+    @include('partials._hero_simple', [
+        'page'   => $pageOrganisation,
+        'stats'  => [
+            ['valeur' => $yearsOfActivity ?? 0, 'fr' => "ans d'action depuis 1995", 'en' => 'years of action since 1995'],
+            ['valeur' => $totalProjects ?? 0,   'fr' => 'projets réalisés',        'en' => 'projects completed'],
+            ['valeur' => $domainCount ?? 0,     'fr' => "domaines d'intervention", 'en' => 'areas of intervention'],
+        ],
+        'locale' => $locale,
+    ])
+
     {{-- ═══════ Organisation (partial complet 8 sections) ═══════ --}}
     @include('partials._organisation', [
         'pageOrganisation' => $pageOrganisation,

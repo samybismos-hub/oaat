@@ -114,7 +114,7 @@ class ProjetController
         // par nom traduit dans la langue active.
         $domaines = Domain::query()
             ->withCount(['projects' => fn (Builder $query) => $query->published()])
-            ->whereHas('projects', fn (Builder $query) => $query->published())
+            //->whereHas('projects', fn (Builder $query) => $query->published())
             ->get()
             ->sortBy([
                 ['position', 'asc'],
@@ -134,8 +134,8 @@ class ProjetController
             'realises'   => Project::query()->published()->where('status', ProjectStatus::Completed->value)->count(),
             'en_attente' => Project::query()->published()->where('status', ProjectStatus::AwaitingFunding->value)->count(),
             'en_cours'   => Project::query()->published()->where('status', ProjectStatus::Ongoing->value)->count(),
-            'domaines'   => Domain::query()->whereHas('projects', fn (Builder $query) => $query->published())->count(),
-            'zones'      => Project::query()->published()->distinct('city')->count('city'),
+            'domaines'   => Domain::query()->count(),
+
         ];
 
         $statuts = [

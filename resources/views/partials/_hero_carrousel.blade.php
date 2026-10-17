@@ -1,16 +1,23 @@
 {{--
-    _hero.blade.php — Section héro (carrousel 3 diapos).
+    _hero_carrousel.blade.php — Carrousel d'accueil (3 diapos).
     ────────────────────────────────────────────────────────────────
+    Consommateur unique : pages/home.blade.php (option A).
     Variables disponibles :
-        $page        (Page|null) — la page courante, porte ses images héros
+        $page        (Page|null) — la page « accueil », porte ses images héros
         $locale      (string)
         $t           (helper)
-    Si la page a des images uploadées dans sa collection `hero`, elles
-    remplacent les placeholders SVG fictifs (data-ph) diapo par diapo.
+    Diapo 1 : 100 % CMS — images hero[0] + title + extrait du body de $page.
+    Diapos 2-3 : images hero[1]/hero[2] + textes de navigation assumés ($t).
+    Si la page n'a pas d'images uploadées, les placeholders SVG fictifs
+    (data-ph) prennent le relais diapo par diapo.
 --}}
 @php
     $heros   = $page?->getMedia('hero') ?? collect();
     $heroUrl = fn(int $i): string => (string) $heros->get($i)?->getUrl('banner');
+    // Diapo 1 — 100 % éditable depuis « Pages du site » (page slug « accueil »).
+    $slide1Title = trim((string) ($page?->getTranslation('title', $locale) ?? ''));
+    $slide1Body  = trim(strip_tags((string) ($page?->getTranslation('body', $locale) ?? '')));
+    $slide1Intro = \Illuminate\Support\Str::limit($slide1Body, 160);
 @endphp
 <section id="accueil"
          class="group relative h-[80vh] min-h-[560px] overflow-hidden bg-deep text-white"
@@ -18,7 +25,7 @@
          aria-label="{{ $t('À la une', 'Highlights') }}">
     {{-- ─── Conteneur des diapos (#sl) ─────────────────────────── --}}
     <div id="sl">
-        {{-- ═══ Diapositive 1 — active par défaut ═══════════════ --}}
+        {{-- ═══ Diapositive 1 — CMS : title + extrait du body ══════ --}}
         <div class="absolute inset-0 opacity-100 z-10 transition-opacity duration-1000">
             @php $h0 = $heroUrl(0); @endphp
             <img @if($h0) src="{{ $h0 }}" @else data-ph="Hero 1|195" @endif alt=""
@@ -27,12 +34,12 @@
             <div class="relative mx-auto flex h-full max-w-7xl items-center px-5 lg:px-8">
                 <div class="t max-w-2xl pb-16">
                     <h2 class="font-serif text-4xl font-semibold leading-[1.1] md:text-6xl transition duration-1000 delay-300">
-                        {{ $t("Aménager les territoires, bâtir des communautés résilientes",
-                              "Planning territories, building resilient communities") }}
+                        @if($slide1Title !== ''){{ $slide1Title }}@else{{ $t("Aménager les territoires, bâtir des communautés résilientes",
+                              "Planning territories, building resilient communities") }}@endif
                     </h2>
                     <p class="mt-5 max-w-xl text-lg text-white/80 transition duration-1000 delay-500">
-                        {{ $t("ONG interafricaine active à l'Est de la RD Congo depuis 1995, aux côtés des populations les plus vulnérables.",
-                              "Pan-African NGO active in Eastern DRC since 1995, working alongside the most vulnerable populations.") }}
+                        @if($slide1Intro !== ''){{ $slide1Intro }}@else{{ $t("ONG interafricaine active à l'Est de la RD Congo depuis 1995, aux côtés des populations les plus vulnérables.",
+                              "Pan-African NGO active in Eastern DRC since 1995, working alongside the most vulnerable populations.") }}@endif
                     </p>
                     <div class="mt-8 flex flex-wrap gap-3 transition duration-1000 delay-700">
                         <a href="{{ route('organisation', ['locale' => $locale]) }}"
@@ -47,7 +54,6 @@
                 </div>
             </div>
         </div>
-
         {{-- ═══ Diapositive 2 : Projets ═════════════════════════ --}}
         <div class="absolute inset-0 opacity-0 transition-opacity duration-1000">
             @php $h1 = $heroUrl(1); @endphp

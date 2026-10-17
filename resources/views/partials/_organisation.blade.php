@@ -1,20 +1,4 @@
-{{-- _organisation.blade.php --}}
-{{-- HERO --}}
-<section id="top" class="relative overflow-hidden bg-gradient-to-br from-deep via-deep to-[#123d6e] text-white">
-<svg class="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-20" viewBox="0 0 1440 800" preserveAspectRatio="none" fill="none" stroke="#E3A82B" stroke-width="1.3" aria-hidden="true">
-<path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" d="M-20 600C220 520 380 690 640 600S1060 470 1460 560"/>
-<path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" style="animation-delay:.5s" d="M-20 650C240 580 400 730 680 650S1080 530 1460 610"/>
-<path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" style="animation-delay:1s" d="M-20 700C260 640 420 770 700 700S1100 590 1460 660"/>
-<path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" style="animation-delay:1.5s" d="M-20 550C200 470 360 640 620 550S1040 420 1460 510"/>
-</svg>
-<div class="relative z-10 mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-<h1 class="font-serif text-5xl font-semibold leading-tight md:text-6xl" data-r>{{ $t('Organisation','Organisation') }}</h1>
-<p class="mt-5 max-w-2xl text-lg text-white/75" data-r>{{ $t("Qui nous sommes, d'ou nous venons et la maniere dont nous travaillons aux cotes des communautes de l'Est de la RD Congo.","Who we are, where we come from and how we work alongside communities in eastern DR Congo.") }}</p>
-<dl class="mt-12 grid max-w-3xl grid-cols-3 gap-4 border-t border-white/15 pt-8 sm:gap-8">
-<div data-r><dd class="font-serif text-4xl font-semibold"><span data-n="{{ $yearsOfActivity }}">0</span></dd><dt class="mt-1 text-sm text-white/65">{{ $t("ans d'action depuis 1995","years of action since 1995") }}</dt></div>
-<div data-r><dd class="font-serif text-4xl font-semibold"><span data-n="{{ $totalProjects }}">0</span></dd><dt class="mt-1 text-sm text-white/65">{{ $t("projets realises","projects completed") }}</dt></div>
-<div data-r><dd class="font-serif text-4xl font-semibold"><span data-n="{{ $domainCount }}">0</span></dd><dt class="mt-1 text-sm text-white/65">{{ $t("domaines d'intervention","areas of intervention") }}</dt></div>
-</dl></div></section>
+{{-- _organisation.blade.php (le hero est rendu par pages/organisation.blade.php via _hero_simple) --}}
 {{-- SOUS-NAV --}}
 <div class="sticky top-[60px] z-30 border-b border-line bg-white/95 backdrop-blur"><nav id="sn" class="mx-auto flex max-w-7xl overflow-x-auto px-5 lg:px-8" aria-label="{{ $t('Sections','Sections') }}">
 <a href="#presentation" class="snl whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-ochre text-lake">{{ $t('Présentation','Overview') }}</a>

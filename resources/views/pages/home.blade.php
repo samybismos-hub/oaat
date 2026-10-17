@@ -26,8 +26,8 @@
 
 @section('content')
 
-    {{-- ═══════ HERO : carrousel 3 diapos ═══════════════════════ --}}
-    @include('partials._hero', [
+    {{-- ═══════ HERO : carrousel 3 diapos (accueil uniquement) ══════ --}}
+    @include('partials._hero_carrousel', [
         'page'   => $organisation,
         'locale' => $locale,
     ])
