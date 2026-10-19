@@ -43,38 +43,23 @@ class OrganisationController
         // ─── 6. Nombre de domaines d'intervention ────────────────
         $domainCount = Domain::query()->count();
 
-        // ─── 7. Extraction timeline + reconnaissances depuis le body ─
+       // ─── 7. Timeline, reconnaissances et zones depuis les colonnes JSON ─
         $timeline = [];
+        foreach ((array) $pageOrganisation->timelineFor($locale) as $item) {
+            $timeline[] = [$item['year'] ?? '', $item['title'] ?? '', $item['description'] ?? ''];
+        }
+
         $recognitions = [];
-        $body = $pageOrganisation->getTranslation('body', $locale) ?? '';
-
-        // Timeline : extraire chaque <div class="timeline-entry">
-        preg_match_all(
-            '/<div class="timeline-entry" data-year="([^"]*)" data-title="([^"]*)">\s*<p>(.*?)<\/p>/s',
-            $body, $tlMatches, PREG_SET_ORDER
-        );
-        foreach ($tlMatches as $m) {
-            $timeline[] = [$m[1], $m[2], trim(strip_tags($m[3]))];
+        foreach ((array) $pageOrganisation->recognitionsFor($locale) as $item) {
+            $recognitions[] = [$item['title'] ?? '', $item['authority'] ?? '', $item['description'] ?? ''];
         }
 
-        // Reconnaissances : extraire chaque <div class="recognition-item">
-        preg_match_all(
-            '/<div class="recognition-item" data-title="([^"]*)" data-authority="([^"]*)">\s*(.*?)\s*<\/div>/s',
-            $body, $recMatches, PREG_SET_ORDER
-        );
-        foreach ($recMatches as $m) {
-            $recognitions[] = [$m[1], $m[2], trim(strip_tags($m[3]))];
-        }
-
-        // ─── 7b. Zones d'intervention (depuis le body CMS) ────────
         $zones = [];
-        preg_match_all(
-            '/<div class="zone-entry" data-province="([^"]*)" data-name="([^"]*)">\s*<p>(.*?)<\/p>/s',
-            $body, $zMatches, PREG_SET_ORDER
-        );
-        foreach ($zMatches as $m) {
-            $zones[$m[1]][] = [$m[2], trim(strip_tags($m[3]))];
+        foreach ((array) $pageOrganisation->zonesFor($locale) as $item) {
+            $province = $item['province'] ?? (string) $item['province'] ?? '';
+            $zones[$province][] = [$item['name'] ?? '', $item['description'] ?? ''];
         }
+
 
         // ─── 8. Rendu de la vue ─────────────────────────────────
         return view('pages.organisation', [

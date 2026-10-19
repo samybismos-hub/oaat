@@ -11,8 +11,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description'])]
-#[Translatable('title', 'body', 'meta_title', 'meta_description')]
+#[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones'])]
+#[Translatable('title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones')]
 class Page extends Model implements HasMedia
 {
     use HasTranslations, InteractsWithMedia;
@@ -99,4 +99,31 @@ class Page extends Model implements HasMedia
 
         return Str::limit(trim(strip_tags(is_string($body) ? $body : '')), 155);
     }
+    public function timelineFor(string $locale): array
+    {
+        $values = $this->getTranslation('timeline', $locale) ?? [];
+        if ($values === [] || ! is_array($values)) {
+            $values = $this->getTranslation('timeline', 'fr') ?? [];
+        }
+        return is_array($values) ? $values : [];
+    }
+
+    public function recognitionsFor(string $locale): array
+    {
+        $values = $this->getTranslation('recognitions', $locale) ?? [];
+        if ($values === [] || ! is_array($values)) {
+            $values = $this->getTranslation('recognitions', 'fr') ?? [];
+        }
+        return is_array($values) ? $values : [];
+    }
+
+    public function zonesFor(string $locale): array
+    {
+        $values = $this->getTranslation('zones', $locale) ?? [];
+        if ($values === [] || ! is_array($values)) {
+            $values = $this->getTranslation('zones', 'fr') ?? [];
+        }
+        return is_array($values) ? $values : [];
+    }
+
 }

@@ -101,36 +101,29 @@ class AccueilController
             ->where('slug', 'organisation')
             ->first();
 
-        // Extraction de la timeline et des reconnaissances depuis le body
+        // ─── 11. Timeline et reconnaissances depuis les colonnes JSON ──────
         $timeline = [];
         $recognitions = [];
-        if ($pageOrganisation) {
-            $body = $pageOrganisation->getTranslation('body', $locale) ?? '';
-            // Timeline : extraire chaque <div class="timeline-entry">
-            preg_match_all(
-                '/<div class="timeline-entry" data-year="([^"]*)" data-title="([^"]*)">\s*<p>(.*?)<\/p>/s',
-                $body, $tlMatches, PREG_SET_ORDER
-            );
-            foreach ($tlMatches as $m) {
-                $timeline[] = [$m[1], $m[2], trim(strip_tags($m[3]))];
-            }
-            // Reconnaissances : extraire chaque <div class="recognition-item">
-            preg_match_all(
-                '/<div class="recognition-item" data-title="([^"]*)" data-authority="([^"]*)">\s*(.*?)\s*<\/div>/s',
-                $body, $recMatches, PREG_SET_ORDER
-            );
-            foreach ($recMatches as $m) {
-                $recognitions[] = [$m[1], $m[2], trim(strip_tags($m[3]))];
-            }
-        }
-
-        // ─── 12. Rendu de la vue ────────────────────────────────
-        // Zones : comptage réel (fallback si le chiffre officiel n'est pas saisi)
         $zonesCount = 0;
+
         if ($pageOrganisation) {
-            $zonesBody = $pageOrganisation->getTranslation('body', $locale) ?? '';
-            preg_match_all('/data-province="([^"]*)"/', $zonesBody, $zonesMatches);
-            $zonesCount = count($zonesMatches[1]);
+            // Timeline
+            foreach ((array) ($pageOrganisation->getTranslation('timeline', $locale) ?? []) as $item) {
+                if (is_array($item)) {
+                    $timeline[] = [$item['year'] ?? '', $item['title'] ?? '', $item['description'] ?? ''];
+                }
+            }
+
+            // Reconnaissances
+            foreach ((array) ($pageOrganisation->getTranslation('recognitions', $locale) ?? []) as $item) {
+                if (is_array($item)) {
+                    $recognitions[] = [$item['title'] ?? '', $item['authority'] ?? '', $item['description'] ?? ''];
+                }
+            }
+
+            // Zones (comptage)
+            $zonesBrutes = (array) ($pageOrganisation->getTranslation('zones', $locale) ?? []);
+            $zonesCount = count($zonesBrutes);
         }
 
         return view('pages.home', [

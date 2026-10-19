@@ -11,6 +11,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Repeater;
+
 
 class PageForm
 {
@@ -47,6 +49,162 @@ class PageForm
                             ]),
                     ])
                     ->columnSpanFull(),
+                // ─── Section réservée à la page Organisation (Historique / Reconnaissances / Zones) ─
+                Section::make('Données structurées (page Organisation uniquement)')
+                    ->description('Ces champs ne sont affichés que pour la page "Notre organisation". Remplissez les onglets Français ET Anglais.')
+                    ->hidden(fn (?Page $record) => $record?->slug !== 'organisation')
+                    ->schema([
+                        // ─── Historique (timeline) ────────────────────────────────
+                        Tabs::make('Historique')
+                            ->tabs([
+                                Tab::make('Français')
+                                    ->icon('heroicon-m-language')
+                                    ->schema([
+                                        Repeater::make('timeline.fr')
+                                            ->label('Jalons historiques')
+                                            ->schema([
+                                                TextInput::make('year')
+                                                    ->label('Année / Période')
+                                                    ->required()
+                                                    ->maxLength(20),
+                                                TextInput::make('title')
+                                                    ->label('Titre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Textarea::make('description')
+                                                    ->label('Description')
+                                                    ->rows(3)
+                                                    ->required(),
+                                            ])
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Ajouter un jalon'),
+                                    ]),
+
+                                Tab::make('English')
+                                    ->icon('heroicon-m-globe-alt')
+                                    ->schema([
+                                        Repeater::make('timeline.en')
+                                            ->label('Historical milestones')
+                                            ->schema([
+                                                TextInput::make('year')
+                                                    ->label('Year / Period')
+                                                    ->required()
+                                                    ->maxLength(20),
+                                                TextInput::make('title')
+                                                    ->label('Title')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Textarea::make('description')
+                                                    ->label('Description')
+                                                    ->rows(3)
+                                                    ->required(),
+                                            ])
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Add a milestone'),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+
+                        // ─── Reconnaissances officielles ──────────────────────────
+                        Tabs::make('Reconnaissances')
+                            ->tabs([
+                                Tab::make('Français')
+                                    ->icon('heroicon-m-language')
+                                    ->schema([
+                                        Repeater::make('recognitions.fr')
+                                            ->label('Reconnaissances')
+                                            ->schema([
+                                                TextInput::make('title')
+                                                    ->label('Titre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                TextInput::make('authority')
+                                                    ->label('Autorité')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Textarea::make('description')
+                                                    ->label('Description')
+                                                    ->rows(2),
+                                            ])
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Ajouter une reconnaissance'),
+                                    ]),
+
+                                Tab::make('English')
+                                    ->icon('heroicon-m-globe-alt')
+                                    ->schema([
+                                        Repeater::make('recognitions.en')
+                                            ->label('Recognitions')
+                                            ->schema([
+                                                TextInput::make('title')
+                                                    ->label('Title')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                TextInput::make('authority')
+                                                    ->label('Authority')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Textarea::make('description')
+                                                    ->label('Description')
+                                                    ->rows(2),
+                                            ])
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Add a recognition'),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+
+                        // ─── Zones d'intervention ────────────────────────────────
+                        Tabs::make('Zones')
+                            ->tabs([
+                                Tab::make('Français')
+                                    ->icon('heroicon-m-language')
+                                    ->schema([
+                                        Repeater::make('zones.fr')
+                                            ->label("Zones d'intervention")
+                                            ->schema([
+                                                TextInput::make('province')
+                                                    ->label('Province')
+                                                    ->required()
+                                                    ->datalist(['Sud-Kivu', 'Nord-Kivu'])
+                                                    ->maxLength(50),
+                                                TextInput::make('name')
+                                                    ->label('Zone')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Textarea::make('description')
+                                                    ->label('Description')
+                                                    ->rows(2),
+                                            ])
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Ajouter une zone'),
+                                    ]),
+
+                                Tab::make('English')
+                                    ->icon('heroicon-m-globe-alt')
+                                    ->schema([
+                                        Repeater::make('zones.en')
+                                            ->label('Areas of intervention')
+                                            ->schema([
+                                                TextInput::make('province')
+                                                    ->label('Province')
+                                                    ->required()
+                                                    ->datalist(['Sud-Kivu', 'Nord-Kivu'])
+                                                    ->maxLength(50),
+                                                TextInput::make('name')
+                                                    ->label('Area')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                Textarea::make('description')
+                                                    ->label('Description')
+                                                    ->rows(2),
+                                            ])
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Add an area'),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
 
                 // 2. Images du carrousel (héros) : plusieurs images possibles,
                 //    visibles dans l'ordre de leur numéro de fichier.
