@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             ActualitySeeder::class,
             DocumentSeeder::class,
             AlbumSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }

@@ -76,10 +76,10 @@
                 @if ($founderPhoto)
                     <img src="{{ $founderPhoto }}"
                          alt="{{ $founderName }} — {{ $t('fondateur de l\'OAAT', 'founder of OAAT') }}"
-                         data-w
+
                          class="aspect-[4/5] w-full object-cover">
                 @else
-                    <img data-w
+                    <img
                          data-ph="Portrait du fondateur|205"
                          alt="{{ $t('Portrait de Roger Manema Cirhahingirwa, fondateur de l\'OAAT',
                                      'Portrait of Roger Manema Cirhahingirwa, founder of OAAT') }}"

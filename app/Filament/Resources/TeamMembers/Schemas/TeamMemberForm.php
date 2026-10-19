@@ -115,6 +115,7 @@ class TeamMemberForm
                             // Le nom de la collection doit correspondre exactement à celui
                             // déclaré dans TeamMember::registerMediaCollections().
                             ->collection('photo')
+                            ->disk('public')
                             ->image()
                             ->maxSize(2048)
                             ->helperText('Portrait carré (JPG ou PNG, 2 Mo maximum). Celui du fondateur apparaît sur la page d\'accueil.'),

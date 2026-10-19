@@ -60,7 +60,7 @@
 <div class="mx-auto grid max-w-7xl items-center gap-14 px-5 lg:grid-cols-2 lg:px-8">
 <div data-r class="overflow-hidden shadow-xl">
 @if ($founder?->getFirstMediaUrl('photo', 'card'))
-<img src="{{ $founder->getFirstMediaUrl('photo', 'card') }}" alt="{{ $founder?->name ?? $t('Portrait du fondateur','Portrait of the founder') }}" data-w class="aspect-[4/5] w-full object-cover">
+<img src="{{ $founder->getFirstMediaUrl('photo', 'card') }}" alt="{{ $founder?->name ?? $t('Portrait du fondateur','Portrait of the founder') }}" class="aspect-[4/5] w-full object-cover">
 @else
 <img data-w data-ph="Portrait du fondateur|205" alt="{{ $t('Portrait de Roger Manema Cirhahingirwa','Portrait of Roger Manema Cirhahingirwa') }}" class="aspect-[4/5] w-full object-cover">
 @endif

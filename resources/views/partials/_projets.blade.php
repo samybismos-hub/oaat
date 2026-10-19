@@ -117,10 +117,9 @@
             <div class="relative min-h-[280px] overflow-hidden lg:col-span-2">
                 @if ($hasPhare)
                     <img src="{{ $phareCover }}" alt="{{ $projetPhare->title }}"
-                         data-w
                          class="absolute inset-0 h-full w-full object-cover transition duration-1000 group-hover:scale-105">
                 @else
-                    <img data-w data-ph="Territoires|120"
+                    <img data-ph="Territoires|120"
                          alt="{{ $projetPhare->title }}"
                          class="absolute inset-0 h-full w-full object-cover transition duration-1000 group-hover:scale-105">
                 @endif

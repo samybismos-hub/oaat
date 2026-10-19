@@ -58,7 +58,7 @@ class Actuality extends Model implements HasMedia
     {
         $body = $this->getTranslation('body', $locale) ?? '';
 
-        return Str::limit(trim(strip_tags($body)), 200);
+        return Str::limit(trim(strip_tags($body)), 100);
     }
 
     public function scopePublished(Builder $query): Builder

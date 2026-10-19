@@ -74,6 +74,7 @@ class AccueilController
         // ─── 6. Actualités récentes (3 dernières publiées) ────
         $actualites = Actuality::query()
             ->published()
+            ->where('is_featured', true)
             ->latest('published_at')
             ->take(3)
             ->get();

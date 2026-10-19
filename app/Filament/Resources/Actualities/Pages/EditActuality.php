@@ -16,4 +16,11 @@ class EditActuality extends EditRecord
             DeleteAction::make(),
         ];
     }
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['is_featured'] = $data['is_featured'] ?? false;
+
+        return $data;
+    }
+
 }
