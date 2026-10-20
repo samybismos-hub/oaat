@@ -98,12 +98,12 @@
             </div>
             {{-- 4. Partenaires --}}
             <div class="bg-white p-3">
-                <dt class="text-xs text-ink/60" data-en="Partners">{{ $t('Partenaires', 'Partners') }}</dt>
-                <dd class="mt-1 font-semibold">{{ $projet->partnersLabel($locale) }}</dd>
+                <dt class="text-xs text-ink/60">{{ $t('Bailleurs', 'Funders') }}</dt>
+                <dd class="mt-1 font-semibold">{{ $projet->funderLabel($locale) }}</dd>
             </div>
             {{-- 5. ONG de mise en œuvre --}}
             <div class="bg-white p-3">
-                <dt class="text-xs text-ink/60" data-en="Implementing">{{ $t('Mise en œuvre', 'Implementing') }}</dt>
+                <dt class="text-xs text-ink/60" data-en="Implementing">{{ $t('Partenaires de mise en œuvre', 'Implementing Partners') }}</dt>
                 <dd class="mt-1 font-semibold">{{ $projet->implementationPartnersLabel($locale) }}</dd>
             </div>
             {{-- 6. Statut --}}

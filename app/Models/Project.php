@@ -234,6 +234,23 @@ class Project extends Model implements HasMedia
     }
 
     /**
+     * Noms des bailleurs de fonds du projet (rôle « funder » dans la table pivot).
+     * Renvoie « — » quand aucun bailleur n'est lié.
+     */
+    public function funderLabel(?string $locale = null): string
+    {
+        if ($this->relationLoaded('partners')) {
+            $funders = $this->partners->filter(fn ($p) => ($p->pivot?->role?->value ?? null) === 'funder');
+
+            if ($funders->isNotEmpty()) {
+                return $funders->map(fn ($p) => trim((string) $p->name))->filter()->implode(', ');
+            }
+        }
+
+        return '—';
+    }
+
+    /**
      * Code court du statut pour la grille de la maquette (data-st).
      *
      * La maquette ne connaît que deux familles visuelles :
