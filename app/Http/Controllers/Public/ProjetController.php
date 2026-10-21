@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Models\Domain;
 use App\Models\Page;
 use App\Models\Project;
+use App\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -167,14 +168,25 @@ class ProjetController
     {
         $projet = Project::query()
             ->where('slug', $slug)
-            ->with('domain')
-            ->with('partners')
-            ->with('albums')
+            ->with(['domain', 'partners', 'albums.media'])
             ->firstOrFail();
 
+        // « Expérience comparable » : les 4 réalisations les plus récentes,
+        // hors projet courant (reprise de la section maquette).
+        $experiences = Project::query()
+            ->published()
+            ->where('status', ProjectStatus::Completed->value)
+            ->whereKeyNot($projet->getKey())
+            ->with(['domain', 'partners'])
+            ->latest('end_date')
+            ->take(4)
+            ->get();
+
         return view('pages.projets-show', [
-            'projet' => $projet,
-            'locale' => $locale,
+            'projet'      => $projet,
+            'experiences' => $experiences,
+            'settings'    => Setting::current(),
+            'locale'      => $locale,
         ]);
     }
 }
