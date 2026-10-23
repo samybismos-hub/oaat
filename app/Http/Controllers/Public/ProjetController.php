@@ -185,15 +185,16 @@ class ProjetController
             ->published()
             ->where('status', ProjectStatus::Completed->value)
             ->whereKeyNot($projet->getKey())
-            ->with(['domain', 'partners'])
+            ->with('partners') // nécessaire pour funderLabel() / partnersLabel()
             ->latest('end_date')
             ->take(4)
             ->get();
+        // « Autres projets disponibles » : 3 projets en attente de financement,
+        // historiquement les plus récents, hors projet courant.
         $connexes_awaiting = Project::query()
             ->published()
             ->where('status', ProjectStatus::AwaitingFunding->value)
             ->whereKeyNot($projet->getKey())
-            ->with(['domain', 'partners'])
             ->latest('start_date')
             ->take(3)
             ->get();

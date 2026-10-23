@@ -18,6 +18,11 @@
          $t('Rapports, documents et renseignements.', 'Reports, documents and information.'),
          'M12 16v-4M12 8h.01M12 22a10 10 0 100-20 10 10 0 000 20z'],
     ];
+
+    // Objet pré-sélectionné : la valeur renvoyée par le formulaire après une
+    // erreur de validation (old), sinon le paramètre d'URL « ?objet= »
+    // utilisé par les liens « Appel à soutien » des fiches projets.
+    $selectedObjet = (string) old('subject', request()->query('objet', ''));
 @endphp
 
 <section id="contact"
@@ -38,7 +43,7 @@
             <div id="pw" class="mt-8 space-y-3">
                 @foreach ($collabTypes as $w)
                     <button type="button" data-v="{{ $w[0] }}"
-                            class="pw sp group relative flex w-full items-center gap-4 overflow-hidden border border-line bg-white p-5 text-left transition duration-300
+                            class="pw sp group relative flex w-full items-center gap-4 overflow-hidden border p-5 text-left transition duration-300 {{ $selectedObjet === $w[0] ? 'border-lake bg-mist' : 'border-line bg-white' }}
                                    before:pointer-events-none before:absolute before:inset-0 before:opacity-0 before:transition before:duration-300
                                    before:bg-[radial-gradient(220px_circle_at_var(--x,50%)_var(--y,50%),rgba(23,80,143,.10),transparent_70%)]
                                    hover:-translate-y-0.5 hover:border-lake hover:shadow-lg hover:before:opacity-100">
@@ -97,10 +102,10 @@
                 {{ $t('Objet', 'Subject') }}
                 <select name="subject"
                         class="mt-1.5 w-full border border-line bg-white px-4 py-3 outline-none transition focus:border-lake focus:ring-4 focus:ring-lake/15">
-                    <option value="p" {{ old('subject')==='p'?'selected':'' }}>{{ $t('Proposer un partenariat', 'Propose a partnership') }}</option>
-                    <option value="f" {{ old('subject')==='f'?'selected':'' }}>{{ $t('Financer un projet', 'Fund a project') }}</option>
-                    <option value="i" {{ old('subject')==='i'?'selected':'' }}>{{ $t("Demande d'information", 'Information request') }}</option>
-                    <option value="m" {{ old('subject')==='m'?'selected':'' }}>{{ $t('Presse', 'Press') }}</option>
+                    <option value="p" {{ $selectedObjet==='p'?'selected':'' }}>{{ $t('Proposer un partenariat', 'Propose a partnership') }}</option>
+                    <option value="f" {{ $selectedObjet==='f'?'selected':'' }}>{{ $t('Financer un projet', 'Fund a project') }}</option>
+                    <option value="i" {{ $selectedObjet==='i'?'selected':'' }}>{{ $t("Demande d'information", 'Information request') }}</option>
+                    <option value="m" {{ $selectedObjet==='m'?'selected':'' }}>{{ $t('Presse', 'Press') }}</option>
                 </select>
             </label>
 

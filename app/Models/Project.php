@@ -251,6 +251,35 @@ class Project extends Model implements HasMedia
     }
 
     /**
+     * Libellé traduit du statut du projet (fiche projet, bloc « Autres projets »).
+     *
+     * L'idée : une seule source de vérité pour les libellés côté vue publique,
+     * au lieu de multiplier les « match ($projet->status) » dans chaque template.
+     */
+    public function statusLabel(?string $locale = null): string
+    {
+        $locale ??= app()->getLocale();
+
+        $fr = match ($this->status) {
+            ProjectStatus::Completed => 'Réalisé',
+            ProjectStatus::Ongoing => 'En cours',
+            ProjectStatus::Planned => 'Planifié',
+            ProjectStatus::AwaitingFunding => 'Recherche de financement',
+            default => '—',
+        };
+
+        $en = match ($this->status) {
+            ProjectStatus::Completed => 'Completed',
+            ProjectStatus::Ongoing => 'Ongoing',
+            ProjectStatus::Planned => 'Planned',
+            ProjectStatus::AwaitingFunding => 'Seeking funding',
+            default => '—',
+        };
+
+        return $locale === 'en' ? $en : $fr;
+    }
+
+    /**
      * Code court du statut pour la grille de la maquette (data-st).
      *
      * La maquette ne connaît que deux familles visuelles :

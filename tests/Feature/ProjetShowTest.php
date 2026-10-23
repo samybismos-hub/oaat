@@ -82,6 +82,46 @@ class ProjetShowTest extends TestCase
             ->assertSee('Recherche de financement');
     }
 
+    public function test_les_cartes_appel_a_soutien_pointent_vers_le_contact_avec_objet_pre_rempli(): void
+    {
+        $domaine = $this->makeDomain();
+        $projet = $this->makeProject($domaine);
+
+        $response = $this->get("/fr/projets/{$projet->slug}");
+
+        $response->assertOk()
+            ->assertSee('/fr/contact?objet=f')
+            ->assertSee('/fr/contact?objet=p')
+            ->assertSee('/fr/contact?objet=i');
+    }
+
+    public function test_le_bloc_autres_projets_affiche_un_badge_traduit_sans_valeur_brute(): void
+    {
+        $domaine = $this->makeDomain();
+        $projet = $this->makeProject($domaine);
+        $autre = $this->makeProject($domaine, [
+            'slug' => 'deuxieme-projet',
+            'title' => ['fr' => 'Deuxième projet à financer', 'en' => 'Second project to fund'],
+        ]);
+
+        $response = $this->get("/fr/projets/{$projet->slug}");
+
+        $response->assertOk()
+            ->assertSee('Autres projets disponibles')
+            ->assertSee('Deuxième projet à financer')
+            ->assertSee('À financer');
+        // La valeur brute de l'enum ne doit plus jamais apparaître.
+        $this->assertStringNotContainsString('awaiting_funding', $response->getContent());
+
+        $enb = $this->get("/en/projets/{$projet->slug}");
+
+        $enb->assertOk()
+            ->assertSee('Other projects available')
+            ->assertSee('Second project to fund')
+            ->assertSee('To fund');
+        $this->assertStringNotContainsString('awaiting_funding', $enb->getContent());
+    }
+
     public function test_la_fiche_projet_ignore_les_sections_sans_contenu(): void
     {
         $domaine = $this->makeDomain();
