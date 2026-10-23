@@ -14,7 +14,7 @@
 
     Sections de la page (ancres de la sous-navigation #sn) :
         #apercu  #contexte  #composantes  #zone  #financement
-        #experience  #documents  #galerie  #soutenir
+        #experience  #galerie  #soutenir
 
     Interactions : le JavaScript est centralisé dans public/js/oaat.js
     (galerie #lb, copie #cpi, impression #pr, sous-nav #sn, barre mobile #mb).
@@ -89,14 +89,6 @@
         'fr' => 'mailto:' . $email . '?subject=' . rawurlencode($sujetFr) . '&body=' . rawurlencode($corpsFr),
         'en' => 'mailto:' . $email . '?subject=' . rawurlencode($sujetEn) . '&body=' . rawurlencode($corpsEn),
     ];
-
-    // Courriels « demande de document », avec le nom du document traduit.
-    $urlDoc = fn (string $libFr, string $libEn): array => $mailto(
-        "Demande de document — {$libFr}",
-        "Document request — {$libEn}",
-        "Bonjour,\n\nPourriez-vous nous transmettre le document « {$libFr} » relatif au projet « {$titre} » ?\n\nMerci d'avance,",
-        "Hello,\n\nCould you please send us the document \"{$libEn}\" relating to the project \"{$titre}\"?\n\nThank you,",
-    );
 
     // ─────────────────────────────────────────────────────────────────────
     //  4. Sélecteurs de sections (affichées seulement si un contenu existe)
@@ -178,7 +170,7 @@
                 <img src="{{ $heroUrl }}" alt="{{ $titre }}" class="aspect-[21/9] w-full object-cover">
                 <figcaption class="mt-2 flex flex-wrap justify-between gap-2 text-xs text-ink/60">
                     <span>{{ $titre }}</span>
-                    <span data-en="Credit: OAAT">Crédit : OAAT</span>
+                    <span>Crédit : OAAT</span>
                 </figcaption>
             </figure>
         @endif
@@ -193,25 +185,23 @@
             @php $snClass = 'shrink-0 whitespace-nowrap border-b-2 px-4 py-3.5 text-sm font-medium transition border-transparent text-ink/70 hover:text-lake'; @endphp
 
             @if ($aApercu)
-                <a href="#apercu" class="shrink-0 whitespace-nowrap border-b-2 border-lake px-4 py-3.5 text-sm font-medium transition text-lake"
-                   data-en="Overview">{{ $t('Aperçu', 'Overview') }}</a>
+                <a href="#apercu" class="shrink-0 whitespace-nowrap border-b-2 border-lake px-4 py-3.5 text-sm font-medium transition text-lake">{{ $t('Aperçu', 'Overview') }}</a>
             @endif
             @if ($editorial)
-                <a href="#contexte" class="{{ $snClass }}" data-en="Context">{{ $t('Contexte', 'Context') }}</a>
-                <a href="#composantes" class="{{ $snClass }}" data-en="Components">{{ $t('Composantes', 'Components') }}</a>
+                <a href="#contexte" class="{{ $snClass }}">{{ $t('Contexte', 'Context') }}</a>
+                <a href="#composantes" class="{{ $snClass }}">{{ $t('Composantes', 'Components') }}</a>
             @endif
             @if ($aZone)
-                <a href="#zone" class="{{ $snClass }}" data-en="Area">{{ $t('Zone', 'Area') }}</a>
+                <a href="#zone" class="{{ $snClass }}">{{ $t('Zone', 'Area') }}</a>
             @endif
-            <a href="#financement" class="{{ $snClass }}" data-en="Funding">{{ $t('Financement', 'Funding') }}</a>
+            <a href="#financement" class="{{ $snClass }}">{{ $t('Financement', 'Funding') }}</a>
             @if ($aExp)
-                <a href="#experience" class="{{ $snClass }}" data-en="Experience">{{ $t('Expérience', 'Experience') }}</a>
+                <a href="#experience" class="{{ $snClass }}">{{ $t('Expérience', 'Experience') }}</a>
             @endif
-            <a href="#documents" class="{{ $snClass }}">{{ $t('Documents', 'Documents') }}</a>
             @if ($photos->isNotEmpty())
-                <a href="#galerie" class="{{ $snClass }}" data-en="Gallery">{{ $t('Galerie', 'Gallery') }}</a>
+                <a href="#galerie" class="{{ $snClass }}">{{ $t('Galerie', 'Gallery') }}</a>
             @endif
-            <a href="#soutenir" class="{{ $snClass }}" data-en="Support">{{ $t('Soutenir', 'Support') }}</a>
+            <a href="#soutenir" class="{{ $snClass }}">{{ $t('Soutenir', 'Support') }}</a>
         </nav>
     </div>
 
@@ -227,42 +217,41 @@
                 <div class="border border-line bg-white">
 
                     <div class="border-b border-line bg-mist px-6 py-4">
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-lake"
-                            data-en="Project fact sheet">{{ $t('Fiche du projet', 'Project fact sheet') }}</h2>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-lake">{{ $t('Fiche du projet', 'Project fact sheet') }}</h2>
                     </div>
 
                     {{-- ═══ Métadonnées ═══ --}}
                     <dl class="divide-y divide-line px-6">
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Status">{{ $t('Statut', 'Status') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Statut', 'Status') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $statut }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Area">{{ $t('Domaine', 'Area') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Domaine', 'Area') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $domaine !== '' ? $domaine : '—' }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Total budget">{{ $t('Budget global', 'Total budget') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Budget global', 'Total budget') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $projet->budgetLabel($locale) }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Duration">{{ $t('Durée', 'Duration') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Durée', 'Duration') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $projet->durationLabel($locale) }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Beneficiaries">{{ $t('Bénéficiaires', 'Beneficiaries') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Bénéficiaires', 'Beneficiaries') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $beneficiaires }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Area of intervention">{{ $t("Zone d'intervention", 'Area of intervention') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t("Zone d'intervention", 'Area of intervention') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $zone !== '' ? $zone : '—' }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Identified donors">{{ $t('Bailleurs identifiés', 'Identified donors') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Bailleurs identifiés', 'Identified donors') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $bailleurs }}</dd>
                         </div>
                         <div class="py-3">
-                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55" data-en="Implementation">{{ $t('Mise en œuvre', 'Implementation') }}</dt>
+                            <dt class="text-xs font-semibold uppercase tracking-wider text-ink/55">{{ $t('Mise en œuvre', 'Implementation') }}</dt>
                             <dd class="mt-1 font-semibold text-ink">{{ $miseEnOeuvre }}</dd>
                         </div>
                     </dl>
@@ -271,16 +260,9 @@
                     {{-- ═══ Actions ═══ --}}
                     <div class="space-y-3 border-t border-line p-6">
                         <a href="#soutenir"
-                           class="block bg-lake px-6 py-3.5 text-center font-semibold text-white transition hover:bg-deep"
-                           data-en="Support this project">{{ $t('Soutenir ce projet', 'Support this project') }}</a>
+                           class="block bg-lake px-6 py-3.5 text-center font-semibold text-white transition hover:bg-deep">{{ $t('Soutenir ce projet', 'Support this project') }}</a>
 
-                        @php $u = $urlDoc('Note conceptuelle du projet', 'Project concept note'); @endphp
-                        <a href="{{ $u['fr'] }}"
-                           data-href-fr="{{ $u['fr'] }}"
-                           data-href-en="{{ $u['en'] }}"
-                           class="block border border-lake px-6 py-3.5 text-center font-semibold text-lake transition hover:bg-lake hover:text-white"
-                           data-en="Request the concept note">{{ $t('Demander la note conceptuelle', 'Request the concept note') }}</a>
-                    </div>
+                        </div>
 
                     {{-- ═══ Outils : copier, imprimer, partager ═══ --}}
                     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line px-6 py-4 text-sm text-ink/60 print:hidden">
@@ -289,21 +271,21 @@
                                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M10 13a5 5 0 007.07 0l3-3a5 5 0 00-7.07-7.07l-1.5 1.5M14 11a5 5 0 00-7.07 0l-3 3a5 5 0 007.07 7.07l1.5-1.5"/>
                             </svg>
-                            <span data-en="Copy link">{{ $t('Copier le lien', 'Copy link') }}</span>
+                            <span>{{ $t('Copier le lien', 'Copy link') }}</span>
                         </button>
                         <button type="button" id="pr" class="inline-flex items-center gap-2 transition hover:text-lake">
                             <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
                                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M6 9V3h12v6M6 18H4a1 1 0 01-1-1v-6a2 2 0 012-2h14a2 2 0 012 2v6a1 1 0 01-1 1h-2M7 14h10v7H7z"/>
                             </svg>
-                            <span data-en="Print">{{ $t('Imprimer', 'Print') }}</span>
+                            <span>{{ $t('Imprimer', 'Print') }}</span>
                         </button>
                         <a class="sh inline-flex items-center gap-2 transition hover:text-lake" href="mailto:">
                             <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
                                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M3 6h18v12H3zM3 7l9 6 9-6"/>
                             </svg>
-                            <span data-en="Share">{{ $t('Partager', 'Share') }}</span>
+                            <span>{{ $t('Partager', 'Share') }}</span>
                         </a>
                     </div>
                 </div>
@@ -317,16 +299,14 @@
             {{-- ═══ APERÇU DU PROJET (#apercu) ═══ --}}
             @if ($aApercu)
                 <section id="apercu" class="scroll-mt-40">
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Project overview">{{ $t('Aperçu du projet', 'Project overview') }}</h2>
+                    <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Aperçu du projet', 'Project overview') }}</h2>
 
                     @if ($objectifs !== '')
                         <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">{{ $objectifs }}</p>
                     @endif
 
                     @if ($resultats !== '')
-                        <h3 class="mt-8 font-serif text-xl font-semibold text-lake"
-                            data-en="Results">{{ $t('Résultats', 'Results') }}</h3>
+                        <h3 class="mt-8 font-serif text-xl font-semibold text-lake">{{ $t('Résultats', 'Results') }}</h3>
                         <p class="mt-2 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">{{ $resultats }}</p>
                     @endif
                 </section>
@@ -335,8 +315,7 @@
             {{-- ═══ CONTEXTE ET ENJEUX (#contexte) — projet emblématique ═══ --}}
             @if ($editorial)
                 <section id="contexte" class="scroll-mt-40 mt-14 border-t border-line pt-10">
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Context and challenges">{{ $t('Contexte et enjeux', 'Context and challenges') }}</h2>
+                    <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Contexte et enjeux', 'Context and challenges') }}</h2>
 
                     <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
                         {{ $t('Après une dizaine d’années de conflits armés, la région a sombré dans l’instabilité socio-économique et culturelle, avec de lourdes conséquences pour les communautés et leurs infrastructures.',
@@ -385,8 +364,7 @@
                     ];
                 @endphp
                 <section id="composantes" class="scroll-mt-40 mt-14 border-t border-line pt-10">
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Objectives and components">{{ $t('Objectifs et composantes', 'Objectives and components') }}</h2>
+                    <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Objectifs et composantes', 'Objectives and components') }}</h2>
 
                     <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
                         {{ $t('Objectif général : faciliter la mobilité des personnes et de leurs biens et renforcer la résilience des communautés de huit territoires, par des infrastructures de base, une énergie renouvelable locale et des centres d’apprentissage de métiers.',
@@ -422,8 +400,7 @@
             {{-- ═══ ZONE D'INTERVENTION (#zone) ═══ --}}
             @if ($aZone)
                 <section id="zone" class="scroll-mt-40 mt-14 border-t border-line pt-10">
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Beneficiaries and area of intervention">{{ $t('Bénéficiaires et zone d’intervention', 'Beneficiaries and area of intervention') }}</h2>
+                    <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Bénéficiaires et zone d’intervention', 'Beneficiaries and area of intervention') }}</h2>
 
                     <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
                         @if ($zone !== '' && $beneficiaires !== '—')
@@ -440,8 +417,7 @@
 
             {{-- ═══ FINANCEMENT ET PARTENAIRES (#financement) ═══ --}}
             <section id="financement" class="scroll-mt-40 mt-14 border-t border-line pt-10">
-                <h2 class="font-serif text-3xl font-semibold text-ink"
-                    data-en="Funding and partners">{{ $t('Financement et partenaires', 'Funding and partners') }}</h2>
+                <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Financement et partenaires', 'Funding and partners') }}</h2>
 
                 {{-- Données financières --}}
                 <dl class="mt-6 divide-y divide-line border-y border-line">
@@ -514,9 +490,7 @@
                 @endphp
                 <p class="mt-6 text-sm text-ink/70">
                     {{ $t('Vous souhaitez rejoindre ce partenariat ?', 'Would you like to join this partnership?') }}
-                    <a href="{{ $u['fr'] }}"
-                       data-href-fr="{{ $u['fr'] }}"
-                       data-href-en="{{ $u['en'] }}"
+                    <a href="{{ $locale === 'en' ? $u['en'] : $u['fr'] }}"
                        class="font-semibold text-lake underline-offset-4 hover:underline">
                         {{ $t('Écrire à l’OAAT', 'Write to OAAT') }}
                     </a>
@@ -527,8 +501,7 @@
             {{-- ═══ EXPÉRIENCE COMPARABLE (#experience) ═══ --}}
             @if ($aExp)
                 <section id="experience" class="scroll-mt-40 mt-14 border-t border-line pt-10">
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Comparable experience">{{ $t('Expérience comparable', 'Comparable experience') }}</h2>
+                    <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Expérience comparable', 'Comparable experience') }}</h2>
 
                     <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
                         {{ $t('Depuis 1995, l’OAAT réalise des routes, des ponts et des ouvrages publics avec des agences des Nations Unies et d’autres bailleurs. Quelques réalisations comparables :',
@@ -579,50 +552,7 @@
             @endif
 
 
-            {{-- ═══ DOCUMENTS ET RESSOURCES (#documents) ═══ --}}
-            <section id="documents" class="scroll-mt-40 mt-14 border-t border-line pt-10">
-                <h2 class="font-serif text-3xl font-semibold text-ink"
-                    data-en="Documents and resources">{{ $t('Documents et ressources', 'Documents and resources') }}</h2>
-
-                <div class="mt-6 overflow-x-auto border border-line">
-                    <table class="w-full min-w-[620px] border-collapse text-left text-sm">
-                        <thead class="bg-mist text-xs uppercase tracking-wider text-ink/60">
-                            <tr>
-                                <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Document', 'Document') }}</th>
-                                <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Format', 'Format') }}</th>
-                                <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Langue', 'Language') }}</th>
-                                <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Disponibilité', 'Availability') }}</th>
-                                <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Action', 'Action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-line bg-white">
-                            @foreach ([
-                                ['fr' => 'Note conceptuelle du projet', 'en' => 'Project concept note'],
-                                ['fr' => 'Fiche de projet',             'en' => 'Project sheet'],
-                                ['fr' => "Présentation de l'OAAT et ses expériences avec les partenaires", 'en' => 'OAAT presentation and experience with partners'],
-                            ] as $document)
-                                @php $u = $urlDoc($document['fr'], $document['en']); @endphp
-                                <tr>
-                                    <th class="px-4 py-4 align-top font-semibold text-ink" scope="row">
-                                        {{ $t($document['fr'], $document['en']) }}
-                                    </th>
-                                    <td class="px-4 py-4 text-ink/75">PDF</td>
-                                    <td class="px-4 py-4 text-ink/75">{{ $t('Français', 'French') }}</td>
-                                    <td class="px-4 py-4 text-ink/75">{{ $t('Sur demande', 'On request') }}</td>
-                                    <td class="px-4 py-4 text-right">
-                                        <a href="{{ $u['fr'] }}"
-                                           data-href-fr="{{ $u['fr'] }}"
-                                           data-href-en="{{ $u['en'] }}"
-                                           class="font-semibold text-lake underline-offset-4 hover:underline"
-                                           data-en="Request">{{ $t('Demander', 'Request') }}</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
+            </div>
     </div>
 
     {{-- ═══════════════════════════════════════════════════════════════════
@@ -632,8 +562,7 @@
         <section id="galerie" class="scroll-mt-32 border-t border-line bg-mist py-16">
             <div class="mx-auto max-w-7xl px-5 lg:px-8">
                 <div class="flex flex-wrap items-end justify-between gap-3">
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Photo gallery">{{ $t('Galerie photo', 'Photo gallery') }}</h2>
+                    <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Galerie photo', 'Photo gallery') }}</h2>
                     <p class="text-sm text-ink/60">{{ $photos->count() }} {{ $t('photos', 'photos') }}</p>
                 </div>
 
@@ -649,7 +578,7 @@
                             </button>
                             <figcaption class="mt-3 text-sm leading-snug text-ink/80">
                                 <span>{{ $photo['title'] }}</span>
-                                <span class="mt-1 block text-xs text-ink/50" data-en="Credit: OAAT">Crédit : OAAT</span>
+                                <span class="mt-1 block text-xs text-ink/50">Crédit : OAAT</span>
                             </figcaption>
                         </figure>
                     @endforeach
@@ -659,107 +588,123 @@
     @endif
 
     {{-- ═══════════════════════════════════════════════════════════════════
-         SOUTENIR CE PROJET (#soutenir)
+         SOUTENIR CE PROJET (#soutenir) — bandeau façon « projets-index »
+         Deux boutons : « Financer ce projet » (mailto pré-rempli) et
+         « Nous contacter » (page contact).
     ═══════════════════════════════════════════════════════════════════ --}}
     @php
-        $urlDonner = $mailto(
-            "Don ou cofinancement — {$titre}",
-            "Donation or co-funding — {$titre}",
-            "Bonjour,\n\nNous souhaitons étudier une possibilité de soutien au projet « {$titre} » (don ou cofinancement).\n\nOrganisation :\nContact :\n\nCordialement,",
-            "Hello,\n\nWe would like to explore a way to support the project \"{$titre}\" (donation or co-funding).\n\nOrganisation:\nContact:\n\nKind regards,",
-        );
-        $urlPartenariatTech = $mailto(
-            "Partenariat technique — {$titre}",
-            "Technical partnership — {$titre}",
-            "Bonjour,\n\nNous souhaitons étudier une possibilité de soutien au projet « {$titre} » (partenariat technique).\n\nOrganisation :\nContact :\n\nCordialement,",
-            "Hello,\n\nWe would like to explore a way to support the project \"{$titre}\" (technical partnership).\n\nOrganisation:\nContact:\n\nKind regards,",
-        );
-        $urlMiseEnRelation = $mailto(
-            "Mise en relation — {$titre}",
-            "Introductions — {$titre}",
-            "Bonjour,\n\nNous souhaiterions être mis en relation avec des organisations pouvant soutenir le projet « {$titre} ».\n\nOrganisation :\nContact :\n\nCordialement,",
-            "Hello,\n\nWe would like to be introduced to organisations that could support the project \"{$titre}\".\n\nOrganisation:\nContact:\n\nKind regards,",
+        $urlFinancer = $mailto(
+            "Financement — {$titre}",
+            "Funding — {$titre}",
+            "Bonjour,\n\nNous souhaitons financer ou cofinancer le projet « {$titre} ».\n\nOrganisation :\nContact :\n\nCordialement,",
+            "Hello,\n\nWe would like to fund or co-fund the project \"{$titre}\".\n\nOrganisation:\nContact:\n\nKind regards,",
         );
     @endphp
-    <section id="soutenir" class="scroll-mt-32 border-t border-line bg-white py-16">
-        <div class="mx-auto max-w-7xl px-5 lg:px-8">
-            <div class="grid gap-12 lg:grid-cols-3">
-
-                {{-- ▸ Description + contact --}}
+    <section id="soutenir" class="scroll-mt-32 border-t border-line bg-lake text-white">
+        <div class="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+            <div class="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center" data-r>
                 <div>
-                    <h2 class="font-serif text-3xl font-semibold text-ink"
-                        data-en="Support this project">{{ $t('Soutenir ce projet', 'Support this project') }}</h2>
-                    <p class="mt-4 text-[17px] leading-relaxed text-ink/75">
-                        {{ $t('Trois façons de contribuer à la relance de ce projet.', 'Three ways to contribute to the launch of this project.') }}
+                    <h2 class="font-serif text-3xl font-semibold md:text-4xl">
+                        {{ $t('Soutenir ce projet', 'Support this project') }}
+                    </h2>
+                    <p class="mt-3 max-w-xl text-white/80">
+                        {{ $t('Financez ce projet ou écrivez-nous pour toute question.', 'Fund this project or write to us with any question.') }}
                     </p>
-
-                    <div class="mt-8 border-t border-line pt-5">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-ink/55"
-                           data-en="Project contact">{{ $t('Contact du projet', 'Project contact') }}</p>
-                        <p class="mt-2 font-semibold text-ink">{{ $t('Ir Roger Manema Cirhahingirwa', 'Ir Roger Manema Cirhahingirwa') }}</p>
-                        <p class="text-sm text-ink/70" data-en="National Representative">{{ $t('Représentant national', 'National Representative') }}</p>
-                        <a class="mt-1 inline-block text-sm font-semibold text-lake underline-offset-4 hover:underline"
-                           href="mailto:{{ $email }}">{{ $email }}</a>
-                    </div>
                 </div>
-
-
-                {{-- ▸ Trois voies de soutien --}}
-                <div class="grid gap-px border border-line bg-line sm:grid-cols-3 lg:col-span-2">
-                    <div class="flex flex-col bg-white p-6">
-                        <h3 class="font-serif text-xl font-semibold text-ink"
-                            data-en="Give or co-fund">{{ $t('Faire un don ou cofinancer', 'Give or co-fund') }}</h3>
-                        <p class="mt-3 grow text-sm leading-relaxed text-ink/70">
-                            {{ $t('Contribution financière ou cofinancement d’une ou plusieurs composantes du projet.', 'Financial contribution or co-funding of one or more components of the project.') }}
-                        </p>
-                        <a class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-lake underline-offset-4 hover:underline"
-                           href="{{ $urlDonner['fr'] }}"
-                           data-href-fr="{{ $urlDonner['fr'] }}"
-                           data-href-en="{{ $urlDonner['en'] }}">
-                            <span>{{ $t('Nous écrire', 'Write to us') }}</span><span aria-hidden="true">→</span>
-                        </a>
-                    </div>
-
-                    <div class="flex flex-col bg-white p-6">
-                        <h3 class="font-serif text-xl font-semibold text-ink"
-                            data-en="Technical partnership">{{ $t('Partenariat technique', 'Technical partnership') }}</h3>
-                        <p class="mt-3 grow text-sm leading-relaxed text-ink/70">
-                            {{ $t('Expertise, équipements ou appui à la mise en œuvre des ouvrages et des formations.', 'Expertise, equipment or support for the delivery of the works and training.') }}
-                        </p>
-                        <a class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-lake underline-offset-4 hover:underline"
-                           href="{{ $urlPartenariatTech['fr'] }}"
-                           data-href-fr="{{ $urlPartenariatTech['fr'] }}"
-                           data-href-en="{{ $urlPartenariatTech['en'] }}">
-                            <span>{{ $t('Nous écrire', 'Write to us') }}</span><span aria-hidden="true">→</span>
-                        </a>
-                    </div>
-
-                    <div class="flex flex-col bg-white p-6">
-                        <h3 class="font-serif text-xl font-semibold text-ink"
-                            data-en="Introductions">{{ $t('Mise en relation', 'Introductions') }}</h3>
-                        <p class="mt-3 grow text-sm leading-relaxed text-ink/70">
-                            {{ $t('Introduction auprès d’autres bailleurs, institutions et réseaux susceptibles de soutenir le projet.', 'Introductions to other donors, institutions and networks that may support the project.') }}
-                        </p>
-                        <a class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-lake underline-offset-4 hover:underline"
-                           href="{{ $urlMiseEnRelation['fr'] }}"
-                           data-href-fr="{{ $urlMiseEnRelation['fr'] }}"
-                           data-href-en="{{ $urlMiseEnRelation['en'] }}">
-                            <span>{{ $t('Nous écrire', 'Write to us') }}</span><span aria-hidden="true">→</span>
-                        </a>
-                    </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ $urlFinancer[$locale] }}"
+                       class="relative overflow-hidden bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%]">
+                        {{ $t('Financer ce projet', 'Fund this project') }}
+                    </a>
+                    <a href="{{ route('contact', ['locale' => $locale]) }}"
+                       class="border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep">
+                        {{ $t('Nous contacter', 'Contact us') }}
+                    </a>
                 </div>
             </div>
         </div>
     </section>
+    <!-- Appel à soutien -->
+    <section id="soutenir" class="scroll-mt-32 bg-deep py-20 text-white">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div data-r class="max-w-2xl">
+          <h2 class="font-serif text-4xl font-semibold" data-en="Support this project">Soutenir ce projet</h2>
+          <p class="mt-4 text-lg text-white/75" data-en="Three ways to contribute to the relaunch of the eight territories.">
+            Trois façons de contribuer à la relance des huit territoires.
+          </p>
+        </div>
+        <div class="mt-10 grid gap-5 md:grid-cols-3">
+          <div data-r class="sp group relative flex flex-col overflow-hidden border border-white/15 bg-white/5 p-7 transition duration-300 before:pointer-events-none before:absolute before:inset-0 before:opacity-0 before:transition before:duration-300 before:bg-[radial-gradient(260px_circle_at_var(--x,50%)_var(--y,50%),rgba(255,255,255,.12),transparent_70%)] hover:-translate-y-1 hover:border-ochre hover:before:opacity-100">
+            <h3 class="relative font-serif text-2xl font-semibold" data-en="Fund">Financer</h3>
+            <p class="relative mt-3 grow text-sm leading-relaxed text-white/75" data-en="Financial contribution or co-funding of one or more components of the project.">
+              Contribution financière ou cofinancement d’une ou plusieurs composantes du projet.
+            </p>
+            <a class="relative mt-6 inline-flex items-center gap-2 font-semibold text-ochre" href="mailto:oaatrdc2000@gmail.com?subject=Financement%20%E2%80%94%20Am%C3%A9nagement%20des%20huit%20territoires&amp;body=Bonjour%2C%0A%0ANous%20souhaitons%20%C3%A9tudier%20une%20possibilit%C3%A9%20de%20soutien%20au%20projet%20%C2%AB%20Am%C3%A9nagement%20des%20huit%20territoires%20%C2%BB%20%28financement%29.%0A%0AOrganisation%20%3A%0AContact%20%3A%0A%0ACordialement%2C" data-href-fr="mailto:oaatrdc2000@gmail.com?subject=Financement%20%E2%80%94%20Am%C3%A9nagement%20des%20huit%20territoires&amp;body=Bonjour%2C%0A%0ANous%20souhaitons%20%C3%A9tudier%20une%20possibilit%C3%A9%20de%20soutien%20au%20projet%20%C2%AB%20Am%C3%A9nagement%20des%20huit%20territoires%20%C2%BB%20%28financement%29.%0A%0AOrganisation%20%3A%0AContact%20%3A%0A%0ACordialement%2C" data-href-en="mailto:oaatrdc2000@gmail.com?subject=Funding%20%E2%80%94%20Development%20of%20the%20eight%20territories&amp;body=Hello%2C%0A%0AWe%20would%20like%20to%20explore%20a%20way%20to%20support%20the%20project%20%E2%80%9CDevelopment%20of%20the%20eight%20territories%E2%80%9D%20%28funding%29.%0A%0AOrganisation%3A%0AContact%3A%0A%0AKind%20regards%2C"><span data-en="Write to OAAT">Écrire à l’OAAT</span><span class="transition group-hover:translate-x-1" aria-hidden="true">→</span></a>
+          </div>
+          <div data-r class="sp group relative flex flex-col overflow-hidden border border-white/15 bg-white/5 p-7 transition duration-300 before:pointer-events-none before:absolute before:inset-0 before:opacity-0 before:transition before:duration-300 before:bg-[radial-gradient(260px_circle_at_var(--x,50%)_var(--y,50%),rgba(255,255,255,.12),transparent_70%)] hover:-translate-y-1 hover:border-ochre hover:before:opacity-100">
+            <h3 class="relative font-serif text-2xl font-semibold" data-en="Technical partnership">
+              Partenariat technique
+            </h3>
+            <p class="relative mt-3 grow text-sm leading-relaxed text-white/75" data-en="Expertise, equipment or support for the delivery of the works and training.">
+              Expertise, équipements ou appui à la mise en œuvre des ouvrages et des formations.
+            </p>
+            <a class="relative mt-6 inline-flex items-center gap-2 font-semibold text-ochre" href="mailto:oaatrdc2000@gmail.com?subject=Partenariat%20technique%20%E2%80%94%20Am%C3%A9nagement%20des%20huit%20territoires&amp;body=Bonjour%2C%0A%0ANous%20souhaitons%20%C3%A9tudier%20une%20possibilit%C3%A9%20de%20soutien%20au%20projet%20%C2%AB%20Am%C3%A9nagement%20des%20huit%20territoires%20%C2%BB%20%28partenariat%20technique%29.%0A%0AOrganisation%20%3A%0AContact%20%3A%0A%0ACordialement%2C" data-href-fr="mailto:oaatrdc2000@gmail.com?subject=Partenariat%20technique%20%E2%80%94%20Am%C3%A9nagement%20des%20huit%20territoires&amp;body=Bonjour%2C%0A%0ANous%20souhaitons%20%C3%A9tudier%20une%20possibilit%C3%A9%20de%20soutien%20au%20projet%20%C2%AB%20Am%C3%A9nagement%20des%20huit%20territoires%20%C2%BB%20%28partenariat%20technique%29.%0A%0AOrganisation%20%3A%0AContact%20%3A%0A%0ACordialement%2C" data-href-en="mailto:oaatrdc2000@gmail.com?subject=Technical%20partnership%20%E2%80%94%20Development%20of%20the%20eight%20territories&amp;body=Hello%2C%0A%0AWe%20would%20like%20to%20explore%20a%20way%20to%20support%20the%20project%20%E2%80%9CDevelopment%20of%20the%20eight%20territories%E2%80%9D%20%28technical%20partnership%29.%0A%0AOrganisation%3A%0AContact%3A%0A%0AKind%20regards%2C"><span data-en="Write to OAAT">Écrire à l’OAAT</span><span class="transition group-hover:translate-x-1" aria-hidden="true">→</span></a>
+          </div>
+          <div data-r class="sp group relative flex flex-col overflow-hidden border border-white/15 bg-white/5 p-7 transition duration-300 before:pointer-events-none before:absolute before:inset-0 before:opacity-0 before:transition before:duration-300 before:bg-[radial-gradient(260px_circle_at_var(--x,50%)_var(--y,50%),rgba(255,255,255,.12),transparent_70%)] hover:-translate-y-1 hover:border-ochre hover:before:opacity-100">
+            <h3 class="relative font-serif text-2xl font-semibold" data-en="Spread the word">Relayer</h3>
+            <p class="relative mt-3 grow text-sm leading-relaxed text-white/75" data-en="Introductions to other donors, institutions and networks that may support the project.">
+              Mise en relation avec d’autres bailleurs, institutions et réseaux susceptibles de soutenir le projet.
+            </p>
+            <a class="relative mt-6 inline-flex items-center gap-2 font-semibold text-ochre" href="mailto:oaatrdc2000@gmail.com?subject=Mise%20en%20relation%20%E2%80%94%20Am%C3%A9nagement%20des%20huit%20territoires&amp;body=Bonjour%2C%0A%0ANous%20souhaitons%20%C3%A9tudier%20une%20possibilit%C3%A9%20de%20soutien%20au%20projet%20%C2%AB%20Am%C3%A9nagement%20des%20huit%20territoires%20%C2%BB%20%28mise%20en%20relation%29.%0A%0AOrganisation%20%3A%0AContact%20%3A%0A%0ACordialement%2C" data-href-fr="mailto:oaatrdc2000@gmail.com?subject=Mise%20en%20relation%20%E2%80%94%20Am%C3%A9nagement%20des%20huit%20territoires&amp;body=Bonjour%2C%0A%0ANous%20souhaitons%20%C3%A9tudier%20une%20possibilit%C3%A9%20de%20soutien%20au%20projet%20%C2%AB%20Am%C3%A9nagement%20des%20huit%20territoires%20%C2%BB%20%28mise%20en%20relation%29.%0A%0AOrganisation%20%3A%0AContact%20%3A%0A%0ACordialement%2C" data-href-en="mailto:oaatrdc2000@gmail.com?subject=Introduction%20%E2%80%94%20Development%20of%20the%20eight%20territories&amp;body=Hello%2C%0A%0AWe%20would%20like%20to%20explore%20a%20way%20to%20support%20the%20project%20%E2%80%9CDevelopment%20of%20the%20eight%20territories%E2%80%9D%20%28introduction%29.%0A%0AOrganisation%3A%0AContact%3A%0A%0AKind%20regards%2C"><span data-en="Write to OAAT">Écrire à l’OAAT</span><span class="transition group-hover:translate-x-1" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <p data-r class="mt-10 border-t border-white/15 pt-6 text-sm text-white/70">
+          <span data-en="Contact: Ir Roger Manema Cirhahingirwa, National Representative — ">Interlocuteur : Ir Roger Manema Cirhahingirwa, Représentant national — </span>
+          <a class="font-semibold text-ochre underline-offset-4 hover:underline" href="mailto:oaatrdc2000@gmail.com">oaatrdc2000@gmail.com</a>
+        </p>
+      </div>
+    </section>
 
+
+    <!-- Autres projets disponibles -->
+    @php
+        $PC_AF = $connexes_awaiting->isNotEmpty()
+    @endphp
+
+    @if ($PC_AF)
+        <section class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-4" data-r>
+            <h2 class="font-serif text-3xl font-semibold text-lake md:text-4xl" data-en="Other available projects">
+            {{ $t('Autres projets disponibles', 'Other projects available') }}
+            </h2>
+            <a href="{{ route('projets.index', ['locale'=> $locale]) }}" class="font-semibold text-lake underline-offset-4 hover:underline" data-en="All projects →">Tous les projets →</a>
+        </div>
+
+            <div class="mt-10 grid gap-6 md:grid-cols-3">
+                @foreach($connexes_awaiting as $connexe)
+                <a data-r href="{{ route('projets.show', ['locale' => $locale, 'slug' => $connexe->slug]) }}" class="group flex flex-col border border-line border-t-4 border-t-ochre bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-[#7A5200]" data-en="To fund">{{ $connexe->status }}</p>
+                    <h3 class="mt-3 grow font-serif text-lg font-semibold leading-snug text-lake" data-en="Nyamubanda marsh drainage, Walungu">
+                        {{ $connexe->getTranslation('title', $locale) }}
+                    </h3>
+                    <p class="mt-4 border-t border-line pt-4 text-sm text-ink/70">
+                        <span>{{ $connexe->budgetLabel($locale) }}</span> · <span>{{$connexe->durationLabel($locale)}}</span> ·
+                        <span>{{ $connexe->beneficiariesLabel($locale) }}</span>
+                    </p>
+                    <span class="mt-4 inline-flex gap-2 text-sm font-semibold text-lake"><span data-en="View the sheet">Voir la fiche</span><span class="transition group-hover:translate-x-1" aria-hidden="true">→</span></span>
+                </a>
+                @endforeach
+            </div>
+
+        </section>
+    @endif
     {{-- ═══════════════════════════════════════════════════════════════════
          BARRE CTA MOBILE (#mb) — affichée par oaat.js §17 sous 1024 px
     ═══════════════════════════════════════════════════════════════════ --}}
     <div id="mb"
          class="fixed inset-x-0 bottom-0 z-40 translate-y-full border-t border-line bg-white/95 p-3 pr-20 backdrop-blur transition duration-300 lg:hidden print:hidden">
         <a href="#soutenir"
-           class="block bg-lake px-6 py-3.5 text-center font-semibold text-white transition hover:bg-deep"
-           data-en="Support this project">{{ $t('Soutenir ce projet', 'Support this project') }}</a>
+           class="block bg-lake px-6 py-3.5 text-center font-semibold text-white transition hover:bg-deep">{{ $t('Soutenir ce projet', 'Support this project') }}</a>
     </div>
 
     {{-- ═══════════════════════════════════════════════════════════════════

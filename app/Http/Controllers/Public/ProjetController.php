@@ -137,6 +137,14 @@ class ProjetController
             'en_cours'   => Project::query()->published()->where('status', ProjectStatus::Ongoing->value)->count(),
             'domaines'   => Domain::query()->count(),
 
+            // « Zones » : nombre de villes distinctes des projets publiés
+            // (reprise du chiffre clé de la maquette « zones en Sud et Nord-Kivu »).
+            'zones'      => Project::query()->published()
+                             ->whereNotNull('city')
+                             ->where('city', '!=', '')
+                             ->distinct()
+                             ->count('city'),
+
         ];
 
         $statuts = [
@@ -181,12 +189,21 @@ class ProjetController
             ->latest('end_date')
             ->take(4)
             ->get();
+        $connexes_awaiting = Project::query()
+            ->published()
+            ->where('status', ProjectStatus::AwaitingFunding->value)
+            ->whereKeyNot($projet->getKey())
+            ->with(['domain', 'partners'])
+            ->latest('start_date')
+            ->take(3)
+            ->get();
 
         return view('pages.projets-show', [
             'projet'      => $projet,
             'experiences' => $experiences,
             'settings'    => Setting::current(),
             'locale'      => $locale,
+            'connexes_awaiting' => $connexes_awaiting,
         ]);
     }
 }
