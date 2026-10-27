@@ -177,17 +177,21 @@ class ProjetController
         $projet = Project::query()
             ->where('slug', $slug)
             ->with(['domain', 'partners', 'albums.media'])
+            ->published()
             ->firstOrFail();
 
         // « Expérience comparable » : les 4 réalisations les plus récentes,
         // hors projet courant (reprise de la section maquette).
         $experiences = Project::query()
             ->published()
-            ->where('status', ProjectStatus::Completed->value)
+            ->whereIn('status', [
+                ProjectStatus::Completed->value,
+                ProjectStatus::Ongoing->value,
+            ])
             ->whereKeyNot($projet->getKey())
             ->with('partners') // nécessaire pour funderLabel() / partnersLabel()
             ->latest('end_date')
-            ->take(4)
+            ->take(config('oaat.projects.experience_count'))
             ->get();
         // « Autres projets disponibles » : 3 projets en attente de financement,
         // historiquement les plus récents, hors projet courant.
@@ -196,7 +200,7 @@ class ProjetController
             ->where('status', ProjectStatus::AwaitingFunding->value)
             ->whereKeyNot($projet->getKey())
             ->latest('start_date')
-            ->take(3)
+            ->take(config('oaat.projects.related_count'))
             ->get();
 
         return view('pages.projets-show', [

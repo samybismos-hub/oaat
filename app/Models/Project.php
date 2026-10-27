@@ -16,8 +16,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['domain_id', 'title', 'slug', 'status', 'country', 'city', 'start_date', 'end_date', 'objectives', 'beneficiaries', 'results', 'budget_amount', 'budget_currency', 'beneficiaries_count', 'beneficiaries_unit', 'is_featured', 'published_at'])]
-#[Translatable('title', 'objectives', 'beneficiaries', 'results')]
+#[Fillable(['domain_id', 'title', 'slug', 'status', 'country', 'city', 'start_date', 'end_date', 'objectives', 'beneficiaries', 'results', 'contexte', 'objectif_general', 'composantes', 'budget_amount', 'budget_currency', 'beneficiaries_count', 'beneficiaries_unit', 'is_featured', 'published_at'])]
+#[Translatable('title', 'objectives', 'beneficiaries', 'results', 'contexte', 'objectif_general')]
 class Project extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, InteractsWithMedia;
@@ -31,6 +31,7 @@ class Project extends Model implements HasMedia
             'is_featured' => 'boolean',
             'budget_amount' => 'decimal:2',       // ← sort toujours avec 2 décimales
             'beneficiaries_count' => 'integer',    // ← force le type entier
+            'composantes' => 'array',               // ← liste d'objets {nom_fr, nom_en, …}
             'status' => ProjectStatus::class,      // ← 'ongoing' devient une valeur de l'enum
         ];
     }
@@ -88,6 +89,26 @@ class Project extends Model implements HasMedia
     }
 
     /**
+     * La fiche possède-t-elle un contenu éditorial (« Contexte », « Objectif
+     * général », « Composantes ») saisissable depuis l'admin ?
+     *
+     * Remplace l'ancien test du slug de la maquette : tout projet peut
+     * afficher ces sections dès que du contenu existe, quelle que soit
+     * la langue consultée.
+     */
+    public function hasEditorialContent(): bool
+    {
+        foreach (['fr', 'en'] as $lang) {
+            if (filled($this->getTranslation('contexte', $lang))
+                || filled($this->getTranslation('objectif_general', $lang))) {
+                return true;
+            }
+        }
+
+        return filled($this->composantes);
+    }
+
+    /**
      * Durée du projet en années + mois, calculée entre start_date et end_date.
      *
      * Retourne null quand la durée n'est pas calculable (pas de date de début,
@@ -131,9 +152,15 @@ class Project extends Model implements HasMedia
         $lang = $locale ?? app()->getLocale();
 
         if ($years === 0) {
+            // Deux dates renseignées mais écart nul (ex. début = fin) :
+            // « 0 mois » n'est pas un projet en cours, c'est une donnée vide.
+            if ($months === 0) {
+                return '—';
+            }
+
             return $lang === 'en'
-                ? ($months > 1 ? "{$months} months" : ($months === 1 ? '1 month' : 'In progress'))
-                : ($months > 1 ? "{$months} mois" : ($months === 1 ? '1 mois' : 'En cours'));
+                ? ($months > 1 ? "{$months} months" : '1 month')
+                : ($months > 1 ? "{$months} mois" : '1 mois');
         }
 
         if ($months === 0) {
@@ -190,7 +217,11 @@ class Project extends Model implements HasMedia
     public function beneficiariesLabel(?string $locale = null): string
     {
         if ($this->beneficiaries_count !== null) {
-            $count = number_format($this->beneficiaries_count, 0, ',', ' ');
+            // Format du nombre selon la langue : 1 234 en français, 1,234 en anglais.
+            $count = ($locale ?? app()->getLocale()) === 'en'
+                ? number_format($this->beneficiaries_count, 0, '.', ',')
+                : number_format($this->beneficiaries_count, 0, ',', ' ');
+
             $unit = trim((string) $this->beneficiaries_unit);
 
             return $unit !== '' ? "{$count} {$unit}" : $count;

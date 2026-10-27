@@ -36,6 +36,15 @@
     $resultats = trim((string) $projet->getTranslation('results', $locale));
     $zone      = trim(implode(' · ', array_values(array_filter([$projet->city, $projet->country]))));
 
+    // Contenu éditorial des sections « Contexte », « Objectif général » et
+    // « Composantes » (saisi depuis l'admin — voir ProjectForm).
+    $contexteParagraphes = collect(explode("\n\n", trim((string) $projet->getTranslation('contexte', $locale))))
+        ->map(fn (string $p) => trim($p))
+        ->filter()
+        ->values();
+    $objectifGeneral = trim((string) $projet->getTranslation('objectif_general', $locale));
+    $composantesData = collect($projet->composantes ?? []);
+
     // Famille visuelle du statut : « w » = à financer (pastille ochre),
     // « d » = réalisé / en cours (pastille verte).
     $aFinancer = $projet->statut_court === 'w';
@@ -89,9 +98,11 @@
     // ─────────────────────────────────────────────────────────────────────
     //  4. Sélecteurs de sections (affichées seulement si un contenu existe)
     // ─────────────────────────────────────────────────────────────────────
-    // Sections éditoriales « Contexte » / « Composantes » : réservées au projet
-    // emblématique de la maquette (ces champs n'existent pas encore en base).
-    $editorial = $projet->slug === 'amenagement-des-8-territoires';
+    // Sections éditoriales « Contexte » / « Composantes » : affichées dès que
+    // du contenu a été saisi dans l'admin (plus aucun slug « caché » en dur).
+    $editorial    = $projet->hasEditorialContent();
+    $aContexte    = $contexteParagraphes->isNotEmpty();
+    $aComposantes = $objectifGeneral !== '' || $composantesData->isNotEmpty();
 
     $aApercu = $objectifs !== '' || $resultats !== '';
     $aZone   = $zone !== '' || $beneficiaires !== '—';
@@ -133,10 +144,8 @@
     <section id="top" class="bg-white">
         <div class="mx-auto max-w-7xl px-5 pb-10 pt-10 lg:px-8 lg:pt-14">
 
-            {{-- ▸ Identification : n° de fiche, domaine, statut --}}
+            {{-- ▸ Identification : domaine, statut --}}
             <p class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold uppercase tracking-wider" data-r>
-                <span class="text-lake">{{ $t('Fiche projet n°', 'Project sheet no.') }} {{ $projet->id }}</span>
-                <span class="text-ink/25" aria-hidden="true">|</span>
                 @if ($domaine !== '')
                     <span class="text-ink/70">{{ $domaine }}</span>
                     <span class="text-ink/25" aria-hidden="true">|</span>
@@ -183,8 +192,10 @@
             @if ($aApercu)
                 <a href="#apercu" class="shrink-0 whitespace-nowrap border-b-2 border-lake px-4 py-3.5 text-sm font-medium transition text-lake">{{ $t('Aperçu', 'Overview') }}</a>
             @endif
-            @if ($editorial)
+            @if ($aContexte)
                 <a href="#contexte" class="{{ $snClass }}">{{ $t('Contexte', 'Context') }}</a>
+            @endif
+            @if ($aComposantes)
                 <a href="#composantes" class="{{ $snClass }}">{{ $t('Composantes', 'Components') }}</a>
             @endif
             @if ($aZone)
@@ -308,87 +319,51 @@
                 </section>
             @endif
 
-            {{-- ═══ CONTEXTE ET ENJEUX (#contexte) — projet emblématique ═══ --}}
-            @if ($editorial)
+            {{-- ═══ CONTEXTE ET ENJEUX (#contexte) ═══ --}}
+            @if ($aContexte)
                 <section id="contexte" class="scroll-mt-40 mt-14 border-t border-line pt-10">
                     <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Contexte et enjeux', 'Context and challenges') }}</h2>
 
-                    <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
-                        {{ $t('Après une dizaine d’années de conflits armés, la région a sombré dans l’instabilité socio-économique et culturelle, avec de lourdes conséquences pour les communautés et leurs infrastructures.',
-                              'After about ten years of armed conflict, the region sank into socio-economic and cultural instability, with severe consequences for communities and their infrastructure.') }}
-                    </p>
-                    <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
-                        {{ $t('La question qui guide l’action de l’OAAT est celle d’une approche pour un processus de paix inclusif, qui améliore les infrastructures et facilite la mobilité des personnes et de leurs biens. Ce projet y répond à l’échelle de huit territoires, en combinant routes, énergie renouvelable et formation aux métiers.',
-                              'The question guiding OAAT\'s work is how to build an inclusive peace process that improves infrastructure and eases the movement of people and goods. This project answers it across eight territories, combining roads, renewable energy and vocational training.') }}
-                    </p>
+                    @foreach ($contexteParagraphes as $paragraphe)
+                        <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">{{ $paragraphe }}</p>
+                    @endforeach
                 </section>
             @endif
 
 
-            {{-- ═══ OBJECTIFS ET COMPOSANTES (#composantes) — projet emblématique ═══ --}}
-            @if ($editorial)
-                @php
-                    $composantes = [
-                        [
-                            'nomFr' => 'Routes de desserte agricole',        'nomEn' => 'Farm-access roads',
-                            'favFr' => 'Réhabilitation des routes de desserte agricole dans les huit territoires.',
-                            'favEn' => 'Rehabilitation of farm-access roads in the eight territories.',
-                            'resFr' => 'Des déplacements facilités pour les personnes et leurs biens.',
-                            'resEn' => 'Easier movement of people and goods.',
-                        ],
-                        [
-                            'nomFr' => 'Barrage hydro-électrique et centrale photovoltaïque', 'nomEn' => 'Hydroelectric dam and photovoltaic plant',
-                            'favFr' => 'Construction d’un barrage hydro-électrique et d’une centrale photovoltaïque.',
-                            'favEn' => 'Construction of a hydroelectric dam and a photovoltaic power plant.',
-                            'resFr' => 'Une production d’énergie renouvelable au service des territoires.',
-                            'resEn' => 'Renewable energy generation serving the territories.',
-                        ],
-                        [
-                            'nomFr' => 'Micro-centrales hydro-électriques', 'nomEn' => 'Micro hydropower plants',
-                            'favFr' => 'Construction de micro-centrales hydro-électriques dans les huit territoires.',
-                            'favEn' => 'Construction of micro hydropower plants in the eight territories.',
-                            'resFr' => 'Une énergie disponible au plus près des communautés.',
-                            'resEn' => 'Energy available close to communities.',
-                        ],
-                        [
-                            'nomFr' => 'Centres d’apprentissage de métiers', 'nomEn' => 'Trade-training centres',
-                            'favFr' => 'Construction de centres d’apprentissage de métiers dans les huit territoires.',
-                            'favEn' => 'Construction of trade-training centres in the eight territories.',
-                            'resFr' => 'Des compétences professionnelles développées localement.',
-                            'resEn' => 'Professional skills developed locally.',
-                        ],
-                    ];
-                @endphp
+            {{-- ═══ OBJECTIFS ET COMPOSANTES (#composantes) ═══ --}}
+            @if ($aComposantes)
                 <section id="composantes" class="scroll-mt-40 mt-14 border-t border-line pt-10">
                     <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Objectifs et composantes', 'Objectives and components') }}</h2>
 
-                    <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
-                        {{ $t('Objectif général : faciliter la mobilité des personnes et de leurs biens et renforcer la résilience des communautés de huit territoires, par des infrastructures de base, une énergie renouvelable locale et des centres d’apprentissage de métiers.',
-                              'General objective: ease the movement of people and goods and strengthen the resilience of communities in eight territories, through basic infrastructure, local renewable energy and trade-training centres.') }}
-                    </p>
+                    @if ($objectifGeneral !== '')
+                        <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">{{ $objectifGeneral }}</p>
+                    @endif
 
-                    <div class="mt-6 overflow-x-auto border border-line">
-                        <table class="w-full min-w-[620px] border-collapse text-left text-sm">
-                            <thead class="bg-mist text-xs uppercase tracking-wider text-ink/60">
-                                <tr>
-                                    <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Composante', 'Component') }}</th>
-                                    <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Ce que prévoit le projet', 'Planned works') }}</th>
-                                    <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Résultat attendu', 'Expected result') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-line bg-white">
-                                @foreach ($composantes as $c)
+                    @if ($composantesData->isNotEmpty())
+                        <div class="mt-6 overflow-x-auto border border-line">
+                            <table class="w-full min-w-[620px] border-collapse text-left text-sm">
+                                <thead class="bg-mist text-xs uppercase tracking-wider text-ink/60">
                                     <tr>
-                                        <th class="w-1/4 px-4 py-4 align-top font-semibold text-ink" scope="row">
-                                            {{ $t($c['nomFr'], $c['nomEn']) }}
-                                        </th>
-                                        <td class="px-4 py-4 align-top text-ink/75">{{ $t($c['favFr'], $c['favEn']) }}</td>
-                                        <td class="px-4 py-4 align-top text-ink/75">{{ $t($c['resFr'], $c['resEn']) }}</td>
+                                        <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Composante', 'Component') }}</th>
+                                        <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Ce que prévoit le projet', 'Planned works') }}</th>
+                                        <th class="px-4 py-3 font-semibold" scope="col">{{ $t('Résultat attendu', 'Expected result') }}</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody class="divide-y divide-line bg-white">
+                                    @foreach ($composantesData as $c)
+                                        <tr>
+                                            <th class="w-1/4 px-4 py-4 align-top font-semibold text-ink" scope="row">
+                                                {{ $t($c['nom_fr'] ?? '', $c['nom_en'] ?? '') }}
+                                            </th>
+                                            <td class="px-4 py-4 align-top text-ink/75">{{ $t($c['prevoit_fr'] ?? '', $c['prevoit_en'] ?? '') }}</td>
+                                            <td class="px-4 py-4 align-top text-ink/75">{{ $t($c['resultat_fr'] ?? '', $c['resultat_en'] ?? '') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </section>
             @endif
 
@@ -442,7 +417,7 @@
                 <div class="mt-8 grid gap-4 sm:grid-cols-3">
                     @forelse ($funders as $partenaire)
                         <div class="flex items-center gap-4 border border-line bg-white p-5">
-                            @if ($logoPartenaire = $partenaire->getFirstMediaUrl('logo'))
+                            @if ($logoPartenaire = $partenaire->getFirstMediaUrl('logo', 'thumb'))
                                 <img src="{{ $logoPartenaire }}" alt="" class="h-12 w-12 shrink-0 object-contain">
                             @else
                                 <span class="grid h-12 w-12 shrink-0 place-items-center rounded bg-lake/10 font-serif text-lg font-semibold text-lake">

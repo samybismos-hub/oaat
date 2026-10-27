@@ -139,4 +139,64 @@ class ProjetShowTest extends TestCase
         $this->assertStringNotContainsString('id="zone"', $response->getContent());
         $this->assertStringNotContainsString('id="galerie"', $response->getContent());
     }
+
+    public function test_un_projet_non_publie_renvoie_404(): void
+    {
+        $domaine = $this->makeDomain();
+        $brouillon = $this->makeProject($domaine, [
+            'slug' => 'projet-brouillon',
+            'published_at' => null,
+        ]);
+
+        $this->get("/fr/projets/{$brouillon->slug}")->assertNotFound();
+
+        // Publier le projet le rend immédiatement accessible.
+        $brouillon->update(['published_at' => now()]);
+        $this->get("/fr/projets/{$brouillon->slug}")->assertOk();
+    }
+
+    public function test_les_sections_editoriales_sont_rendues_depuis_la_base(): void
+    {
+        $domaine = $this->makeDomain();
+        $projet = $this->makeProject($domaine, [
+            'slug' => 'projet-avec-editorial',
+            'contexte' => [
+                'fr' => "Paragraphe un.\n\nParagraphe deux.",
+                'en' => "Paragraph one.\n\nParagraph two.",
+            ],
+            'objectif_general' => [
+                'fr' => 'Objectif général test.',
+                'en' => 'General test objective.',
+            ],
+            'composantes' => [
+                [
+                    'nom_fr' => 'Routes', 'nom_en' => 'Roads',
+                    'prevoit_fr' => 'Construire.', 'prevoit_en' => 'Build.',
+                    'resultat_fr' => 'Trafic.', 'resultat_en' => 'Traffic.',
+                ],
+            ],
+        ]);
+
+        $response = $this->get("/fr/projets/{$projet->slug}");
+
+        $response->assertOk()
+            ->assertSee('id="contexte"', false)
+            ->assertSee('Paragraphe un.')
+            ->assertSee('Paragraphe deux.')
+            ->assertSee('Objectif général test.')
+            ->assertSee('id="composantes"', false)
+            ->assertSee('Routes')
+            ->assertSee('Construire.')
+            ->assertSee('Trafic.');
+
+        $responseEn = $this->get("/en/projets/{$projet->slug}");
+
+        $responseEn->assertOk()
+            ->assertSee('Paragraph one.')
+            ->assertSee('Paragraph two.')
+            ->assertSee('General test objective.')
+            ->assertSee('Roads')
+            ->assertSee('Build.')
+            ->assertSee('Traffic.');
+    }
 }

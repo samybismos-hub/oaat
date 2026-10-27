@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Models\Domain;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -57,6 +58,16 @@ class ProjectForm
                                     ->label('Résultats obtenus (FR)')
                                     ->rows(3)
                                     ->helperText('Ce qui a été livré ou construit, en une ou deux phrases.'),
+
+                                Textarea::make('contexte.fr')
+                                    ->label('Contexte et enjeux (FR)')
+                                    ->rows(5)
+                                    ->helperText('Séparez les paragraphes par une ligne vide. Éditées dans la section « Contexte et enjeux » de la fiche.'),
+
+                                Textarea::make('objectif_general.fr')
+                                    ->label('Objectif général (FR)')
+                                    ->rows(3)
+                                    ->helperText('La phrase qui résume l\'ambition du projet.'),
                             ]),
 
                         Tab::make('English')
@@ -77,9 +88,60 @@ class ProjectForm
                                 Textarea::make('results.en')
                                     ->label('Results (EN)')
                                     ->rows(3),
+
+                                Textarea::make('contexte.en')
+                                    ->label('Context and challenges (EN)')
+                                    ->rows(5),
+
+                                Textarea::make('objectif_general.en')
+                                    ->label('General objective (EN)')
+                                    ->rows(3),
                             ]),
                     ])
                     ->columnSpanFull(),
+
+                // 1b. Contenu éditorial optionnel de la fiche : les sections
+                //     « Contexte », « Objectif général » et le tableau des
+                //     « Composantes » de la page publique (pages.projets-show).
+                //     Laissées vides, ces sections n'apparaissent pas sur le site.
+                Section::make('Contenu éditorial (optionnel)')
+                    ->description('À renseigner seulement si la fiche doit détailler le contexte du projet et ses composantes (ex. projet emblématique).')
+                    ->schema([
+                        Repeater::make('composantes')
+                            ->label('Composantes (tableau « Objectifs et composantes »)')
+                            ->schema([
+                                TextInput::make('nom_fr')
+                                    ->label('Nom (FR)')
+                                    ->required()
+                                    ->maxLength(120),
+
+                                TextInput::make('nom_en')
+                                    ->label('Nom (EN)')
+                                    ->maxLength(120),
+
+                                Textarea::make('prevoit_fr')
+                                    ->label('Ce que prévoit le projet (FR)')
+                                    ->rows(2),
+
+                                Textarea::make('prevoit_en')
+                                    ->label('Planned works (EN)')
+                                    ->rows(2),
+
+                                Textarea::make('resultat_fr')
+                                    ->label('Résultat attendu (FR)')
+                                    ->rows(2),
+
+                                Textarea::make('resultat_en')
+                                    ->label('Expected result (EN)')
+                                    ->rows(2),
+                            ])
+                            ->columns(2)
+                            ->reorderable()
+                            ->collapsible()
+                            ->defaultItems(0)
+                            ->addActionLabel('Ajouter une composante')
+                            ->helperText('Triées par glisser-déposer : la première ligne apparaît en tête de tableau sur le site public.'),
+                    ]),
 
                 // 2. À quel domaine le projet appartient-il, et à quelle adresse ?
                 Section::make('Rattachement & identification')
