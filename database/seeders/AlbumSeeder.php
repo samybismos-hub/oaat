@@ -13,8 +13,8 @@ class AlbumSeeder extends Seeder
      * Les photos ne sont PAS semées automatiquement : elles doivent être téléversées
      * depuis l'administration (Filament) pour que le client garde la maîtrise des images publiées.
      *
-     * La table "albums" n'a pas de colonne unique : le seeder ne s'exécute donc
-     * qu'une seule fois (si la table est vide).
+     * La table « albums » porte désormais une colonne unique (slug) : le seeder
+     * ne recrée donc rien tant qu'un album existe déjà.
      */
     public function run(): void
     {
@@ -27,6 +27,7 @@ class AlbumSeeder extends Seeder
                 'fr' => 'Album de démonstration',
                 'en' => 'Demonstration album',
             ],
+            'slug' => 'album-de-demonstration',
             'project_id' => null,
         ]);
     }

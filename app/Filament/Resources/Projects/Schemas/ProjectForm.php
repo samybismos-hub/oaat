@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Models\Domain;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -257,9 +258,12 @@ class ProjectForm
                 //    qu'un enregistrement du formulaire, resté sur une liste périmée,
                 //    ne détache un partenaire ajouté entre-temps depuis l'onglet.
 
-                // 7. Les photos : une de couverture, puis la galerie.
+                // 7. Les photos : la couverture ici ; la galerie se gère dans
+                //    l'onglet « Albums photo » de la fiche. Un seul canal pour
+                //    les photos, partagé avec la ressource « Albums photo » du
+                //    menu « Médias & documents ».
                 Section::make('Photos & illustrations')
-                    ->description('Ces images alimentent la fiche du projet sur le site public. Conseils : JPG ou PNG, 1600 px de large minimum, moins de 5 Mo par image.')
+                    ->description('Couverture et mention de crédit de la fiche. La galerie de photos se gère dans l\'onglet « Albums photo » de la fiche. Conseils images : JPG ou PNG, 1600 px de large minimum, moins de 5 Mo par image.')
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('cover')
                             ->label('Photo de couverture')
@@ -271,16 +275,10 @@ class ProjectForm
                             ->maxSize(5120)
                             ->helperText('L\'image principale de la fiche : une seule photo possible (un nouvel envoi remplace l\'ancienne).'),
 
-                        SpatieMediaLibraryFileUpload::make('photos')
-                            ->label('Galerie photos')
-                            ->collection('photos')
-                            ->disk('public')
-                            ->image()
-                            ->multiple()
-                            ->reorderable()
-                            ->maxFiles(24)
-                            ->maxSize(5120)
-                            ->helperText('Toutes les autres photos du projet. Glissez-déposez les vignettes pour choisir l\'ordre d\'affichage.'),
+                        Placeholder::make('galerie')
+                            ->label('Galerie photo')
+                            ->columnSpanFull()
+                            ->content('Téléversez vos photos dans l\'onglet « Albums photo » en bas de la fiche : elles apparaissent alors dans la section Galerie de la fiche publique. Chaque album regroupe ses photos sous un titre, et l\'ordre des photos se règle par glisser-déposer. Les albums généraux du site se gèrent dans le menu « Albums photo ».'),
 
                         Section::make('Crédit photo')
                             ->description('Mention affichée sous la photo de couverture et sous chaque photo de la galerie de la fiche. Laissez vide pour afficher « OAAT ».')

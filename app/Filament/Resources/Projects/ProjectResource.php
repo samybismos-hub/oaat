@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Projects;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Projects\RelationManagers\AlbumsRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\PartnersRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
@@ -77,13 +78,17 @@ class ProjectResource extends Resource
     }
 
     /**
-     * Les onglets affichés sous la fiche projet : les partenaires et leur rôle
-     * (bailleur / exécutant), stocké dans la table pivot.
+     * Les onglets affichés sous la fiche projet :
+     *  - « Partenaires & rôles » : bailleurs / exécutants, stockés dans la
+     *    table pivot project_partner ;
+     *  - « Albums photo » : la galerie du projet — un seul canal pour les
+     *    photos, partagé avec la ressource « Albums photo » (Médias & documents).
      */
     public static function getRelations(): array
     {
         return [
             PartnersRelationManager::class,
+            AlbumsRelationManager::class,
         ];
     }
 

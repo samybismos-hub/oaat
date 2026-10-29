@@ -7,7 +7,9 @@ use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
 use App\Filament\Resources\Projects\ProjectResource;
+use App\Filament\Resources\Projects\RelationManagers\AlbumsRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\PartnersRelationManager;
+use App\Models\Album;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\User;
@@ -197,12 +199,14 @@ class ProjectResourceTest extends TestCase
             ->assertFormFieldExists('is_featured')
             ->assertFormFieldExists('published_at')
             ->assertFormFieldExists('cover')
-            ->assertFormFieldExists('photos')
+            // La galerie ne se téléverse plus ici : elle se gère dans l'onglet
+            // « Albums photo » de la fiche (gestionnaire de relations).
+            ->assertFormFieldDoesNotExist('photos')
             ->assertSee('Français')
             ->assertSee('English')
             ->assertSee('Domaine d\'intervention')
             ->assertSee('Photos & illustrations')
-            ->assertSee('Galerie photos');
+            ->assertDontSee('Galerie photos');
     }
 
     public function test_le_menu_deroulant_des_domaines_affiche_le_nom_francais_et_non_le_json(): void
@@ -244,39 +248,92 @@ class ProjectResourceTest extends TestCase
         $this->assertSame('12500.50', $project->budget_amount);
     }
 
-    public function test_une_photo_de_couverture_et_des_photos_de_galerie_peuvent_etre_attachees(): void
+    /**
+     * Depuis l'option A, la galerie d'un projet vit dans ses albums (collection
+     * « photos » des albums liés), et plus dans une collection « photos » du
+     * projet lui-même : un seul canal pour toutes les images.
+     *
+     * Un vrai PNG est utilisé : contrairement à un upload factice, il passe les
+     * conversions Spatie (thumb/card, non-queued) sans erreur du pilote GD.
+     */
+    public function test_la_galerie_dun_projet_est_alimentee_par_ses_albums(): void
     {
         // Storage::fake : les fichiers partent dans un dossier temporaire,
         // rien n'est écrit dans storage/app/public pendant les tests.
         Storage::fake('public');
 
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+
         $domain = $this->makeDomain();
         $project = $this->makeProject($domain);
 
-        $project->addMediaFromString('contenu-de-la-couverture')
+        $project->addMediaFromString($png)
             ->usingFileName('pont-kasandjala.jpg')
             ->toMediaCollection('cover');
 
-        $project->addMediaFromString('contenu-photo-1')
+        $album = Album::create([
+            'title' => ['fr' => 'Chantier des ponts', 'en' => 'Bridges building site'],
+            'slug' => 'chantier-des-ponts',
+            'project_id' => $project->id,
+        ]);
+
+        $album->addMediaFromString($png)
             ->usingFileName('chantier-1.jpg')
             ->toMediaCollection('photos');
-
-        $project->addMediaFromString('contenu-photo-2')
+        $album->addMediaFromString($png)
             ->usingFileName('chantier-2.jpg')
             ->toMediaCollection('photos');
 
         $project = $project->refresh();
 
-        // « cover » est une collection singleFile : une seule image à la fois.
-        $this->assertCount(1, $project->getMedia('cover'));
-        $this->assertCount(2, $project->getMedia('photos'));
-
+        // La couverture reste une collection singleFile sur le projet…
         $cover = $project->getFirstMedia('cover');
-
+        $this->assertCount(1, $project->getMedia('cover'));
         $this->assertNotNull($cover);
         $this->assertSame('pont-kasandjala.jpg', $cover->file_name);
         $this->assertNotNull($cover->getUrl());
         Storage::disk('public')->assertExists($cover->getPathRelativeToRoot());
+
+        // …et la galerie vit dans les albums rattachés, plus dans une
+        // collection « photos » du projet (canal unique pour les images).
+        $this->assertCount(1, $project->albums);
+        $this->assertCount(2, $album->getMedia('photos'));
+        $this->assertSame($project->id, $album->project_id);
+        $this->assertCount(0, $project->getMedia('photos'));
+    }
+
+    /**
+     * L'onglet « Albums photo » de la fiche projet remplace l'ancien champ
+     * « Galerie photos » du formulaire : on peut créer un album lié au projet
+     * sans quitter la fiche, et il est immédiatement attaché au projet.
+     */
+    public function test_l_onglet_albums_est_branche_sur_la_fiche_et_permet_de_creer_un_album(): void
+    {
+        $domain = $this->makeDomain();
+        $project = $this->makeProject($domain);
+
+        $this->assertContains(AlbumsRelationManager::class, ProjectResource::getRelations());
+
+        Livewire::test(AlbumsRelationManager::class, [
+            'ownerRecord' => $project,
+            'pageClass' => EditProject::class,
+        ])
+            ->assertOk()
+            ->assertTableActionExists('create')
+            ->callTableAction('create', data: [
+                'title.fr' => 'Album de chantier',
+                'title.en' => 'Worksite album',
+                'slug' => 'album-de-chantier',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $album = $project->albums()->first();
+
+        $this->assertNotNull($album, 'L\'album aurait dû être créé depuis l\'onglet.');
+        $this->assertSame('Album de chantier', $album->getTranslation('title', 'fr'));
+        $this->assertSame('Worksite album', $album->getTranslation('title', 'en'));
+        $this->assertSame('album-de-chantier', $album->slug);
+        $this->assertSame($project->id, $album->project_id);
     }
 
     /**

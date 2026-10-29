@@ -67,6 +67,17 @@ class AlbumResourceTest extends TestCase
         ], $attributes));
     }
 
+    /**
+     * Un vrai PNG d'1×1 px : les conversions Spatie (thumb/card, non-queued)
+     * sont générées à l'ajout de chaque média, et un contenu factice déclenche
+     * une erreur du pilote GD (« imagecreatefromstring »). Comme ProjetShowTest,
+     * on passe donc une image réelle plutôt qu'une chaîne bidon.
+     */
+    private function png(): string
+    {
+        return base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+    }
+
     public function test_la_ressource_est_rangee_dans_le_menu_des_medias_et_documents(): void
     {
         $this->assertSame('Albums photo', AlbumResource::getNavigationLabel());
@@ -81,8 +92,8 @@ class AlbumResourceTest extends TestCase
 
         $album = $this->makeAlbum(['project_id' => $projet->id]);
 
-        $album->addMediaFromString('photo-1')->usingFileName('chantier-1.jpg')->toMediaCollection('photos');
-        $album->addMediaFromString('photo-2')->usingFileName('chantier-2.jpg')->toMediaCollection('photos');
+        $album->addMediaFromString($this->png())->usingFileName('chantier-1.jpg')->toMediaCollection('photos');
+        $album->addMediaFromString($this->png())->usingFileName('chantier-2.jpg')->toMediaCollection('photos');
 
         $general = $this->makeAlbum([
             'title' => ['fr' => "Vie de l'organisation", 'en' => 'Life of the organisation'],
@@ -135,6 +146,7 @@ class AlbumResourceTest extends TestCase
             ->assertOk()
             ->assertFormFieldExists('title.fr')
             ->assertFormFieldExists('title.en')
+            ->assertFormFieldExists('slug')
             ->assertFormFieldExists('project_id')
             ->assertFormFieldExists('photos')
             ->assertSee('Photos de l\'album');
@@ -169,6 +181,7 @@ class AlbumResourceTest extends TestCase
             ->fillForm([
                 'title.fr' => 'Forages de Fizi',
                 'title.en' => 'Fizi boreholes',
+                'slug' => 'forages-de-fizi',
                 'project_id' => $projet->id,
             ])
             ->call('create')
@@ -187,11 +200,11 @@ class AlbumResourceTest extends TestCase
 
         $album = $this->makeAlbum();
 
-        $album->addMediaFromString('premiere-photo')
+        $album->addMediaFromString($this->png())
             ->usingFileName('chantier-1.jpg')
             ->toMediaCollection('photos');
 
-        $album->addMediaFromString('seconde-photo')
+        $album->addMediaFromString($this->png())
             ->usingFileName('chantier-2.jpg')
             ->toMediaCollection('photos');
 

@@ -42,9 +42,6 @@ class Project extends Model implements HasMedia
             ->singleFile()
             ->useDisk('public')
             ->storeConversionsOnDisk('public');
-        $this->addMediaCollection('photos')
-            ->useDisk('public')
-            ->storeConversionsOnDisk('public');
     }
 
     public function registerMediaConversions(?Media $media = null): void

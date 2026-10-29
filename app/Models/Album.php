@@ -12,7 +12,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['title', 'project_id'])]
+#[Fillable(['title', 'slug', 'project_id'])]
 #[Translatable('title')]
 class Album extends Model implements HasMedia
 {
