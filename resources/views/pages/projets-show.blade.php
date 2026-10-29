@@ -45,6 +45,10 @@
     $objectifGeneral = trim((string) $projet->getTranslation('objectif_general', $locale));
     $composantesData = collect($projet->composantes ?? []);
 
+    // Mention de crédit photo : saisie dans l'admin du projet (ProjectForm § « Crédit photo »),
+    // affichée sous la photo de couverture et sous chaque photo de la galerie.
+    $creditPhoto = trim((string) $projet->getTranslation('credit_photo', $locale)) ?: 'OAAT';
+
     // Famille visuelle du statut : « w » = à financer (pastille ochre),
     // « d » = réalisé / en cours (pastille verte).
     $aFinancer = $projet->statut_court === 'w';
@@ -175,7 +179,7 @@
                 <img src="{{ $heroUrl }}" alt="{{ $titre }}" class="aspect-[21/9] w-full object-cover">
                 <figcaption class="mt-2 flex flex-wrap justify-between gap-2 text-xs text-ink/60">
                     <span>{{ $titre }}</span>
-                    <span>Crédit : OAAT</span>
+                    <span>{{ $t('Crédit', 'Credit') }} : {{ $creditPhoto }}</span>
                 </figcaption>
             </figure>
         @endif
@@ -549,7 +553,7 @@
                             </button>
                             <figcaption class="mt-3 text-sm leading-snug text-ink/80">
                                 <span>{{ $photo['title'] }}</span>
-                                <span class="mt-1 block text-xs text-ink/50">Crédit : OAAT</span>
+                                <span class="mt-1 block text-xs text-ink/50">{{ $t('Crédit', 'Credit') }} : {{ $creditPhoto }}</span>
                             </figcaption>
                         </figure>
                     @endforeach

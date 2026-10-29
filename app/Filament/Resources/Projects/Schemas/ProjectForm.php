@@ -281,6 +281,18 @@ class ProjectForm
                             ->maxFiles(24)
                             ->maxSize(5120)
                             ->helperText('Toutes les autres photos du projet. Glissez-déposez les vignettes pour choisir l\'ordre d\'affichage.'),
+
+                        Section::make('Crédit photo')
+                            ->description('Mention affichée sous la photo de couverture et sous chaque photo de la galerie de la fiche. Laissez vide pour afficher « OAAT ».')
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('credit_photo.fr')
+                                    ->label('Crédit photo (FR)')
+                                    ->placeholder('ex. : OAAT'),
+                                TextInput::make('credit_photo.en')
+                                    ->label('Crédit photo (EN)')
+                                    ->placeholder('e.g. OAAT'),
+                            ]),
                     ]),
             ]);
     }

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Domain;
 use App\Models\Project;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -198,5 +199,51 @@ class ProjetShowTest extends TestCase
             ->assertSee('Roads')
             ->assertSee('Build.')
             ->assertSee('Traffic.');
+    }
+
+    /**
+     * La mention « Crédit : … » de la fiche (couverture + galerie) vient du champ
+     * bilingue credit_photo saisi dans l'administration du projet. Un vrai PNG est
+     * utilisé : contrairement à un upload factice, il passe les conversions Spatie
+     * sans déclencher d'erreur du pilote GD.
+     */
+    private function attachCover(Project $projet): void
+    {
+        Storage::fake('public');
+
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+
+        $projet->addMediaFromString($png)
+            ->usingFileName('couverture.png')
+            ->toMediaCollection('cover');
+    }
+
+    public function test_le_credit_photo_est_rendu_depuis_le_projet(): void
+    {
+        $domaine = $this->makeDomain();
+        $projet = $this->makeProject($domaine, [
+            'slug' => 'projet-avec-credit',
+            'credit_photo' => ['fr' => 'Photographe de test', 'en' => 'Test photographer'],
+        ]);
+        $this->attachCover($projet);
+
+        $this->get("/fr/projets/{$projet->slug}")
+            ->assertOk()
+            ->assertSee('Crédit : Photographe de test');
+
+        $this->get("/en/projets/{$projet->slug}")
+            ->assertOk()
+            ->assertSee('Credit : Test photographer');
+    }
+
+    public function test_sans_credit_photo_la_fiche_replie_sur_oaat(): void
+    {
+        $domaine = $this->makeDomain();
+        $projet = $this->makeProject($domaine, ['slug' => 'projet-sans-credit']);
+        $this->attachCover($projet);
+
+        $this->get("/fr/projets/{$projet->slug}")
+            ->assertOk()
+            ->assertSee('Crédit : OAAT');
     }
 }

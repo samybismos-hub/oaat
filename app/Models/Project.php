@@ -16,8 +16,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['domain_id', 'title', 'slug', 'status', 'country', 'city', 'start_date', 'end_date', 'objectives', 'beneficiaries', 'results', 'contexte', 'objectif_general', 'composantes', 'budget_amount', 'budget_currency', 'beneficiaries_count', 'beneficiaries_unit', 'is_featured', 'published_at'])]
-#[Translatable('title', 'objectives', 'beneficiaries', 'results', 'contexte', 'objectif_general')]
+#[Fillable(['domain_id', 'title', 'slug', 'status', 'country', 'city', 'start_date', 'end_date', 'objectives', 'beneficiaries', 'results', 'contexte', 'objectif_general', 'composantes', 'credit_photo', 'budget_amount', 'budget_currency', 'beneficiaries_count', 'beneficiaries_unit', 'is_featured', 'published_at'])]
+#[Translatable('title', 'objectives', 'beneficiaries', 'results', 'contexte', 'objectif_general', 'credit_photo')]
 class Project extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, InteractsWithMedia;
