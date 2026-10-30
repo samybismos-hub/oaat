@@ -118,6 +118,7 @@ if(mg&&dn){
   [dn,mg].forEach(e=>{e.onmouseenter=()=>{clearTimeout(mt);sm(1)};e.onmouseleave=()=>mt=setTimeout(()=>sm(0),180)});
   dn.onfocus=()=>sm(1);mg.onclick=()=>sm(0);
   addEventListener('keydown',e=>e.key=='Escape'&&sm(0));
+  addEventListener('scroll',()=>sm(0),{passive:true});
 }
 
 /* 17 Page projet — barre mobile (CTA « Soutenir ce projet ») */
@@ -149,4 +150,15 @@ if(lb&&li&&GL.length){
 /* 21 Liens réseaux sociaux sans URL : toast (sans écraser les vrais liens du pied de page) */
 addEventListener('click',e=>{const a=e.target.closest?.('a.sc');if(a&&!a.hasAttribute('onclick')&&(!a.getAttribute('href')||a.getAttribute('href')==='#')){e.preventDefault();toast(L('Lien du réseau social à renseigner.','Social link to be added.'))}});
 
+/* 22 Page domaines : scrollspy de la barre #rl (domaine visible) */
+const rl=$('#rl'),rla=$$('#rl a');
+if(rl&&rla.length){
+  const spyRl=()=>{
+    let a=0;
+    rla.forEach((l,i)=>{const s=$(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<250)a=i});
+    rla.forEach((l,i)=>{const on=i===a;l.classList.toggle('border-ochre',on);l.classList.toggle('border-transparent',!on);l.classList.toggle('text-lake',on);l.classList.toggle('text-ink/70',!on)});
+  };
+  addEventListener('scroll',spyRl,{passive:true});
+  spyRl();
+}
 });
