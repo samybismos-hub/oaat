@@ -1,170 +1,49 @@
-J'ai maintenant tout le contexte nécessaire pour une feuille de route précise et vérifiée (j'ai re-contrôlé le modèle `Project`, le pivot `ProjectPartner`, le seeder, le layout Tailwind CDN, le formulaire Filament v5 et le namespace `Repeater`). Voici __ce que je vais implémenter__, dans l'ordre.
+# Refonte des fiches projet & galeries — Plan de conformité (v2)
+
+> **Ce plan remplace la v1.** Il ne reflète pas un cahier des charges à exécuter :
+> il documente l'**état réellement livré** (référentiel) et les seuls points
+> résiduels ouverts. Conformément aux échanges, **ce qui est déjà implémenté
+> et testé prime sur toute ancienne mention de phase « à faire »** ; les phases
+> 3/4 de la v1 s'y rapportent désormais comme « résidu optionnel ».
 
 ---
 
-# 🗺️ Feuille de route d'implémentation — Fiche projet
+## 1. Livré et testé (référentiel — ne pas refaire)
 
-## Rappel des principes validés
+| Domaine | Implémentation | Validation |
+|---|---|---|
+| **Fiche projet publique** | `projets-show` hérite de `layouts.app` ; sections à affichage conditionnel (zone, editorial, expérience, connexes, galerie) ; SEO dynamique ; plus de contenu hardcodé | `ProjetShowTest` 9/9 |
+| **Contenu éditorial** | `contexte`, `objectif_general`, `composantes` (JSON bilingue sur `projects`), saisis via `ProjectForm`, rendus dans les sections « Contexte » / « Composantes », masquées si vides (`hasEditorialContent()`) | `ProjetShowTest` 9/9 |
+| **Crédit photo** | **Par projet** (champ bilingue `credit_photo`), appliqué à la couverture + galerie, fallback « OAAT » | `ProjetShowTest` (2 tests) |
+| **Appels à l'action « Soutenir »** | 3 cartes + CTA du bloc soutien → `/{locale}/contact?objet=f|p|i` ; le formulaire de contact pré-sélectionne l'objet et surligne le bouton correspondant | `ContactPageTest` 3/3 |
+| **Publication** | Brouillons/non publiés → 404 (`published()` sur `show`) | `ProjetShowTest` |
+| **Expérience comparable / connexes** | Réalisés **+ En cours**, hors fiche courante ; compteurs `take(4)` / `take(3)` issus de `config('oaat.projects.*')` | `ProjetShowTest` + `config/oaat.php` |
+| **Helpers modèle** | `statusLabel()`, `durationLabel()` (cas zéro), `beneficiariesLabel()` (loc), `hasEditorialContent()`, `funderLabel()`… — source unique | `ProjetIndexTest` 7/7 |
+| **Indicateurs index** | Compteurs publics (dont `zones`) | `ProjetIndexTest` 7/7 |
+| **Options A — Albums = canal unique** | La collection `photos` du projet (code mort) est supprimée ; galerie gérée **uniquement** par les albums liés ; onglet « Albums photo » (`AlbumsRelationManager`) sur la fiche projet ; slug d'album (migration + formulaire) corrigeant `GalerieController@show` | `ProjectResourceTest` 12/12, `AlbumResourceTest` 8/8 |
 
-- Aucune régression de rendu : les textes actuellement affichés restent __identiques__, mais lus depuis la base au lieu du template.
-- Chaque phase est livrable et testable indépendamment. La suite de tests est relancée après chaque phase.
-- Le pivot bailleurs (`withPivot('role')` + enum `PartnerRole` + `->value`) est __déjà correct__ : les bailleurs s'affichent bien, pas de correctif nécessaire (point 1.2 de l'audit résolu).
+## 2. Décisions déjà actées (à ne pas rouvrir)
 
----
+- **D1 — N° de fiche** : retiré de la fiche publique.
+- **D2 — Stockage éditorial** : colonnes JSON sur `projects` (pas de table `project_sections`).
+- **D3 — « Expérience comparable »** : inclut Réalisés **+ En cours**.
+- **D4 — Appels à l'action** : les cartes et CTAs « Soutenir » passent par le **formulaire de contact avec objet pré-rempli** (traçable, cohérent), plus de `mailto:` pour ces blocs.
+- **D5 — Crédit photo** : **par projet** (et non `photo_credit` global dans les Settings comme le prévoyait la v1) — la v1 (T3.1/T3.2) est caduc sur ce point.
+- **D6 — Galeries** : **albums = canal unique** (option A) ; pas de double système de photos projet/album.
+- **D7 — Publication** : les fiches non publiées ne sont jamais exposées.
 
-## 📘 Phase 1 — Sécurité & robustesse *(aucune migration)*
+## 3. Points résiduels — traités (section 3 « décisions »)
 
-### T1.1 — Bloquer l'accès public aux brouillons
+| # | Décision | Traitement appliqué |
+|---|---|---|
+| **O1** | Pas de `mailto:` | ✅ Le lien « Rejoindre ce partenariat » (bloc Financement) et le lien « Interlocuteur » passent par `route('contact')` (`objet=p` / `objet=i`) ; le helper mort `$mailto`/`$u` et le bloc « E-mails automatiques » sont supprimés. Aucun `mailto:` dans la fiche. |
+| **O2** | Wording « Recherche de financement » | ✅ `_carte_projet` utilise désormais `statusLabel()` (source unique du modèle) ; le doublon local `$statutLabel` (« En attente de financement ») est supprimé. |
+| **O3** | Nettoyer | ✅ **O3a** – §22 `data-href-fr`/`apply` de `oaat.js` retiré (`node --check` OK). **O3b** – `data-en` retirés de `_carte_projet` + `projets-index` (0 restant ; les `$t()` rendent déjà l’EN). **O3c** – SEO : `rel=canonical` + OG de base dans `layouts/app.blade.php`, fallback `meta_description` (objectifs → résultats → titre) + `og:image` sur la fiche. **O3d** – token `ochreDark` (#7A5200), plus aucune classe arbitraire. **O3e** – logo SVG factorisé dans `partials/_logo_oaat` (3 occurrences), SVG restant unique. Vues compilées ✓ |
+| **O4** | Corriger les derniers PNG | ✅ `PartnerResourceTest::test_le_logo_est_stocke…` réparé avec un vrai PNG 1×1 `base64_decode` (fini le `imagecreatefromstring` en échec). `ExampleTest` réécrit : la racine redirige vers la locale (302). |
 
-__Fichier__ : `app/Http/Controllers/Public/ProjetController.php` (l.177-180)
+## 4. Critère d'acceptation (reformulé)
 
-```php
-$projet = Project::query()
-    ->where('slug', $slug)
-    ->with(['domain', 'partners', 'albums.media'])
-    ->published()          // ← ajout : non publié → 404
-    ->firstOrFail();
-```
+- **Suite complète « tout vert »** : 105/105 avant O4 → cible après O4 : 107/107 (voir `storage/logs/_suite2.log`).
+- Les 5 classes ciblées (`ProjetShowTest`, `ContactPageTest`, `ProjetIndexTest`, `ProjectResourceTest`, `AlbumResourceTest`) : ✓ vertes tout au long.
+- Rendu manuel FR/EN conforme sur « 8 territoires » et fiches sans sections vides : ✓.
 
-__Test__ : `test_show_renvoie_404_sur_brouillon` dans `ProjetShowTest` (projet sans `published_at` → 404). Les projets de test existants doivent publier leurs fixtures (à vérifier dans les factories/tests).
-
-### T1.2 — Retirer l'ID interne du hero
-
-__Fichier__ : `resources/views/pages/projets-show.blade.php` (l.138) `Fiche projet n° {{ $projet->id }}` expose l'ID de la base. → suppression de la mention, ou remplacement par un éventuel champ métier « référence » (voir __Décision 1__).
-
-### T1.3 — Compteurs configurables + « Expérience » incluant « En cours »
-
-__Fichier__ : `config/oaat.php` (ajout) + `ProjetController.php` (l.184-200)
-
-```php
-// config/oaat.php
-'projects' => [
-    'experience_count' => 4,
-    'related_count'    => 3,
-],
-```
-
-```php
-// contrôleur
-->whereIn('status', [
-    ProjectStatus::Completed->value,
-    ProjectStatus::Ongoing->value,      // ← ajout
-])
-->take(config('oaat.projects.experience_count')),
-```
-
-*(voir __Décision 3__ pour inclure ou non `ongoing`)*
-
-### T1.4 — i18n durée & bénéficiaires
-
-__Fichier__ : `app/Models/Project.php`
-
-- `durationLabel()` : quand les deux dates sont renseignées mais que la durée fait 0 mois → `—` (et non « En cours ») ;
-- `beneficiariesLabel()` : nombre formaté selon la locale (`1 234` en FR, `1,234` en EN).
-
-### T1.5 — Logo bailleur en vignette allégée
-
-__Fichier__ : `projets-show.blade.php` (l.445-446) `getFirstMediaUrl('logo','thumb')` (conversion `thumb` déjà déclarée côté `Partner` à vérifier).
-
----
-
-## 📗 Phase 2 — Contenu éditorial pilotable *(migration — le gros chantier)*
-
-> Objectif : faire disparaître __tous les textes figés__ des sections Contexte / Objectif général / Composantes multiplié par le slug magique `amenagement-des-8-territoires`, et les rendre administrables.
-
-### T2.1 — Migration
-
-__Fichier__ : `database/migrations/2026_10_26_000001_add_editorial_content_to_projects_table.php`
-
-```php
-$table->json('contexte')->nullable();         // {'fr':'…','en':'…'}  — 1 à 2 paragraphes
-$table->json('objectif_general')->nullable(); // {'fr':'…','en':'…'}
-$table->json('composantes')->nullable();      // liste d'objets (voir T2.3)
-```
-
-Structure des composantes (clés plates, comme les traductions existantes) :
-
-```json
-[{ "nom_fr":"…","nom_en":"…","prevoit_fr":"…","prevoit_en":"…","resultat_fr":"…","resultat_en":"…" }]
-```
-
-### T2.2 — Modèle `Project`
-
-- Ajouter `contexte`, `objectif_general`, `composantes` au `#[Fillable]` ;
-- `contexte` + `objectif_general` dans `#[Translatable]` ; `composantes` en cast `array` ;
-- Nouvelle méthode `hasEditorialContent(): bool` (non vide sur __au moins une langue__) qui __remplace le test du slug__.
-
-### T2.3 — Formulaire Filament (`ProjectForm.php`)
-
-- Ongllets FR / EN existants : ajout d'un `Textarea` « Contexte » et « Objectif général » dans chacun ;
-- Nouvelle `Section::make('Composantes')` avec `Filament\Forms\Components\Repeater::make('composantes')` → 6 sous-champs bilingues, `->reorderable()->collapsible()->defaultItems(0)->addActionLabel('Ajouter une composante')`. (Namespace `Repeater` confirmé dans `vendor/filament/forms/src/Components/Repeater.php`.)
-
-### T2.4 — Seeder
-
-L'entrée `amenagement-des-8-territoires` du `ProjectSeeder` (l.360) reçoit les 2 paragraphes de contexte, l'objectif général et les 4 composantes __tels qu'affichés aujourd'hui__ → rendu strictement identique après refactor, en dev comme en recette. *(En production : une saisie via Filament, pas de script.)*
-
-### T2.5 — Vue
-
-- l.94 : `$editorial = $projet->hasEditorialContent();`
-- `#contexte` (l.311-325) : boucle sur les paragraphes issus de `contexte` ;
-- `#composantes` (l.328-393) : boucle sur `composantes`, objectif général issu de la base ; __structure HTML conservée telle quelle__.
-
-### T2.6 — Tests
-
-- `test_sections_editoriales_rendues_depuis_la_base` (projet avec composantes → tableau FR/EN rendu) ;
-- Le test existant « sections masquées pour les autres projets » __doit continuer à passer__ (aucun éditorial en base pour eux).
-
----
-
-## 📙 Phase 3 — Dés-hardcodage des textes & Settings *(migration)*
-
-### T3.1/T3.2 — Interlocuteur + crédit photo paramétrables
-
-__Migration__ `settings` : `contact_person_fr`, `contact_person_en`, `contact_role_fr`, `contact_role_en`, `photo_credit` (JSON, nullable). __Fichiers__ : `Setting.php` (Fillable/casts) + __`SettingForm.php` existant__ (nouvelle section « Affichage des fiches projet »). __Vue__ : interlocuteur `#soutenir` (l.630) affiché __seulement si renseigné__ ; figcaptions hero (l.169) et galerie (~l.577) : `$settings?->photo_credit` avec fallback traduit « Crédit : OAAT ».
-
-### T3.3 — « Rejoindre le partenariat » : du mailto vers le formulaire
-
-__Fichier__ : l.479-490 → lien `route('contact')` avec `?objet=p` pré-sélectionné cohérent avec les 3 cartes « Soutenir » (voir __Décision 4__).
-
-### T3.4 — Email de secours dans la config
-
-__Fichiers__ : `config/oaat.php` (`'contact_email' => 'oaatrdc2000@gmail.com'`) + vue (l.82) `config('oaat.contact_email')`.
-
-### T3.5 — Token couleur `ochre-dark`
-
-__Fichier__ : `layouts/app.blade.php` (l.26, config Tailwind CDN) : `ochreDark: '#7A5200'` → remplacement de `text-[#7A5200]` (l.144 et 654) par `text-ochre-dark`.
-
-### T3.6 — Factorisation du logo SVG OAAT
-
-__Fichier__ : nouveau `partials/_svg_oaat.blade.php` (rect `#17508F` + path ochre), puis remplacement des __3 occurrences__ : `projets-show` l.466-469, `_header` l.20-21, `_footer` l.44-45.
-
-### T3.7 — Harmonisation du libellé de statut
-
-`statusLabel()` (« Recherche de financement ») vs carte de l'index (« En attente de financement ») : aligner les deux sur __un seul wording__ (voir __Décision 5__).
-
-### T3.8 — Tests
-
-ContactPageTest inchangé + test « interlocuteur masqué si vide ».
-
----
-
-## 📕 Phase 4 — Nettoyage transverse *(bonus, sans migration)*
-
-- __T4.1__ — `public/js/oaat.js` : retirer la branche morte `[data-href-fr]` (§22) ;
-- __T4.2__ — Traiter les `data-en` __restants__ (`projets-index`, `_carte_projet`) : les traductions EN de l'index sont actuellement cassées — basculer sur `$t()` comme fait pour la fiche ;
-- __T4.3__ — SEO : `<link rel="canonical">` + OG de base + fallback de `meta_description` (reprendre `$resultats` puis le titre) ;
-- __T4.4__ — Harmoniser l'offset de scroll via une variable `--scroll-offset` (optionnel).
-
----
-
-## 🚦 Critère d'acceptation global
-
-`php artisan test` vert (dont `ProjetShowTest`), rendu FR/EN manuel sur Laragon conforme à la maquette pour le projet « 8 territoires », et fiches « non emblématiques » sans sections vides.
-
-## ⚖️ Décisions à trancher
-
-1. __N° de fiche__ (T1.2) : retirer la mention (simple) *ou* créer une vraie référence métier ?
-2. __Stockage éditorial__ (T2.1) : colonnes JSON sur `projects` — ma recommandation, cohérent avec l'existant (`title`, `objectives`…) *vs* table `project_sections` (plus évolutive mais plus lourde) ?
-3. __« Expérience comparable »__ (T1.3) : inclure les projets __En cours__ en plus des Réalisés ?
-4. __« Rejoindre le partenariat »__ (T3.3) : basculer sur `contact?objet=p` (traçable, cohérent) *vs* conserver le `mailto:` ?
-5. __Wording statut__ (T3.7) : « Recherche de financement » *ou* « En attente de financement » partout ?

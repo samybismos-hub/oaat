@@ -92,12 +92,7 @@
     // ─────────────────────────────────────────────────────────────────────
     //  3. E-mails automatiques (« Demander un document », « Soutenir »)
     // ─────────────────────────────────────────────────────────────────────
-    $email = $settings?->email ?? 'oaatrdc2000@gmail.com';
-
-    $mailto = fn (string $sujetFr, string $sujetEn, string $corpsFr, string $corpsEn): array => [
-        'fr' => 'mailto:' . $email . '?subject=' . rawurlencode($sujetFr) . '&body=' . rawurlencode($corpsFr),
-        'en' => 'mailto:' . $email . '?subject=' . rawurlencode($sujetEn) . '&body=' . rawurlencode($corpsEn),
-    ];
+    $email = $settings?->email ?? 'contact@oaat.cd';
 
     // ─────────────────────────────────────────────────────────────────────
     //  4. Sélecteurs de sections (affichées seulement si un contenu existe)
@@ -119,8 +114,14 @@
 @endsection
 
 @section('meta_description')
-    {{ \Illuminate\Support\Str::limit(strip_tags($objectifs), 155) }}
+    {{ \Illuminate\Support\Str::limit(strip_tags($objectifs ?: ($resultats ?: $titre)), 155) }}
 @endsection
+
+@push('head')
+    @if ($heroUrl !== '')
+        <meta property="og:image" content="{{ $heroUrl }}">
+    @endif
+@endpush
 
 @section('content')
 
@@ -154,7 +155,7 @@
                     <span class="text-ink/70">{{ $domaine }}</span>
                     <span class="text-ink/25" aria-hidden="true">|</span>
                 @endif
-                <span class="inline-flex items-center gap-2 {{ $aFinancer ? 'text-[#7A5200]' : 'text-moss' }}">
+                <span class="inline-flex items-center gap-2 {{ $aFinancer ? 'text-ochre-dark' : 'text-moss' }}">
                     <i class="h-2 w-2 {{ $aFinancer ? 'bg-ochre' : 'bg-moss' }}"></i>
                     <span>{{ $statut }}</span>
                 </span>
@@ -442,11 +443,7 @@
 
                     {{-- OAAT : mise en œuvre --}}
                     <div class="flex items-center gap-4 border border-line bg-white p-5">
-                        <svg viewBox="0 0 40 40" class="h-12 w-12 shrink-0" aria-hidden="true">
-                            <rect width="40" height="40" rx="9" fill="#17508F"/>
-                            <path d="M5 27c6-9 11 3 17-6s8-5 13-9M5 21c5-8 10 2 15-5s9-4 15-8M5 33c7-8 12 3 18-5s7-4 12-7"
-                                  fill="none" stroke="#E3A82B" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
+                        @include('partials._logo_oaat', ['svgClass' => 'h-12 w-12 shrink-0'])
                         <div>
                             <p class="font-serif text-lg font-semibold text-ink">OAAT</p>
                             <p class="text-sm text-ink/65">{{ $t('Organisation de mise en œuvre', 'Implementing organisation') }}</p>
@@ -454,20 +451,12 @@
                     </div>
                 </div>
 
-                {{-- Rejoindre le partenariat --}}
-                @php
-                    $u = $mailto(
-                        "Partenariat — {$titre}",
-                        "Partnership — {$titre}",
-                        "Bonjour,\n\nNotre organisation souhaite étudier un partenariat sur le projet « {$titre} ».\n\nOrganisation :\nContact :\n\nCordialement,",
-                        "Hello,\n\nOur organisation would like to explore a partnership on the project \"{$titre}\".\n\nOrganisation:\nContact:\n\nKind regards,",
-                    );
-                @endphp
+                {{-- Rejoindre le partenariat -> formulaire de contact pré-sélectionné --}}
                 <p class="mt-6 text-sm text-ink/70">
                     {{ $t('Vous souhaitez rejoindre ce partenariat ?', 'Would you like to join this partnership?') }}
-                    <a href="{{ $locale === 'en' ? $u['en'] : $u['fr'] }}"
+                    <a href="{{ route('contact', ['locale' => $locale, 'objet' => 'p']) }}"
                        class="font-semibold text-lake underline-offset-4 hover:underline">
-                        {{ $t('Écrire à l’OAAT', 'Write to OAAT') }}
+                        {{ $t('Écrire à l\'OAAT', 'Write to OAAT') }}
                     </a>
                 </p>
             </section>
@@ -479,7 +468,7 @@
                     <h2 class="font-serif text-3xl font-semibold text-ink">{{ $t('Expérience comparable', 'Comparable experience') }}</h2>
 
                     <p class="mt-5 max-w-[68ch] text-[17px] leading-relaxed text-ink/80">
-                        {{ $t('Depuis 1995, l’OAAT réalise des routes, des ponts et des ouvrages publics avec des agences des Nations Unies et d’autres bailleurs. Quelques réalisations comparables :',
+                        {{ $t('Depuis 1995, l\'OAAT réalise des routes, des ponts et des ouvrages publics avec des agences des Nations Unies et d\'autres bailleurs. Quelques réalisations comparables :',
                               'Since 1995, OAAT has built roads, bridges and public works with UN agencies and other donors. A few comparable achievements:') }}
                     </p>
 
@@ -520,7 +509,7 @@
                     <p class="mt-5 text-sm">
                         <a href="{{ route('organisation', ['locale' => $locale]) }}#reconnaissance"
                            class="font-semibold text-lake underline-offset-4 hover:underline">
-                            {{ $t('Reconnaissance officielle et enregistrement de l’organisation →', 'Official recognition and registration of the organisation →') }}
+                            {{ $t('Reconnaissance officielle et enregistrement de l\'organisation →', 'Official recognition and registration of the organisation →') }}
                         </a>
                     </p>
                 </section>
@@ -607,7 +596,8 @@
         </div>
         <p data-r class="mt-10 border-t border-white/15 pt-6 text-sm text-white/70">
           {{ $t('Interlocuteur : Ir Roger Manema Cirhahingirwa, Représentant national — ', 'Contact: Ir Roger Manema Cirhahingirwa, National Representative — ') }}
-          <a class="font-semibold text-ochre underline-offset-4 hover:underline" href="mailto:{{ $email }}">{{ $email }}</a>
+          <a class="font-semibold text-ochre underline-offset-4 hover:underline"
+             href="{{ route('contact', ['locale' => $locale, 'objet' => 'i']) }}">{{ $email }}</a>
         </p>
       </div>
     </section>
@@ -630,7 +620,7 @@
                 @foreach ($connexes_awaiting as $connexe)
                     <a data-r href="{{ route('projets.show', ['locale' => $locale, 'slug' => $connexe->slug]) }}"
                        class="group flex flex-col border border-line border-t-4 border-t-ochre bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-[#7A5200]">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-ochre-dark">
                             {{ $connexe->statutCourt === 'w' ? $t('À financer', 'To fund') : $connexe->statusLabel($locale) }}
                         </p>
                         <h3 class="mt-3 grow font-serif text-lg font-semibold leading-snug text-lake">

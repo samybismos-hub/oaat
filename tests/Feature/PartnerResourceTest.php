@@ -221,7 +221,7 @@ class PartnerResourceTest extends TestCase
 
         $partner = $this->makePartner();
 
-        $partner->addMediaFromString('contenu-du-logo')
+        $partner->addMediaFromString(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='))
             ->usingFileName('pnud.png')
             ->toMediaCollection('logo');
 
@@ -232,7 +232,7 @@ class PartnerResourceTest extends TestCase
         Storage::disk('public')->assertExists($partner->getFirstMedia('logo')->getPathRelativeToRoot());
 
         // La collection « logo » est singleFile : un deuxième envoi remplace le premier.
-        $partner->addMediaFromString('contenu-du-nouveau-logo')
+        $partner->addMediaFromString(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='))
             ->usingFileName('pnud-2026.png')
             ->toMediaCollection('logo');
 

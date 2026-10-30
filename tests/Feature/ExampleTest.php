@@ -10,10 +10,10 @@ class ExampleTest extends TestCase
     /**
      * A basic test example.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_the_application_redirige_la_racine_vers_la_locale(): void
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+        // La racine du site n'affiche pas une page : elle redirige vers la
+        // locale courante (accueil FR ou EN), posée par le middleware SetLocale.
+        $this->get('/')->assertRedirect();
     }
 }

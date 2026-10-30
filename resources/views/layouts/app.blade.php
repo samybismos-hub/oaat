@@ -7,6 +7,14 @@
     {{-- ─── SEO : chaque page peut surcharger ces valeurs ─── --}}
     <title>@yield('meta_title', "OAAT — Organisation Africaine pour l'Am\u00E9nagement des Territoires")</title>
     <meta name="description" content="@yield('meta_description', 'ONG interafricaine active \u00E0 l\u2019Est de la RD Congo depuis 1995 : sant\u00E9, eau, \u00E9ducation, s\u00E9curit\u00E9 alimentaire, infrastructures, protection et environnement.')">
+    {{-- ─── SEO structurel : canonical + Open Graph ─────────────────── --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:site_name" content="OAAT">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    <meta property="og:locale" content="{{ ($locale ?? 'fr') === 'en' ? 'en_US' : 'fr_FR' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('meta_title', 'OAAT — Organisation Africaine pour l\'Aménagement des Territoires')">
+    <meta property="og:description" content="@yield('meta_description', 'ONG interafricaine active à l\'Est de la RD Congo depuis 1995 : santé, eau, éducation, sécurité alimentaire, infrastructures, protection et environnement.')">
 
     {{-- ─── Google Fonts : Public Sans + Source Serif 4 ─── --}}
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
@@ -24,6 +32,7 @@
                         lake: '#17508F',
                         deep: '#0B2545',
                         ochre: '#E3A82B',
+                        ochreDark: '#7A5200',
                         moss: '#2F7D52',
                         mist: '#F2F5F9',
                         line: '#D6DEE8',

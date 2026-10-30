@@ -149,8 +149,4 @@ if(lb&&li&&GL.length){
 /* 21 Liens réseaux sociaux sans URL : toast (sans écraser les vrais liens du pied de page) */
 addEventListener('click',e=>{const a=e.target.closest?.('a.sc');if(a&&!a.hasAttribute('onclick')&&(!a.getAttribute('href')||a.getAttribute('href')==='#')){e.preventDefault();toast(L('Lien du réseau social à renseigner.','Social link to be added.'))}});
 
-/* 22 Liens localisés : data-href-fr/en (demande de document) + partage par e-mail (.sh) */
-const apply=()=>{$$('[data-href-fr]').forEach(a=>a.href=document.documentElement.lang=='en'?a.dataset.hrefEn:a.dataset.hrefFr);$$('.sh').forEach(a=>a.href='mailto:?subject='+encodeURIComponent(document.title)+'&body='+encodeURIComponent(location.href.split('#')[0]))};
-apply();
-
 });

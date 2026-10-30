@@ -96,7 +96,7 @@
                     ];
                 @endphp
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-ink/60" data-en="Status">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-ink/60">
                         {{ $t('Statut', 'Status') }}
                     </h3>
                     <div id="fst" class="mt-3 flex flex-col gap-1">
@@ -115,14 +115,14 @@
 
                 {{-- 3. Domaines --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-ink/60" data-en="Area">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-ink/60">
                         {{ $t('Domaine', 'Area') }}
                     </h3>
                     <div id="fdm" class="mt-2 space-y-1">
                         <a href="{{ $mk(['domaine' => '']) }}"
                            class="block py-1.5 text-sm transition
                                   {{ blank($domaine) ? 'font-semibold text-lake' : 'text-ink/75 hover:text-lake' }}">
-                            <span data-en="All areas">{{ $t('Tous', 'All') }}</span>
+                            <span>{{ $t('Tous', 'All') }}</span>
                         </a>
                         @foreach ($domaines as $d)
                             <a href="{{ $mk(['domaine' => $d->slug]) }}"
@@ -140,7 +140,7 @@
                 </div>
 {{-- 4. Périodes --}}
                 <div>
-                    <h3 class="text-xs font-semibold uppercase tracking-wider text-ink/60" data-en="Period">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-ink/60">
                         {{ $t('Période', 'Period') }}
                     </h3>
                     <div id="fpe" class="mt-3 flex flex-wrap gap-2">
@@ -157,8 +157,7 @@
                 {{-- 5. Reset --}}
                 <button id="frs"
                         onclick="window.location.href='{{ route('projets.index', ['locale' => $locale]) }}'"
-                        class="text-sm font-semibold text-lake underline-offset-4 hover:underline"
-                        data-en="Reset filters">
+                        class="text-sm font-semibold text-lake underline-offset-4 hover:underline">
                     {{ $t('Réinitialiser les filtres', 'Reset filters') }}
                 </button>
             </div>
@@ -174,13 +173,13 @@
                     {{ $t('projet·s', 'project·s') }}
                 </p>
                 <label class="flex items-center gap-2 text-sm text-ink/70">
-                    <span data-en="Sort by">{{ $t('Trier par', 'Sort by') }}</span>
+                    <span>{{ $t('Trier par', 'Sort by') }}</span>
                     <select id="fs" aria-label="Tri"
                             class="border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-lake focus:ring-4 focus:ring-lake/15">
-                        <option value="rec" data-en="Recommended">{{ $t('Recommandé', 'Recommended') }}</option>
-                        <option value="new" data-en="Newest">{{ $t('Plus récents', 'Newest') }}</option>
-                        <option value="old" data-en="Oldest">{{ $t('Plus anciens', 'Oldest') }}</option>
-                        <option value="bud" data-en="Highest budget">{{ $t('Budget décroissant', 'Highest budget') }}</option>
+                        <option value="rec">{{ $t('Recommandé', 'Recommended') }}</option>
+                        <option value="new">{{ $t('Plus récents', 'Newest') }}</option>
+                        <option value="old">{{ $t('Plus anciens', 'Oldest') }}</option>
+                        <option value="bud">{{ $t('Budget décroissant', 'Highest budget') }}</option>
                     </select>
                 </label>
             </div>
@@ -212,11 +211,11 @@
                 {{-- ▸ État vide --}}
                 @if ($projets->isEmpty())
                     <p id="em" class="border border-dashed border-line p-10 text-center text-ink/65">
-                        <span data-en="No project matches your search.">
+                        <span>
                             {{ $t("Aucun projet ne correspond à votre recherche.", "No project matches your search.") }}
                         </span>
                         <a href="{{ route('projets.index', ['locale' => $locale]) }}"
-                           class="font-semibold text-lake underline" data-en="Reset">
+                           class="font-semibold text-lake underline">
                             {{ $t('Réinitialiser', 'Reset') }}
                         </a>
                     </p>
@@ -232,24 +231,20 @@
 <section class="bg-lake text-white">
     <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-5 py-16 lg:flex-row lg:items-center lg:px-8">
         <div data-r>
-            <h2 class="font-serif text-3xl font-semibold md:text-4xl"
-                data-en="Fund or co-design a project">
+            <h2 class="font-serif text-3xl font-semibold md:text-4xl">
                 {{ $t('Financer ou co-construire un projet', 'Fund or co-design a project') }}
             </h2>
-            <p class="mt-3 max-w-xl text-white/80"
-               data-en="Six projects are available and awaiting funding. Let's talk.">
+            <p class="mt-3 max-w-xl text-white/80">
                 {{ $t('Six projets sont disponibles et attendent un financement. Parlons-en.', 'Six projects are available and awaiting funding. Let\'s talk.') }}
             </p>
         </div>
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('contact', ['locale' => $locale]) }}"
-               class="relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%] bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl"
-               data-en="Contact us">
+               class="relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%] bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl">
                 {{ $t('Nous contacter', 'Contact us') }}
             </a>
             <a href="{{ route('organisation', ['locale' => $locale]) }}"
-               class="border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep"
-               data-en="Discover the organisation">
+               class="border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep">
                 {{ $t('Découvrir l\'organisation', 'Discover the organisation') }}
             </a>
         </div>
