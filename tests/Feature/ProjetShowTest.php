@@ -96,7 +96,7 @@ class ProjetShowTest extends TestCase
             ->assertSee('/fr/contact?objet=i');
     }
 
-    public function test_le_bloc_autres_projets_affiche_un_badge_traduit_sans_valeur_brute(): void
+    public function test_le_bloc_bas_affiche_un_badge_traduit_sans_valeur_brute(): void
     {
         $domaine = $this->makeDomain();
         $projet = $this->makeProject($domaine);
@@ -108,7 +108,7 @@ class ProjetShowTest extends TestCase
         $response = $this->get("/fr/projets/{$projet->slug}");
 
         $response->assertOk()
-            ->assertSee('Autres projets disponibles')
+            ->assertSee('D’autres projets à soutenir')
             ->assertSee('Deuxième projet à financer')
             ->assertSee('À financer');
         // La valeur brute de l'enum ne doit plus jamais apparaître.
@@ -117,10 +117,96 @@ class ProjetShowTest extends TestCase
         $enb = $this->get("/en/projets/{$projet->slug}");
 
         $enb->assertOk()
-            ->assertSee('Other projects available')
+            ->assertSee('More projects to fund')
             ->assertSee('Second project to fund')
             ->assertSee('To fund');
         $this->assertStringNotContainsString('awaiting_funding', $enb->getContent());
+    }
+
+    public function test_la_fiche_realisee_personnalise_le_bloc_bas_avec_dautres_realisations(): void
+    {
+        $domaine = $this->makeDomain();
+
+        $projet = $this->makeProject($domaine, [
+            'slug' => 'projet-realise',
+            'title' => ['fr' => 'Projet réalisé de référence', 'en' => 'Reference completed project'],
+            'status' => 'completed',
+            'start_date' => '2025-01-01',
+            'end_date' => '2025-12-31',
+        ]);
+
+        // 5 autres réalisations du même domaine : « Expérience comparable »
+        // en retient 4, le bloc « Prolonger » doit montrer la 5ᵉ — jamais en doubler.
+        foreach ([2020, 2021, 2022, 2023, 2024] as $annee) {
+            $this->makeProject($domaine, [
+                'title' => ['fr' => "Réalisation {$annee}", 'en' => "Achievement {$annee}"],
+                'slug' => "realisation-{$annee}",
+                'status' => 'completed',
+                'start_date' => "{$annee}-01-01",
+                'end_date' => "{$annee}-12-31",
+            ]);
+        }
+
+        $response = $this->get("/fr/projets/{$projet->slug}");
+
+        $response->assertOk()
+            ->assertSee('Autres réalisations d’OAAT')
+            ->assertSee('Réalisation 2020')
+            ->assertSee('realisation-2020');
+        // La 4ᵉ la plus récente (2023) est déjà dans « Expérience comparable » :
+        // elle ne doit apparaître qu'une seule fois dans toute la page.
+        $this->assertSame(1, substr_count($response->getContent(), 'realisation-2023'));
+    }
+
+    public function test_la_fiche_en_cours_personnalise_le_bloc_bas_avec_les_autres_projets_en_cours(): void
+    {
+        $domaine = $this->makeDomain();
+
+        $projet = $this->makeProject($domaine, [
+            'slug' => 'projet-en-cours',
+            'title' => ['fr' => 'Projet en cours de référence', 'en' => 'Reference ongoing project'],
+            'status' => 'ongoing',
+            'start_date' => '2025-01-01',
+            'end_date' => '2029-12-31',
+        ]);
+
+        foreach ([2020, 2021, 2022, 2023, 2024] as $annee) {
+            $this->makeProject($domaine, [
+                'title' => ['fr' => "Chantier {$annee}", 'en' => "Worksite {$annee}"],
+                'slug' => "chantier-{$annee}",
+                'status' => 'ongoing',
+                'start_date' => "{$annee}-01-01",
+                'end_date' => "2029-12-31",
+            ]);
+        }
+
+        $response = $this->get("/fr/projets/{$projet->slug}");
+
+        $response->assertOk()
+            ->assertSee('Autres projets en cours')
+            ->assertSee('chantier-2020');
+        $this->assertSame(1, substr_count($response->getContent(), 'chantier-2023'));
+    }
+
+    public function test_le_bloc_bas_se_cache_quand_il_na_que_des_projets_deja_affiches(): void
+    {
+        $domaine = $this->makeDomain();
+        $projet = $this->makeProject($domaine, ['slug' => 'a-financer']);
+
+        // Un seul autre projet, réalisé : il part dans « Expérience comparable » ;
+        // le bloc du bas n'a alors plus rien de neuf à montrer → il s'efface.
+        $this->makeProject($domaine, [
+            'slug' => 'unique-realisation',
+            'status' => 'completed',
+            'start_date' => '2020-01-01',
+            'end_date' => '2022-12-31',
+        ]);
+
+        $response = $this->get("/fr/projets/{$projet->slug}");
+
+        $response->assertOk()
+            ->assertSee('unique-realisation');
+        $this->assertStringNotContainsString('D’autres projets à soutenir', $response->getContent());
     }
 
     public function test_la_fiche_projet_ignore_les_sections_sans_contenu(): void

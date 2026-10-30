@@ -180,35 +180,45 @@ class ProjetController
             ->published()
             ->firstOrFail();
 
-        // « Expérience comparable » : les 4 réalisations les plus récentes,
-        // hors projet courant (reprise de la section maquette).
-        $experiences = Project::query()
-            ->published()
-            ->whereIn('status', [
-                ProjectStatus::Completed->value,
-                ProjectStatus::Ongoing->value,
-            ])
-            ->whereKeyNot($projet->getKey())
-            ->with('partners') // nécessaire pour funderLabel() / partnersLabel()
-            ->latest('end_date')
-            ->take(config('oaat.projects.experience_count'))
-            ->get();
-        // « Autres projets disponibles » : 3 projets en attente de financement,
-        // historiquement les plus récents, hors projet courant.
-        $connexes_awaiting = Project::query()
-            ->published()
-            ->where('status', ProjectStatus::AwaitingFunding->value)
-            ->whereKeyNot($projet->getKey())
-            ->latest('start_date')
-            ->take(config('oaat.projects.related_count'))
-            ->get();
+        // Bloc haut « Expérience comparable » : réalisés + en cours, le même
+        // domaine d'abord (les plus proches hors projet courant). Attention :
+        // pas de palier « repli » ici — un projet qui n'est ni réalisé ni en
+        // cours n'a rien à faire dans des « réalisations comparables ».
+        $experiences = Project::relatedTo(
+            $projet,
+            [ProjectStatus::Completed->value, ProjectStatus::Ongoing->value],
+            (int) config('oaat.projects.experience_count', 4),
+            [],
+            repli: false,
+        );
+
+        // Les projets déjà affichés dans le haut ne doivent jamais réapparaître
+        // dans le bloc bas : cette liste d'exclusion est cumulée.
+        $dejaAffiches = $experiences->pluck('id')->all();
+
+        // Bloc bas « Prolonger », adapté au statut de la fiche consultée :
+        //  - fiche à financer / planifiée → autres projets à financer (entonnoir) ;
+        //  - fiche en cours               → autres en cours, puis à financer ;
+        //  - fiche réalisée               → autres réalisés, puis en cours.
+        $statutsConnexes = match ($projet->status) {
+            ProjectStatus::Completed => [ProjectStatus::Completed->value, ProjectStatus::Ongoing->value],
+            ProjectStatus::Ongoing => [ProjectStatus::Ongoing->value, ProjectStatus::AwaitingFunding->value],
+            default => [ProjectStatus::AwaitingFunding->value],
+        };
+
+        $connexes = Project::relatedTo(
+            $projet,
+            $statutsConnexes,
+            (int) config('oaat.projects.related_count', 3),
+            array_merge([$projet->getKey()], $dejaAffiches),
+        );
 
         return view('pages.projets-show', [
             'projet'      => $projet,
             'experiences' => $experiences,
+            'connexes'    => $connexes,
             'settings'    => Setting::current(),
             'locale'      => $locale,
-            'connexes_awaiting' => $connexes_awaiting,
         ]);
     }
 }

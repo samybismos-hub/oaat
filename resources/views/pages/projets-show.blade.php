@@ -7,10 +7,12 @@
     Variables disponibles (depuis ProjetController@show) :
         $projet      (Project)           — projet affiché (relations domain,
                                            partners et albums.media chargées)
-        $experiences (Collection)       — 4 réalisations récentes (section
-                                           « Expérience comparable »)
-        $connexes_awaiting (Collection) — 3 projets en attente de financement
-                                           (section « Autres projets disponibles »)
+        $experiences (Collection)       — réalisés + en cours (4 max), même domaine
+                                           d'abord, jamais de projet ni réalisé ni en
+                                           cours (section « Expérience comparable »)
+        $connexes (Collection)          — bloc « Prolonger » (3 max), statuts adaptés
+                                           au statut de la fiche, sans doublon avec
+                                           $experiences (exclusions cumulées)
         $settings    (Setting|null)
         $locale      (string)           — 'fr' | 'en'
 
@@ -603,12 +605,19 @@
     </section>
 
 
-    <!-- Autres projets disponibles -->
-    @if ($connexes_awaiting->isNotEmpty())
+    <!-- Bloc « Prolonger » : les projets liés (adapté au statut de la fiche) -->
+    @if ($connexes->isNotEmpty())
+        @php
+            $titreConnexes = match ($projet->status->value) {
+                'ongoing'   => $t('Autres projets en cours', 'Other ongoing projects'),
+                'completed' => $t('Autres réalisations d’OAAT', 'More OAAT achievements'),
+                default     => $t('D’autres projets à soutenir', 'More projects to fund'),
+            };
+        @endphp
         <section class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
             <div class="flex flex-wrap items-end justify-between gap-4" data-r>
                 <h2 class="font-serif text-3xl font-semibold text-lake md:text-4xl">
-                    {{ $t('Autres projets disponibles', 'Other projects available') }}
+                    {{ $titreConnexes }}
                 </h2>
                 <a href="{{ route('projets.index', ['locale' => $locale]) }}"
                    class="font-semibold text-lake underline-offset-4 hover:underline">
@@ -617,7 +626,7 @@
             </div>
 
             <div class="mt-10 grid gap-6 md:grid-cols-3">
-                @foreach ($connexes_awaiting as $connexe)
+                @foreach ($connexes as $connexe)
                     <a data-r href="{{ route('projets.show', ['locale' => $locale, 'slug' => $connexe->slug]) }}"
                        class="group flex flex-col border border-line border-t-4 border-t-ochre bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg">
                         <p class="text-xs font-semibold uppercase tracking-wider text-ochre-dark">

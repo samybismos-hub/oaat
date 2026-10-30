@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ProjectStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -83,6 +84,92 @@ class Project extends Model implements HasMedia
     public function scopePublished(Builder $query): Builder
     {
         return $query->whereNotNull('published_at')->where('published_at', '<=', now());
+    }
+
+    /**
+     * Projets liés à cette fiche, par paliers de pertinence.
+     *
+     * Deux blocs de la fiche l'utilisent (« Expérience comparable » en haut,
+     * bloc « Prolonger » en bas). Le premier critère n'est plus la récence
+     * globale mais la proximité : même domaine d'abord, puis mêmes statuts,
+     * puis — uniquement si $repli est vrai (bloc « Prolonger ») — tout projet
+     * publié restant, pour ne jamais laisser le bloc vide.
+     *
+     * Les exclusions cumulées (liste passée par l'appelant) garantissent qu'un
+     * même projet n'apparaît jamais deux fois sur la même page.
+     *
+     * @param  array<int, ProjectStatus|string>  $statuts   Statuts cibles (ordre non significatif)
+     * @param  array<int, int>                   $excludeIds Identifiants à exclure
+     * @param  bool                              $repli     Autoriser le palier 3 (n'importe quel statut
+     *                                                       publié restant). « Expérience comparable » le
+     *                                                       désactive afin de n'y montrer que des projets
+     *                                                       réalisés ou en cours.
+     */
+    public static function relatedTo(self $projet, array $statuts, int $max, array $excludeIds = [], bool $repli = true): Collection
+    {
+        $statuts = array_map(
+            fn ($statut): string => $statut instanceof ProjectStatus ? $statut->value : (string) $statut,
+            $statuts,
+        );
+
+        if ($max <= 0) {
+            return new Collection;
+        }
+
+        $exclus = collect($excludeIds)->flip();
+
+        $exclure = fn (Collection $pool): array => $exclus
+            ->keys()
+            ->merge($pool->pluck('id')->all())
+            ->all();
+
+        $restants = $max;
+        $trouves = new Collection;
+
+        // ── Palier 1 : même domaine + statuts cibles (le plus pertinent). ──
+        $palier1 = self::query()
+            ->when(is_numeric($projet->domain_id), fn (Builder $q) => $q->where('domain_id', $projet->domain_id))
+            ->whereKeyNot($projet->getKey())
+            ->whereIn('status', $statuts)
+            ->whereNotIn('id', $exclure(new Collection))
+            ->with(['domain', 'partners'])
+            ->latest('start_date')
+            ->limit($restants)
+            ->get();
+
+        $trouves = $trouves->merge($palier1);
+        $restants -= $palier1->count();
+
+        // ── Palier 2 : mêmes statuts cibles, autres domaines. ──
+        if ($restants > 0) {
+            $palier2 = self::query()
+                ->where('domain_id', '!=', $projet->domain_id)
+                ->whereKeyNot($projet->getKey())
+                ->whereIn('status', $statuts)
+                ->whereNotIn('id', $exclure($trouves))
+                ->with(['domain', 'partners'])
+                ->latest('start_date')
+                ->limit($restants)
+                ->get();
+
+            $trouves = $trouves->merge($palier2);
+            $restants -= $palier2->count();
+        }
+
+        // ── Palier 3 : tous les projets publiés restants (jamais page vide). ──
+        if ($restants > 0 && $repli) {
+            $repliProjet = self::query()
+                ->whereKeyNot($projet->getKey())
+                ->whereNotIn('id', $exclure($trouves))
+                ->with(['domain', 'partners'])
+                ->latest('start_date')
+                ->limit($restants)
+                ->get();
+
+            $trouves = $trouves->merge($repliProjet);
+        }
+
+        return $trouves;
     }
 
     /**
