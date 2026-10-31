@@ -1,4 +1,4 @@
-{{-- pages/domaines-index.blade.php — « Domaines d’intervention ».
+﻿{{-- pages/domaines-index.blade.php — « Domaines d’intervention ».
      Contenu rendu côté serveur (Blade), sans injection HTML ni traduction
      via JavaScript. Page unilingue française (maquette migrée). --}}
 <!DOCTYPE html>
@@ -464,7 +464,7 @@
                 {{-- ▸ Colonne droite : illustration, interventions, formations, projets --}}
                 <div class="lg:col-span-8" data-r>
                     {{-- Illustration (dégradé + libellé, rendu côté serveur) --}}
-                    <figure class="overflow-hidden" data-w>
+                    <figure class="overflow-hidden" data-r>
                         <svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" class="h-56 w-full md:h-72"
                              role="img" aria-label="{{ $domaine['libelle'] }}">
                             <defs>
