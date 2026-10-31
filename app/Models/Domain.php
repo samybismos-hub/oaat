@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['name', 'slug', 'objectives', 'activities', 'icon', 'position'])]
-#[Translatable('name', 'objectives', 'activities')]
+#[Fillable(['name', 'slug', 'objectives', 'activities', 'intro', 'interventions', 'formations', 'icon', 'position'])]
+#[Translatable('name', 'objectives', 'activities', 'intro', 'interventions', 'formations')]
 class Domain extends Model
 {
     use HasFactory, HasTranslations;
