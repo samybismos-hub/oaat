@@ -1,53 +1,85 @@
-# Refonte des fiches projet & galeries — Plan de conformité (v2)
-
-> **Ce plan remplace la v1.** Il ne reflète pas un cahier des charges à exécuter :
-> il documente l'**état réellement livré** (référentiel) et les seuls points
-> résiduels ouverts. Conformément aux échanges, **ce qui est déjà implémenté
-> et testé prime sur toute ancienne mention de phase « à faire »** ; les phases
-> 3/4 de la v1 s'y rapportent désormais comme « résidu optionnel ».
+Analyse terminée. Voici l'audit chirurgical complet.
 
 ---
 
-## 1. Livré et testé (référentiel — ne pas refaire)
+# 🔬 Audit — `domaines-index.blade.php` (672 lignes)
 
-| Domaine | Implémentation | Validation |
+## 1. Problème structurel n°1 : cette vue n'est pas intégrée au projet
+
+C'est une **maquette autonome** (doctype + `<head>` + topbar + header + footer inline, l.4-40, 257-344, 586-656), alors que toutes les autres pages (`projets-index`, `organisation`, `contact`…) héritent de `layouts/app.blade.php` et des partials `_topbar`, `_header`, `_footer`. Elle **réinvente** topbar/header/footer en code dupliqué.
+
+## 2. Shadowing fatal : le `$domaines` du contrôleur est écrasé
+
+Le contrôleur charge `Domain::withCount('projects')` et passe `$domaines` (Collection Eloquent). Or la vue définit l.46-188 :
+```php
+$domaines = [ 'sante' => ['libelle'=…, 'icone'=…, 'interventions'=…], … ];
+```
+**Elle écrase la Collection** — le modèle, les relations et les traductions ne servent à rien ici.
+
+---
+
+## 3. Inventaire du hardcodé (réel, par bloc)
+
+### Bloc A — Données métier en dur (l.41-254)
+| Élément | Lignes | Ce qui existe déjà en base |
 |---|---|---|
-| **Fiche projet publique** | `projets-show` hérite de `layouts.app` ; sections à affichage conditionnel (zone, editorial, expérience, connexes, galerie) ; SEO dynamique ; plus de contenu hardcodé | `ProjetShowTest` 12/12 |
-| **Contenu éditorial** | `contexte`, `objectif_general`, `composantes` (JSON bilingue sur `projects`), saisis via `ProjectForm`, rendus dans les sections « Contexte » / « Composantes », masquées si vides (`hasEditorialContent()`) | `ProjetShowTest` 12/12 |
-| **Crédit photo** | **Par projet** (champ bilingue `credit_photo`), appliqué à la couverture + galerie, fallback « OAAT » | `ProjetShowTest` (2 tests) |
-| **Appels à l'action « Soutenir »** | 3 cartes + CTA du bloc soutien → `/{locale}/contact?objet=f|p|i` ; le formulaire de contact pré-sélectionne l'objet et surligne le bouton correspondant | `ContactPageTest` 3/3 |
-| **Publication** | Brouillons/non publiés → 404 (`published()` sur `show`) | `ProjetShowTest` |
-| **Expérience comparable / connexes** | `Project::relatedTo()` par paliers (même domaine + statuts cibles → autres domaines + statuts cibles → repli publiés **réservé au bloc « Prolonger »**), exclusions cumulées anti-doublon ; bloc bas adapté au statut de la fiche, titres bilingues dynamiques ; compteurs `take(4)` / `take(3)` issus de `config('oaat.projects.*')` | `ProjetShowTest` 12/12 (fiche réalisée / en cours / à financer) |
-| **Helpers modèle** | `statusLabel()`, `durationLabel()` (cas zéro), `beneficiariesLabel()` (loc), `hasEditorialContent()`, `funderLabel()`… — source unique | `ProjetIndexTest` 7/7 |
-| **Indicateurs index** | Compteurs publics (dont `zones`) | `ProjetIndexTest` 7/7 |
-| **Options A — Albums = canal unique** | La collection `photos` du projet (code mort) est supprimée ; galerie gérée **uniquement** par les albums liés ; onglet « Albums photo » (`AlbumsRelationManager`) sur la fiche projet ; slug d'album (migration + formulaire) corrigeant `GalerieController@show` | `ProjectResourceTest` 12/12, `AlbumResourceTest` 8/8 |
+| 9 domaines : `libelle`, `descriptif`, `interventions` | 46-188 | Modèle `Domain` : `name`, `objectives`, `activities` (translatables FR/EN) ✓ |
+| `icone` (path SVG de 9 icônes) | 46-188 | Colonne `icon` (clé texte, ex. `heart-pulse`) ✓ mais pas de path |
+| `teinte` (hue dégradé 350/95/30…) | 46-188 | ❌ n'existe nulle part (convention visuelle de la maquette) |
+| `formations` (listes par domaine) | 46-188 | ❌ aucune colonne/table (ex. « Normes INEE », « Ateliers SAFE »…) |
+| `$rail` (9 étiquettes courtes) | 190-201 | Duplique le nom du domaine (peut se dériver) |
+| **35 projets du portefeuille** (année/domaine/titre/bailleur) | 218-254 | ✅ **37 projets réels en base** (`ProjectSeeder`) avec `status`, `domain_id`, partenaires pivot |
 
-## 2. Décisions déjà actées (à ne pas rouvrir)
-
-- **D1 — N° de fiche** : retiré de la fiche publique.
-- **D2 — Stockage éditorial** : colonnes JSON sur `projects` (pas de table `project_sections`).
-- **D3 — « Expérience comparable »** : inclut Réalisés **+ En cours**.
-- **D4 — Appels à l'action** : les cartes et CTAs « Soutenir » passent par le **formulaire de contact avec objet pré-rempli** (traçable, cohérent), plus de `mailto:` pour ces blocs.
-- **D5 — Crédit photo** : **par projet** (et non `photo_credit` global dans les Settings comme le prévoyait la v1) — la v1 (T3.1/T3.2) est caduc sur ce point.
-- **D6 — Galeries** : **albums = canal unique** (option A) ; pas de double système de photos projet/album.
-- **D7 — Publication** : les fiches non publiées ne sont jamais exposées.
-- **D8 — Paliers `relatedTo()`** : même domaine + statuts cibles → autres domaines + statuts cibles → repli « tout projet publié restant » **uniquement** pour le bloc « Prolonger ». Le bloc « Expérience comparable » refuse le repli (`repli: false`) : un projet ni réalisé ni en cours n'a pas sa place dans des « réalisations comparables ».
-- **D9 — Bloc « Prolonger » personnalisé** : le titre dépend du statut de la fiche consultée (`Autres projets en cours` / `Autres réalisations d’OAAT` / `D’autres projets à soutenir`) et les statuts proposés suivent l'entonnoir fiche (à financer → en cours → réalisé).
-- **D10 — Zone non-critère** : la « zone » (pays/villes) n'est volontairement **pas** un critère de similarité des blocs liés — seuls le domaine et le statut comptent.
-
-## 3. Points résiduels — traités (section 3 « décisions »)
-
-| # | Décision | Traitement appliqué |
+### Bloc B — Contenus texte en dur
+| Élément | Lignes | Source réelle |
 |---|---|---|
-| **O1** | Pas de `mailto:` | ✅ Le lien « Rejoindre ce partenariat » (bloc Financement) et le lien « Interlocuteur » passent par `route('contact')` (`objet=p` / `objet=i`) ; le helper mort `$mailto`/`$u` et le bloc « E-mails automatiques » sont supprimés. Aucun `mailto:` dans la fiche. |
-| **O2** | Wording « Recherche de financement » | ✅ `_carte_projet` utilise désormais `statusLabel()` (source unique du modèle) ; le doublon local `$statutLabel` (« En attente de financement ») est supprimé. |
-| **O3** | Nettoyer | ✅ **O3a** – §22 `data-href-fr`/`apply` de `oaat.js` retiré (`node --check` OK). **O3b** – `data-en` retirés de `_carte_projet` + `projets-index` (0 restant ; les `$t()` rendent déjà l’EN). **O3c** – SEO : `rel=canonical` + OG de base dans `layouts/app.blade.php`, fallback `meta_description` (objectifs → résultats → titre) + `og:image` sur la fiche. **O3d** – token `ochreDark` (#7A5200), plus aucune classe arbitraire. **O3e** – logo SVG factorisé dans `partials/_logo_oaat` (3 occurrences), SVG restant unique. Vues compilées ✓ |
-| **O4** | Corriger les derniers PNG | ✅ `PartnerResourceTest::test_le_logo_est_stocke…` réparé avec un vrai PNG 1×1 `base64_decode` (fini le `imagecreatefromstring` en échec). `ExampleTest` réécrit : la racine redirige vers la locale (302). |
-| **O5** | Blocs liés (étape 5/5) | ✅ `Project::relatedTo()` remplace les deux requêtes figées (`exp` réalisés+en cours / `connexes_awaiting`) ; priorité « même domaine », exclusions cumulées (`$dejaAffiches` + fiche courante) jamais de doublon entre les deux blocs. **Régression vue par le test puis corrigée** : le repli attirait un projet à financer dans « Expérience comparable » (échec du test badge) → paramètre `repli: false` appliqué à ce bloc. Titres des deux blocs validés FR/EN. |
+| Topbar : adresse, tel `+243 993 537 325`, email | 263-266 | `$settings->addresses/phones/email` (le partial `_topbar` le fait déjà) |
+| Logo SVG + nom complet | 277-283 | Partial `_logo_oaat` (existe) + `$settings->organisation_name` |
+| Héro : titre, sous-titre, compteurs **9 / 35 / 13** | 359-383 | `Domain::count()`, `Project::count()`, compteur zones réel |
+| Libellés sections (« Nos interventions », « Projets associés »…) | 482-504 | Textes statiques `$t()` légitimes |
 
-## 4. Critère d'acceptation (reformulé)
+### Bloc C — Compétences transversales (l.532-562)
+5 cartes (Gestion admin/fin, Gestion projet, GPS, Renforcement OSC, Ateliers SAFE) **figées en dur**. Ce sont les « formations reçues » transversales du PDF ≠ formations par domaine. **Aucune structure de données.**
 
-- **Suite complète « tout vert »** : 107/107 après O4 → **110/110 (696 assertions)** après l'étape 5/5 (blocs liés personnalisés) — voir le run de validation en fin de session.
-- Les 5 classes ciblées (`ProjetShowTest`, `ContactPageTest`, `ProjetIndexTest`, `ProjectResourceTest`, `AlbumResourceTest`) : ✓ vertes tout au long.
-- Rendu manuel FR/EN conforme sur « 8 territoires » et fiches sans sections vides : ✓.
+### Bloc D — Footer inline dupliqué
+Coordonnées, réseaux sociaux (`href="#"` vides), copyright en dur (l.587-656) → tout ça est dans `_footer` avec `$settings`.
 
+---
+
+## 4. Ce qu'il faut pour finaliser
+
+### a) Rendre la page cohérente avec le reste du site
+1. **Convertir** la vue en `@extends('layouts.app')` + `@section('content')` + `@push('scripts')` pour `oaat.js`.
+2. **Supprimer** le header/topbar/footer inline (l.4-40, 257-344, 586-656) → apportés par le layout/partials.
+3. **Supprimer** `$liensNav` (l.204-214) et le `@php` des 35 projets.
+4. **Supprimer le shadowing** : ne plus redéfinir `$domaines` ; utiliser la Collection du contrôleur.
+
+### b) Brancher les données réelles
+5. **Domaines** : `@foreach($domaines as $domaine)` → `$domaine->slug`, `getTranslation('name', $locale)`, `activities`, `objectives`.
+6. **Icônes** : soit publication d'un `@php` map `slug => path SVG` (comme sur l'accueil `_domaines`), soit upload admin.
+7. **`teinte`** : assumer.csses (map slug→hue dans le code, style) — ou ajouter une colonne.
+8. **Projets par domaine** : `$domaine->projects` (relation `hasMany` existante) → boucle avec `year`, `status`, `partners`.
+9. **Compteurs héro** : `$domaines->count()`, `Project::published()->count()` (≈35-37), `$zonesCount`.
+10. **Topbar/footer résaux** : `$settings->socials` (remplace `href="#"`).
+
+### c) Nouvelles structures de données à décider
+11. **Formations par domaine + compétences transversales** : aucun stockage n'existe. Deux options :
+    - colonne JSON `formations` sur `Domain` (+ champs admin), et table `competences_transversales` (ou JSON dans Settings),
+    - ou les assumer comme contenu éditorial d'une section `Page` (`body`) avec un format dédié.
+12. **Optimisation contrôleur** : charger `with(['projects' => …published…])` pour éviter N+1.
+
+### d) Statut FR/EN
+13. La vue est **unilingue FR**. Si la page doit être bilingue comme les autres, il faut `$t()` partout + traductions réelles des données. À arbitrer avec toi (ce domaine de la maquette était FR-only, les données `Domain` sont elles bilingues).
+
+---
+
+## 5. Verdict / priorisation
+
+Pour « finaliser » proprement, l'ordre que je recommande :
+1. **Intégrer la vue au layout** (tuer le doublon header/topbar/footer + le shadowing) — c'est le plus gros gain de qualité, en une passe.
+2. **Brancher les domaines sur la base** (le contrôleur fournit déjà tout).
+3. **Brancher les projets sur `domain->projects`** (les 37 projets existants remplacent les 35 codés).
+4. **Décider** du stockage des `formations`/compétences transversales + icônes/teinte.
+5. Ajouter `$t()` si on active le bilingue.
+
+Souhaites-tu que je te détaille l'un de ces points (par ex. le schéma exact de la migration `formations` + `teinte`, ou le mapping icônes), ou qu'on attaque l'étape 1 — l'intégration au layout ?

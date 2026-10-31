@@ -1,43 +1,27 @@
-﻿{{-- pages/domaines-index.blade.php — « Domaines d’intervention ».
-     Contenu rendu côté serveur (Blade), sans injection HTML ni traduction
-     via JavaScript. Page unilingue française (maquette migrée). --}}
-<!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Domaines d’intervention — OAAT</title>
-    <meta name="description" content="Les neuf domaines d’intervention de l’OAAT : interventions, formations reçues et projets associés.">
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        ink: '#12263F', lake: '#17508F', deep: '#0B2545', ochre: '#E3A82B',
-                        ochreDark: '#7A5200', moss: '#2F7D52', mist: '#F2F5F9', line: '#D6DEE8',
-                    },
-                    fontFamily: {
-                        sans: ['Public Sans', 'system-ui', 'sans-serif'],
-                        serif: ['Source Serif 4', 'Georgia', 'serif'],
-                    },
-                    keyframes: {
-                        dash: { to: { strokeDashoffset: '0' } },
-                    },
-                    animation: {
-                        dash: 'dash 5s ease-out forwards',
-                    },
-                },
-            },
-        };
-    </script>
+{{-- pages/domaines-index.blade.php — « Domaines d'intervention ».
+     Vue intégrée au layout commun : topbar, en-tête et pied de page proviennent
+     de layouts/app.blade.php. Contenu rendu côté serveur (Blade), sans injection
+     HTML ni traduction par JavaScript. --}}
+@extends('layouts.app')
+
+@php
+    // $t et $locale doivent être définis avant toute @section qui les utilise (cf. projets-index).
+    $locale ??= 'fr';
+    $t = fn($fr, $en) => $locale === 'en' ? $en : $fr;
+@endphp
+
+@section('meta_title', $t("Domaines d'intervention — OAAT", 'Areas of intervention — OAAT'))
+@section('meta_description', $t(
+    "Les neuf domaines d'intervention de l'OAAT : santé, sécurité alimentaire, logistique, éducation, eau et assainissement, genre, protection, environnement et formation aux métiers.",
+    'The nine areas of intervention of OAAT: health, food security, logistics, education, water and sanitation, gender, protection, environment and vocational training.',
+))
+@push('head')
     <style>
         .animate-dash { animation: dash 5s ease-out forwards; }
         .motion-reduce .animate-dash { animation: none; }
     </style>
-</head>
-<body class="bg-white font-sans text-ink antialiased pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] [&_*:focus-visible]:outline [&_*:focus-visible]:outline-2 [&_*:focus-visible]:outline-offset-2 [&_*:focus-visible]:outline-ochre">
+@endpush
+
 @php
     // ────────────────────────────────────────────────────────────────────────
     //  Données de la page (contenu de la maquette, FR) — rendues côté serveur.
@@ -199,22 +183,9 @@
         'env'   => 'Environnement',
         'form'  => 'Métiers',
     ];
-
-    // Navigation principale (desktop, mobile et pied de page).
-    $liensNav = [
-        [route('accueil', ['locale' => $locale]),        'Accueil',               false],
-        [route('organisation', ['locale' => $locale]),  'L’Organisation',        false],
-        [route('domaines.index', ['locale' => $locale]), 'Domaines d’intervention', true],
-        [route('projets.index', ['locale' => $locale]),  'Projets',               false],
-        [route('actualites.index', ['locale' => $locale]), 'Actualités',          false],
-        [route('documents.index', ['locale' => $locale]), 'Documents',            false],
-        [route('galerie.index', ['locale' => $locale]),  'Galerie',               false],
-        [route('partenaires', ['locale' => $locale]),    'Partenaires',           false],
-        [route('contact', ['locale' => $locale]),       'Contact',               false],
-    ];
 @endphp
+
 @php
-    // Portefeuille de projets (année 0 = projet « à financer »).
     $projets = [
         ['annee' => 1994, 'domaine' => 'prot',  'titre' => 'Sensibilisation des femmes burundaises à la cohabitation', 'bailleur' => 'CECI'],
         ['annee' => 1995, 'domaine' => 'form',  'titre' => 'Atelier de couture pour orphelins et veuves, Burundi', 'bailleur' => 'PNUD'],
@@ -254,96 +225,7 @@
     ];
 @endphp
 
-{{-- ═══ Barre de progression (défilement) ═══════════════════════════════ --}}
-<div id="pg" class="fixed left-0 top-0 z-[70] h-[3px] w-0 bg-ochre"></div>
-
-{{-- ═══ Barre supérieure (adresse, téléphone, e-mail) ═══════════════════ --}}
-<div class="bg-deep text-[13px] text-white/80">
-    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-1.5 lg:px-8">
-        <p class="hidden lg:block">Bukavu · Sud-Kivu · République démocratique du Congo</p>
-        <p class="flex gap-5">
-            <a class="transition hover:text-ochre" href="tel:+243993537325">+243 993 537 325</a>
-            <a class="hidden transition hover:text-ochre md:inline" href="mailto:oaatrdc2000@gmail.com">oaatrdc2000@gmail.com</a>
-        </p>
-    </div>
-</div>
-
-{{-- ═══ En-tête (logo, navigation, CTA, menu mobile) ════════════════════ --}}
-<header id="hd" class="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur transition-shadow duration-300">
-    <div id="hi" class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 transition-[padding] duration-300 lg:px-8">
-
-        {{-- ▸ Logo OAAT --}}
-        <a href="{{ route('accueil', ['locale' => $locale]) }}" class="flex items-center gap-3" aria-label="OAAT, accueil">
-            <svg viewBox="0 0 40 40" class="h-11 w-11" aria-hidden="true">
-                <rect width="40" height="40" rx="9" fill="#17508F"/>
-                <path d="M5 27c6-9 11 3 17-6s8-5 13-9M5 21c5-8 10 2 15-5s9-4 15-8M5 33c7-8 12 3 18-5s7-4 12-7" fill="none" stroke="#E3A82B" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span class="leading-tight">
-                <b class="block font-serif text-xl text-lake">OAAT</b>
-                <span class="block max-w-[200px] text-[11px] text-ink/60">Organisation Africaine pour l’Aménagement des Territoires</span>
-            </span>
-        </a>
-
-        {{-- ▸ Navigation desktop --}}
-        <nav id="nav" class="hidden items-center xl:flex" aria-label="Navigation principale">
-            @foreach ($liensNav as $lien)
-                <a href="{{ $lien[0] }}"
-                   class="nl relative px-2.5 py-2 text-[13px] font-medium transition hover:text-lake
-                          after:absolute after:inset-x-2.5 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-ochre after:transition after:duration-300 hover:after:scale-x-100
-                          {{ $lien[2] ? 'text-lake after:scale-x-100' : 'text-ink/75' }}">
-                    {{ $lien[1] }}
-                    @if ($lien[2])<i class="ml-1 text-[10px] not-italic opacity-60">▾</i>@endif
-                </a>
-            @endforeach
-        </nav>
-
-        {{-- ▸ CTA « Devenir partenaire » --}}
-        <a href="{{ route('contact', ['locale' => $locale]) }}"
-           class="hidden rounded-full bg-lake px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-deep hover:shadow-lg 2xl:block relative overflow-hidden
-                  before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%]">
-            Devenir partenaire
-        </a>
-
-        {{-- ▸ Bouton menu mobile --}}
-        <button id="bt" aria-label="Ouvrir le menu" aria-expanded="false"
-                class="grid h-11 w-11 place-items-center rounded-full border border-line transition hover:bg-mist xl:hidden">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 7h16M4 12h16M4 17h16"/>
-            </svg>
-        </button>
-    </div>
-
-    {{-- ▸ Méga menu « Domaines » (sous le lien actif) --}}
-    <div id="mg" class="invisible absolute inset-x-0 top-full -translate-y-2 border-b border-line bg-white opacity-0 shadow-2xl transition duration-300">
-        <div id="mgi" class="mx-auto grid max-w-7xl gap-1 px-5 py-6 sm:grid-cols-2 lg:grid-cols-3 lg:px-8">
-            @foreach ($domaines as $cle => $domaine)
-                <a href="#{{ $cle }}" class="group flex items-center gap-3 p-3 transition hover:bg-mist">
-                    <span class="grid h-10 w-10 shrink-0 place-items-center bg-lake/10 text-lake transition group-hover:bg-lake group-hover:text-white">
-                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="{{ $domaine['icone'] }}"/>
-                        </svg>
-                    </span>
-                    <span class="text-sm font-medium transition group-hover:text-lake">{{ $domaine['libelle'] }}</span>
-                </a>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- ▸ Menu mobile (coulissant) --}}
-    <div id="mn" class="grid grid-rows-[0fr] bg-white transition-[grid-template-rows] duration-300 xl:hidden">
-        <div class="overflow-hidden">
-            <nav id="mnav" class="flex flex-col border-t border-line p-4" aria-label="Navigation mobile">
-                @foreach ($liensNav as $lien)
-                    <a href="{{ $lien[0] }}" class="px-3 py-3 font-medium transition hover:bg-mist hover:text-lake">
-                        {{ $lien[1] }}
-                    </a>
-                @endforeach
-            </nav>
-        </div>
-    </div>
-</header>
-
-<main class="transition-opacity duration-300">
+@section('content')
 
     {{-- ═══ Héro ═════════════════════════════════════════════════════════ --}}
     <section id="top" class="relative overflow-hidden bg-gradient-to-br from-deep via-deep to-[#123d6e] text-white">
@@ -581,92 +463,9 @@
             </div>
         </div>
     </section>
-</main>
 
-{{-- ═══ Pied de page ════════════════════════════════════════════════════ --}}
-<footer class="bg-deep text-sm text-white/70">
-    <div class="mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-2 lg:grid-cols-12 lg:px-8">
+@endsection
 
-        {{-- ▸ Colonne 1 : logo, description, réseaux sociaux --}}
-        <div class="lg:col-span-5">
-            <a href="{{ route('accueil', ['locale' => $locale]) }}" class="flex items-center gap-3 text-white">
-                <svg viewBox="0 0 40 40" class="h-12 w-12" aria-hidden="true">
-                    <rect width="40" height="40" rx="9" fill="#17508F"/>
-                    <path d="M5 27c6-9 11 3 17-6s8-5 13-9M5 21c5-8 10 2 15-5s9-4 15-8M5 33c7-8 12 3 18-5s7-4 12-7" fill="none" stroke="#E3A82B" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <span class="leading-tight">
-                    <b class="block font-serif text-2xl">OAAT</b>
-                    <span class="block text-xs text-white/60">Organisation Africaine pour l’Aménagement des Territoires</span>
-                </span>
-            </a>
-
-            <p class="mt-5 max-w-md leading-relaxed">
-                Aménagement des territoires et développement durable des communautés à l’Est de la RD Congo, depuis 1995.
-            </p>
-
-            <p class="mb-3 mt-7 font-semibold text-white">Réseaux sociaux</p>
-            <div id="so" class="flex gap-2">
-                <a href="#" aria-label="Facebook" class="sc grid h-10 w-10 place-items-center border border-white/25 font-bold text-white transition hover:-translate-y-0.5 hover:border-ochre hover:bg-ochre hover:text-deep">f</a>
-                <a href="#" aria-label="LinkedIn" class="sc grid h-10 w-10 place-items-center border border-white/25 font-bold text-white transition hover:-translate-y-0.5 hover:border-ochre hover:bg-ochre hover:text-deep">in</a>
-                <a href="#" aria-label="X" class="sc grid h-10 w-10 place-items-center border border-white/25 font-bold text-white transition hover:-translate-y-0.5 hover:border-ochre hover:bg-ochre hover:text-deep">X</a>
-                <a href="#" aria-label="YouTube" class="sc grid h-10 w-10 place-items-center border border-white/25 font-bold text-white transition hover:-translate-y-0.5 hover:border-ochre hover:bg-ochre hover:text-deep">▶</a>
-            </div>
-        </div>
-
-        {{-- ▸ Colonne 2 : liens rapides --}}
-        <div class="lg:col-span-3">
-            <b class="text-white">Liens rapides</b>
-            <ul id="fn" class="mt-4 space-y-2">
-                @foreach ($liensNav as $lien)
-                    <li>
-                        <a href="{{ $lien[0] }}" class="transition hover:text-ochre">{{ $lien[1] }}</a>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-
-        {{-- ▸ Colonne 3 : coordonnées --}}
-        <div id="coordonnees" class="scroll-mt-24 lg:col-span-4">
-            <b class="text-white">Coordonnées</b>
-            <ul class="mt-4 space-y-4 leading-relaxed">
-                <li>
-                    <span class="block text-white">E-mail</span>
-                    <a class="transition hover:text-ochre" href="mailto:oaatrdc2000@gmail.com">oaatrdc2000@gmail.com</a>
-                </li>
-                <li>
-                    <span class="block text-white">Téléphone</span>
-                    +243 993 537 325 · +243 896 127 195
-                </li>
-                <li>
-                    <span class="block text-white">Bureau de représentation</span>
-                    N° 007, Avenue Fizi II/Nyawera, Quartier Ndendere, Commune d’Ibanda, Bukavu, Sud-Kivu
-                </li>
-                <li>
-                    <span class="block text-white">Siège social</span>
-                    Nyangezi, Groupement de Karhongo, Territoire de Walungu
-                </li>
-            </ul>
-        </div>
-
-    </div>
-
-    <div class="border-t border-white/10 py-5 text-center text-xs">
-        &copy; 2026 OAAT. Tous droits réservés.
-    </div>
-</footer>
-
-{{-- ═══ Bouton retour en haut (anneau de progression) ════════════════════ --}}
-<button id="up"
-        aria-label="Retour en haut"
-        class="pointer-events-none fixed bottom-5 right-5 z-40 grid h-12 w-12 translate-y-4 place-items-center rounded-full bg-deep text-white opacity-0 shadow-xl transition duration-300 hover:bg-lake">
-    <svg viewBox="0 0 48 48" class="absolute inset-0 -rotate-90" aria-hidden="true">
-        <circle cx="24" cy="24" r="22" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="2"/>
-        <circle id="rg" cx="24" cy="24" r="22" fill="none" stroke="#E3A82B" stroke-width="2"
-                pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
-    </svg>
-    <span class="relative">↑</span>
-</button>
-
-<script src="{{ asset('js/oaat.js') }}" defer></script>
-</body>
-</html>
+@push('scripts')
+    <script src="{{ asset('js/oaat.js') }}" defer></script>
+@endpush
