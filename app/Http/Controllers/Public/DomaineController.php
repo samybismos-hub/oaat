@@ -3,19 +3,29 @@
 namespace App\Http\Controllers\Public;
 
 use App\Models\Domain;
+use App\Models\Project;
+use App\Models\Setting;
 
 class DomaineController
 {
     public function index(string $locale): mixed
     {
         $domaines = Domain::query()
+            ->with('projects', fn ($q) => $q->published()->with('partners'))
             ->withCount('projects')
             ->orderBy('position')
             ->get();
 
+        $projetsCount = Project::query()
+            ->published()
+            ->count();
+        $zonesCount = (int) (Setting::query()->first()?->stat_zones ?? 0);
+
         return view('pages.domaines-index', [
-            'domaines' => $domaines,
-            'locale'   => $locale,
+            'domaines'     => $domaines,
+            'projetsCount' => $projetsCount,
+            'zonesCount'   => $zonesCount,
+            'locale'       => $locale,
         ]);
     }
 

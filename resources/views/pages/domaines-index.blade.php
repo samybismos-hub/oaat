@@ -24,205 +24,44 @@
 
 @php
     // ────────────────────────────────────────────────────────────────────────
-    //  Données de la page (contenu de la maquette, FR) — rendues côté serveur.
-    //  Aucun contenu n'est injecté par JavaScript.
+    //  Données de la page pilotées par la base de données (aucune donnée en dur).
+    //  `$domaines` (Domain, avec relation `projects` publiés + partenaires) et les
+    //  compteurs viennent du contrôleur. Les valeurs de style figé (teinte, rail,
+    //  icône) vivent dans config/oaat.php — indexées par slug de domaine.
     // ────────────────────────────────────────────────────────────────────────
-    $domaines = [
-        'sante' => [
-            'libelle'       => 'Santé',
-            'teinte'        => 350,
-            'icone'         => 'M12 8v8M8 12h8M12 3a9 9 0 100 18 9 9 0 000-18z',
-            'descriptif'    => 'Réhabilitation de centres de santé, fourniture de matériel médical, formation du personnel soignant.',
-            'interventions' => [
-                'Réhabilitation d’infrastructures médicales et sanitaires',
-                'Fourniture de matériels et d’intrants médicaux',
-                'Formation des personnels soignants',
-            ],
-            'formations'    => [],
-        ],
-        'alim' => [
-            'libelle'       => 'Sécurité alimentaire',
-            'teinte'        => 95,
-            'icone'         => 'M12 21V9M12 13c-4 0-6-2-6-6 4 0 6 2 6 6zM12 11c0-4 2-6 6-6 0 4-2 6-6 6z',
-            'descriptif'    => 'Kits agricoles, drainage de marais, appui aux ménages déplacés et activités génératrices de revenus.',
-            'interventions' => [
-                'Renforcement technique et accompagnement des ménages agricoles',
-                'Assistance alimentaire aux ménages déplacés, retournés et aux familles d’accueil',
-                'Distribution de kits agricoles d’urgence (semences et outils aratoires)',
-                'Vulgarisation des méthodes culturales et encadrement des agriculteurs',
-                'Drainage de marais',
-                'Gestion et accès à la terre justes et équitables',
-                'Cohabitation pacifique dans nos rayons d’action',
-                'Appui aux activités génératrices de revenus (AGR)',
-            ],
-            'formations'    => [
-                'Collecte des données de prix des denrées alimentaires, avec le PAM et le ministère de l’Agriculture',
-            ],
-        ],
-        'logi' => [
-            'libelle'       => 'Logistique',
-            'teinte'        => 30,
-            'icone'         => 'M3 18h18M5 18v-6a7 7 0 0114 0v6M12 5v13',
-            'descriptif'    => 'Routes de desserte agricole, ponts, dalots et infrastructures publiques et sociales.',
-            'interventions' => [
-                'Réhabilitation des infrastructures de base',
-                'Aménagement des routes de desserte agricole : ponts, passages sous route, dalots',
-                'Création et curage de canalisations et de saignées',
-                'Construction et réhabilitation d’infrastructures publiques et sociales',
-            ],
-            'formations'    => [],
-        ],
-        'educ' => [
-            'libelle'       => 'Éducation',
-            'teinte'        => 215,
-            'icone'         => 'M3 5h6a3 3 0 013 3v12a2 2 0 00-2-2H3zM21 5h-6a3 3 0 00-3 3v12a2 2 0 012-2h7z',
-            'descriptif'    => 'Construction d’écoles, équipements, kits scolaires et formation des enseignants.',
-            'interventions' => [
-                'Construction et réhabilitation d’infrastructures scolaires',
-                'Fourniture d’équipements et de kits scolaires',
-                'Formation des enseignants',
-            ],
-            'formations'    => [
-                'Normes INEE : éducation en situation d’urgence (atelier de formation)',
-            ],
-        ],
-    
-        'wash' => [
-            'libelle'       => 'Eau, hygiène et assainissement',
-            'teinte'        => 190,
-            'icone'         => 'M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z',
-            'descriptif'    => 'Adduction d’eau, captage de sources, forages, latrines et sensibilisation à l’hygiène.',
-            'interventions' => [
-                'Étude et conception de projets hydrauliques',
-                'Adduction d’eau et captage de sources',
-                'Forage de puits',
-                'Construction de latrines publiques et familiales',
-                'Sensibilisation à l’eau, à l’hygiène et à l’assainissement',
-            ],
-            'formations'    => [
-                'Atelier de l’UNICEF sur les 5 engagements du cluster WASH pour la sécurité et la dignité des filles, garçons, femmes et hommes',
-            ],
-        ],
-        'genre' => [
-            'libelle'       => 'Genre',
-            'teinte'        => 285,
-            'icone'         => 'M12 14a5 5 0 100-10 5 5 0 000 10zM12 14v7M9 18h6',
-            'descriptif'    => 'Équité, égalité de sexe et de chances pour les femmes, hommes, filles et garçons.',
-            'interventions' => [
-                'Sensibilisation à l’intégration du genre et au respect de l’équité',
-                'Égalité de sexe et de chances pour hommes, femmes, filles et garçons dans tous les secteurs',
-            ],
-            'formations'    => [
-                'Formation en genre par le HCR, à Bukavu',
-                'Outils d’intégration du genre : analyse de genre, cadre ADAPT, AGIR et Gender Marker',
-                'Premier atelier d’appui aux points focaux genre au Sud-Kivu, avec ICCO et OCHA',
-            ],
-        ],
-        'prot' => [
-            'libelle'       => 'Protection',
-            'teinte'        => 330,
-            'icone'         => 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
-            'descriptif'    => 'Droits de la femme et de l’enfant, lutte contre les violences basées sur le genre, réinsertion des personnes vulnérables.',
-            'interventions' => [
-                'Promotion des droits de la femme et de l’enfant',
-                'Bonne gouvernance',
-                'Lutte contre les viols et violences sexuelles et les violences basées sur le genre',
-                'Lutte contre les IST et le VIH/SIDA',
-                'Réinsertion socio-économique des personnes vulnérables, déplacées et retournées',
-                'Réinsertion des personnes vivant avec un handicap',
-            ],
-            'formations'    => [
-                'Management sensible aux conflits',
-                'Aide humanitaire d’urgence et sensibilité aux conflits',
-            ],
-        ],
-        'env' => [
-            'libelle'       => 'Environnement',
-            'teinte'        => 150,
-            'icone'         => 'M5 19c0-9 5-14 15-14 0 10-5 15-14 15M5 19c2-5 5-8 9-10',
-            'descriptif'    => 'Reboisement, énergies renouvelables, biodigesteurs, briquettes issues de déchets ménagers.',
-            'interventions' => [
-                'Sensibilisation au droit de l’environnement et à la résolution 1325 de l’ONU',
-                'Protection de l’environnement, des forêts et de la biodiversité',
-                'Lutte contre le changement climatique',
-                'Promotion des énergies renouvelables et alternatives',
-                'Reboisement',
-                'Briquettes à partir de déchets ménagers et fabrication de pavés',
-                'Biodigesteurs et production d’engrais biologique',
-            ],
-            'formations'    => [
-                'Forum sur la séquestration du carbone et le changement climatique, à Kigali (Rwanda), 2016 — IPBS, NAMA Facility, UNFCCC',
-            ],
-        ],
-        'form' => [
-            'libelle'       => 'Formation professionnelle',
-            'teinte'        => 45,
-            'icone'         => 'M14 6l4 4M4 20l8-8M13 5l6 6-3 3-6-6z',
-            'descriptif'    => 'Couture, maçonnerie, menuiserie, briqueterie, savonnerie et art culinaire.',
-            'interventions' => [
-                'Coupe-couture',
-                'Maçonnerie',
-                'Menuiserie',
-                'Briqueterie',
-                'Savonnerie',
-                'Art culinaire',
-            ],
-            'formations'    => [],
-        ],
+    $counters = [
+        'domaines' => $domaines->count(),
+        'projets'  => (int) $projetsCount,
+        'zones'    => (int) $zonesCount,
     ];
 
-    // Étiquettes courtes de la barre de navigation interne (#rl).
-    $rail = [
-        'sante' => 'Santé',
-        'alim'  => 'Alimentation',
-        'logi'  => 'Logistique',
-        'educ'  => 'Éducation',
-        'wash'  => 'Eau',
-        'genre' => 'Genre',
-        'prot'  => 'Protection',
-        'env'   => 'Environnement',
-        'form'  => 'Métiers',
-    ];
-@endphp
+    // Année d'un projet (réalisation), sinon null.
+    $anneeProjet = static fn ($p) => $p->end_date?->year ?? $p->start_date?->year;
 
-@php
-    $projets = [
-        ['annee' => 1994, 'domaine' => 'prot',  'titre' => 'Sensibilisation des femmes burundaises à la cohabitation', 'bailleur' => 'CECI'],
-        ['annee' => 1995, 'domaine' => 'form',  'titre' => 'Atelier de couture pour orphelins et veuves, Burundi', 'bailleur' => 'PNUD'],
-        ['annee' => 1995, 'domaine' => 'educ',  'titre' => 'École primaire pour enfants orphelins, Bujumbura', 'bailleur' => ''],
-        ['annee' => 1996, 'domaine' => 'wash',  'titre' => 'Assainissement d’Uvira et entretien des avenues', 'bailleur' => 'PAM'],
-        ['annee' => 1997, 'domaine' => 'form',  'titre' => 'Tuiles, briques et foyers améliorés, plaine de la Ruzizi', 'bailleur' => 'PAM, USAID'],
-        ['annee' => 1998, 'domaine' => 'logi',  'titre' => 'Réhabilitation de la route Kamanyola–Uvira', 'bailleur' => 'PAM, USAID'],
-        ['annee' => 1999, 'domaine' => 'sante', 'titre' => 'Centres de santé de Mazigiro et Ibambiro', 'bailleur' => 'BCZS'],
-        ['annee' => 2000, 'domaine' => 'sante', 'titre' => 'Centres de santé, latrines et douches, Walungu', 'bailleur' => 'BDOM / Louvain Développement'],
-        ['annee' => 2000, 'domaine' => 'logi',  'titre' => 'Escalier de 5 400 mètres à Bukavu', 'bailleur' => 'MONUC'],
-        ['annee' => 2005, 'domaine' => 'alim',  'titre' => 'Petit bétail pour les femmes retournées, Lemera', 'bailleur' => 'BDOM / Louvain Développement'],
-        ['annee' => 2006, 'domaine' => 'sante', 'titre' => 'Réhabilitation de la maternité de Kasenga', 'bailleur' => 'SPES / UNHCR'],
-        ['annee' => 2006, 'domaine' => 'educ',  'titre' => 'Réhabilitation de 50 classes à Fizi', 'bailleur' => 'AVSI / ECHO'],
-        ['annee' => 2006, 'domaine' => 'educ',  'titre' => 'Quatre écoles, 18 latrines et 19 citernes, plaine de la Ruzizi', 'bailleur' => 'AVSI / UNICEF'],
-        ['annee' => 2007, 'domaine' => 'logi',  'titre' => 'Deux ponts Kasandjala I et II, territoire de Fizi', 'bailleur' => 'PNUD / COMREC'],
-        ['annee' => 2008, 'domaine' => 'wash',  'titre' => 'Eau potable et hygiène à Sebele, huit puits à Fizi', 'bailleur' => 'Pooled Fund'],
-        ['annee' => 2009, 'domaine' => 'logi',  'titre' => 'Réhabilitation de la route Sebele–Kazimia', 'bailleur' => 'PNUD / COMREC'],
-        ['annee' => 2010, 'domaine' => 'form',  'titre' => 'Formation en informatique de jeunes à Beni', 'bailleur' => 'BETING'],
-        ['annee' => 2010, 'domaine' => 'wash',  'titre' => '346 latrines familiales', 'bailleur' => 'Tearfund'],
-        ['annee' => 2013, 'domaine' => 'logi',  'titre' => 'Route de 38 km Numbi–Ziralo, territoire de Kalehe', 'bailleur' => 'AAP / P.F.'],
-        ['annee' => 2014, 'domaine' => 'form',  'titre' => 'Autonomisation économique de jeunes à Goma', 'bailleur' => 'BETING'],
-        ['annee' => 2014, 'domaine' => 'educ',  'titre' => 'Douze classes et latrines à l’EP Bakhita', 'bailleur' => 'COPA'],
-        ['annee' => 2015, 'domaine' => 'form',  'titre' => 'Formation à l’entrepreneuriat de jeunes, Masisi', 'bailleur' => 'BETING'],
-        ['annee' => 2017, 'domaine' => 'wash',  'titre' => 'Citernes d’eau à l’EP Camp Saio', 'bailleur' => 'EPSP / UNICEF'],
-        ['annee' => 2019, 'domaine' => 'form',  'titre' => 'Formation de jeunes contre la pauvreté, Nyiragongo', 'bailleur' => 'BETING'],
-        ['annee' => 2021, 'domaine' => 'educ',  'titre' => 'Construction et réhabilitation de l’EP EDAP/ISP', 'bailleur' => 'EDAP'],
-        ['annee' => 2022, 'domaine' => 'alim',  'titre' => 'Entrepôt de riz, marais de Nyamubanda et Hogola', 'bailleur' => 'PICAGEL'],
-        ['annee' => 2023, 'domaine' => 'alim',  'titre' => 'Production de tilapia en étangs piscicoles, Karhongo', 'bailleur' => 'FAO'],
-        ['annee' => 2024, 'domaine' => 'educ',  'titre' => 'École primaire et secondaire de Karhale, Bukavu', 'bailleur' => 'BETING'],
-        ['annee' => 2024, 'domaine' => 'prot',  'titre' => 'Foyer social pour jeunes filles mères, Saké', 'bailleur' => 'BETING'],
-        ['annee' => 0,    'domaine' => 'logi',  'titre' => 'Aménagement des huit territoires', 'bailleur' => 'IPBS, NAMA Facility'],
-        ['annee' => 0,    'domaine' => 'alim',  'titre' => 'Drainage du marais de Nyamubanda, Walungu', 'bailleur' => ''],
-        ['annee' => 0,    'domaine' => 'alim',  'titre' => 'Relance de la production agricole à Fizi', 'bailleur' => ''],
-        ['annee' => 0,    'domaine' => 'alim',  'titre' => 'Relance de la production de riz à Fizi', 'bailleur' => ''],
-        ['annee' => 0,    'domaine' => 'genre', 'titre' => 'Intégration du genre dans le Sud-Kivu', 'bailleur' => ''],
-        ['annee' => 0,    'domaine' => 'wash',  'titre' => 'Prévention d’Ebola, COVID-19 et mpox en milieu scolaire', 'bailleur' => ''],
-    ];
+    // Libellé court du rail pour un domaine (fallback = nom traduit, puis slug).
+    $railLabel = static function ($d) use ($locale) {
+        $label = config('oaat.domaine_page.rail.'.$d->slug);
+
+        return $label ?: (string) ($d->getTranslation('name', $locale) ?: $d->slug);
+    };
+
+    // Pictogramme SVG (design figé dans config), chaîne vide si jamais absent.
+    $icone = static fn ($d) => (string) (config('oaat.domaine_page.icons.'.$d->slug) ?? '');
+
+    // Teinte HSL (design figé), défaut 200 si jamais absent.
+    $teinte = static fn ($d) => (int) (config('oaat.domaine_page.tints.'.$d->slug) ?? 200);
+
+    // Libellé des bailleurs d'un projet (funder puis, à défaut, tous les
+    // partenaires) ; chaîne vide si aucun partenaire.
+    $bailleurProjet = static function ($p) use ($locale) {
+        $label = trim((string) $p->funderLabel($locale));
+
+        if ($label === '' || $label === '—') {
+            $label = trim((string) $p->partnersLabel($locale));
+        }
+
+        return $label === '—' ? '' : $label;
+    };
 @endphp
 
 @section('content')
@@ -252,15 +91,15 @@
 
             <dl class="mt-12 grid max-w-3xl grid-cols-3 gap-4 border-t border-white/15 pt-8 sm:gap-8">
                 <div data-r>
-                    <dd class="font-serif text-4xl font-semibold"><span data-n="9">0</span></dd>
+                    <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['domaines'] }}">0</span></dd>
                     <dt class="mt-1 text-sm text-white/65">domaines d’intervention</dt>
                 </div>
                 <div data-r>
-                    <dd class="font-serif text-4xl font-semibold"><span data-n="35">0</span></dd>
+                    <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['projets'] }}">0</span></dd>
                     <dt class="mt-1 text-sm text-white/65">projets répertoriés</dt>
                 </div>
                 <div data-r>
-                    <dd class="font-serif text-4xl font-semibold"><span data-n="13">0</span></dd>
+                    <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['zones'] }}">0</span></dd>
                     <dt class="mt-1 text-sm text-white/65">zones en Sud et Nord-Kivu</dt>
                 </div>
             </dl>
@@ -270,44 +109,50 @@
     {{-- ═══ Barre de navigation interne (ancres par domaine) ══════════════ --}}
     <div class="sticky top-[60px] z-30 border-b border-line bg-white/95 backdrop-blur">
         <nav id="rl" class="mx-auto flex max-w-7xl overflow-x-auto px-5 lg:px-8" aria-label="Domaines">
-            @foreach ($rail as $cle => $libelle)
-                <a href="#{{ $cle }}"
+            @foreach ($domaines as $domaine)
+                <a href="#{{ $domaine->slug }}"
                    class="flex shrink-0 items-center gap-2 border-b-2 px-3 py-3.5 text-sm font-medium transition {{ $loop->first ? 'border-ochre text-lake' : 'border-transparent text-ink/70' }}">
                     <span class="[&_svg]:h-5 [&_svg]:w-5">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="{{ $domaines[$cle]['icone'] }}"/>
+                            <path d="{{ $icone($domaine) }}"/>
                         </svg>
                     </span>
-                    <span class="hidden lg:inline">{{ $libelle }}</span>
+                    <span class="hidden lg:inline">{{ $railLabel($domaine) }}</span>
                 </a>
             @endforeach
         </nav>
     </div>
 
     {{-- ═══ Sections par domaine ═════════════════════════════════════════ --}}
-    @foreach ($domaines as $cle => $domaine)
+    @foreach ($domaines as $domaine)
         @php
-            $projetsDuDomaine = collect($projets)->where('domaine', $cle);
-            $realises         = $projetsDuDomaine->where('annee', '>', 0)->sortByDesc('annee');
-            $aFinancer        = $projetsDuDomaine->where('annee', '<=', 0)->values();
-            $parcours         = $realises->concat($aFinancer);
+            $projetsDuDomaine = $domaine->projects; // publiés + partenaires (chargés par le contrôleur)
 
-            $annees           = $realises->pluck('annee');
-            $periode          = $annees->isNotEmpty() ? $annees->min() . '–' . $annees->max() : '';
+            $realises  = $projetsDuDomaine->filter(fn ($p) => $p->statut_court === 'd')
+                ->sortByDesc(fn ($p) => $anneeProjet($p) ?? 0);
+            $aFinancer = $projetsDuDomaine->filter(fn ($p) => $p->statut_court === 'w')->values();
+            $parcours  = $realises->concat($aFinancer);
 
-            $bailleurs        = collect();
-            foreach ($projetsDuDomaine as $projet) {
-                foreach (preg_split('~[\/,]~', $projet['bailleur']) as $segment) {
-                    $seg = trim($segment);
-                    if ($seg !== '' && $seg !== 'P.F.') {
-                        $bailleurs->push($seg);
-                    }
-                }
-            }
-            $bailleurs = $bailleurs->unique()->values()->join(', ');
+            $annees    = $realises->map(fn ($p) => $anneeProjet($p))->filter()->values();
+            $periode   = $annees->isNotEmpty() ? $annees->min() . '–' . $annees->max() : '';
+
+            $bailleurs = collect($projetsDuDomaine)
+                ->flatMap(fn ($p) => preg_split('~[\/,]~', $bailleurProjet($p)))
+                ->map(fn ($seg) => trim($seg))
+                ->filter(fn ($seg) => $seg !== '' && $seg !== 'P.F.')
+                ->unique()
+                ->values()
+                ->join(', ');
+
+            $nom           = (string) ($domaine->getTranslation('name', $locale) ?: $domaine->slug);
+            $intro         = (string) ($domaine->getTranslation('intro', $locale)
+                ?: $domaine->getTranslation('objectives', $locale)
+                ?: '');
+            $interventions = (array) ($domaine->getTranslation('interventions', $locale) ?? []);
+            $formations    = (array) ($domaine->getTranslation('formations', $locale) ?? []);
         @endphp
 
-        <section id="{{ $cle }}" class="scroll-mt-32 {{ $loop->odd ? 'bg-mist' : 'bg-white' }} py-20">
+        <section id="{{ $domaine->slug }}" class="scroll-mt-32 {{ $loop->odd ? 'bg-mist' : 'bg-white' }} py-20">
             <div class="mx-auto grid max-w-7xl gap-12 px-5 lg:grid-cols-12 lg:px-8">
 
                 {{-- ▸ Colonne gauche : résumé sticky --}}
@@ -315,13 +160,15 @@
                     <div class="lg:sticky lg:top-40">
                         <span class="grid h-16 w-16 place-items-center bg-lake text-white">
                             <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="{{ $domaine['icone'] }}"/>
+                                <path d="{{ $icone($domaine) }}"/>
                             </svg>
                         </span>
 
-                        <h2 class="mt-6 font-serif text-3xl font-semibold text-lake md:text-4xl">{{ $domaine['libelle'] }}</h2>
+                        <h2 class="mt-6 font-serif text-3xl font-semibold text-lake md:text-4xl">{{ $nom }}</h2>
 
-                        <p class="mt-3 leading-relaxed text-ink/70">{{ $domaine['descriptif'] }}</p>
+                        @if ($intro !== '')
+                            <p class="mt-3 leading-relaxed text-ink/70">{{ $intro }}</p>
+                        @endif
 
                         <dl class="mt-6 grid grid-cols-2 gap-px border border-line bg-line">
                             <div class="bg-white p-4">
@@ -348,37 +195,39 @@
                     {{-- Illustration (dégradé + libellé, rendu côté serveur) --}}
                     <figure class="overflow-hidden" data-r>
                         <svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" class="h-56 w-full md:h-72"
-                             role="img" aria-label="{{ $domaine['libelle'] }}">
+                             role="img" aria-label="{{ $nom }}">
                             <defs>
-                                <linearGradient id="degrade-{{ $cle }}" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0" stop-color="hsl({{ $domaine['teinte'] }} 45% 26%)"/>
-                                    <stop offset="1" stop-color="hsl({{ $domaine['teinte'] }} 50% 44%)"/>
+                                <linearGradient id="degrade-{{ $domaine->slug }}" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0" stop-color="hsl({{ $teinte($domaine) }} 45% 26%)"/>
+                                    <stop offset="1" stop-color="hsl({{ $teinte($domaine) }} 50% 44%)"/>
                                 </linearGradient>
                             </defs>
-                            <rect width="800" height="300" fill="url(#degrade-{{ $cle }})"/>
-                            <text x="400" y="156" fill="#fff" fill-opacity=".85" font-family="sans-serif" font-size="24" text-anchor="middle">{{ $domaine['libelle'] }}</text>
+                            <rect width="800" height="300" fill="url(#degrade-{{ $domaine->slug }})"/>
+                            <text x="400" y="156" fill="#fff" fill-opacity=".85" font-family="sans-serif" font-size="24" text-anchor="middle">{{ $nom }}</text>
                             <text x="400" y="182" fill="#fff" fill-opacity=".6" font-family="sans-serif" font-size="15" text-anchor="middle">Image d’illustration</text>
                         </svg>
                     </figure>
 
-                    <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">Nos interventions</h3>
-                    <ul class="mt-4 grid gap-3 sm:grid-cols-2">
-                        @foreach ($domaine['interventions'] as $intervention)
-                            <li class="flex gap-3 border border-line bg-white p-4 text-sm leading-relaxed">
-                                <span class="mt-0.5 shrink-0 text-moss">
-                                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M5 12l5 5 9-10"/>
-                                    </svg>
-                                </span>
-                                <span>{{ $intervention }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
+                    @if ($interventions !== [])
+                        <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">Nos interventions</h3>
+                        <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+                            @foreach ($interventions as $intervention)
+                                <li class="flex gap-3 border border-line bg-white p-4 text-sm leading-relaxed">
+                                    <span class="mt-0.5 shrink-0 text-moss">
+                                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M5 12l5 5 9-10"/>
+                                        </svg>
+                                    </span>
+                                    <span>{{ $intervention }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
 
-                    @if ($domaine['formations'] !== [])
+                    @if ($formations !== [])
                         <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">Formations reçues de nos partenaires</h3>
                         <ul class="mt-4 space-y-2">
-                            @foreach ($domaine['formations'] as $formation)
+                            @foreach ($formations as $formation)
                                 <li class="border-l-4 border-ochre bg-white px-4 py-3 text-sm leading-relaxed">{{ $formation }}</li>
                             @endforeach
                         </ul>
@@ -387,14 +236,20 @@
                     @if ($projetsDuDomaine->isNotEmpty())
                         <ul class="mt-4 divide-y divide-line border border-line bg-white">
                             @foreach ($parcours as $projet)
+                                @php
+                                    $anneeP    = (string) $anneeProjet($projet);
+                                    $aFinP     = $projet->statut_court === 'w';
+                                    $titreP    = trim((string) $projet->getTranslation('title', $locale));
+                                    $bailleurP = $bailleurProjet($projet);
+                                @endphp
                                 <li class="flex items-center gap-4 p-4">
-                                    <span class="w-20 shrink-0 text-sm font-bold {{ $projet['annee'] ? 'text-ink/60' : 'text-ochreDark' }}">
-                                        {{ $projet['annee'] ?: 'À financer' }}
+                                    <span class="w-20 shrink-0 text-sm font-bold {{ $aFinP ? 'text-ochreDark' : 'text-ink/60' }}">
+                                        {{ $aFinP ? 'À financer' : $anneeP }}
                                     </span>
                                     <span class="grow">
-                                        <b class="block text-lake">{{ $projet['titre'] }}</b>
-                                        @if ($projet['bailleur'] !== '')
-                                            <span class="text-xs text-ink/60">{{ $projet['bailleur'] }}</span>
+                                        <b class="block text-lake">{{ $titreP }}</b>
+                                        @if ($bailleurP !== '')
+                                            <span class="text-xs text-ink/60">{{ $bailleurP }}</span>
                                         @endif
                                     </span>
                                 </li>
