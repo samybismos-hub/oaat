@@ -122,6 +122,57 @@ class PageSeeder extends Seeder
                     'en' => 'Thirty years of achievements alongside communities, with UN agencies and international NGOs, and projects ready for funding.',
                 ],
             ],
+        [
+                'slug' => 'domaines',
+                'title' => [
+                    'fr' => 'Domaines d’intervention',
+                    'en' => 'Areas of intervention',
+                ],
+                'body' => [
+                    'fr' => 'Neuf domaines d’action pour répondre aux besoins des populations de l’Est de la RD Congo, de la santé à la formation aux métiers.',
+                    'en' => 'Nine areas of action to meet the needs of the people of eastern DR Congo, from health to vocational training.',
+                ],
+                'meta_title' => [
+                    'fr' => 'Domaines d’intervention — OAAT',
+                    'en' => 'Areas of intervention — OAAT',
+                ],
+                'meta_description' => [
+                    'fr' => "Les neuf domaines d'intervention de l'OAAT : santé, sécurité alimentaire, logistique, éducation, eau et assainissement, genre, protection, environnement et formation aux métiers.",
+                    'en' => 'The nine areas of intervention of OAAT: health, food security, logistics, education, water and sanitation, gender, protection, environment and vocational training.',
+                ],
+                'competences_titre' => [
+                    'fr' => 'Compétences transversales',
+                    'en' => 'Cross-cutting skills',
+                ],
+                'competences_intro' => [
+                    'fr' => 'Des formations reçues de nos partenaires et bailleurs, utiles à tous les domaines.',
+                    'en' => 'Training received from our partners and funders, useful across all areas.',
+                ],
+                'competences' => [
+                    'fr' => [
+                        ['titre' => 'Gestion administrative et financière', 'detail' => 'PNUD COMREC, Uvira · 2008'],
+                        ['titre' => 'Gestion de projet', 'detail' => 'Pooled Fund Kinshasa, Uvira · 2009'],
+                        ['titre' => 'GPS et smartphones pour la collecte de données', 'detail' => 'Session de formation'],
+                        ['titre' => 'Renforcement des capacités des organisations de la société civile', 'detail' => 'Sensibilisation et formation'],
+                        ['titre' => 'Ateliers SAFE', 'detail' => 'Kigali (Rwanda) · 2016 — Nairobi (Kenya) · 2017'],
+                    ],
+                    'en' => [
+                        ['titre' => 'Administrative and financial management', 'detail' => 'PNUD COMREC, Uvira · 2008'],
+                        ['titre' => 'Project management', 'detail' => 'Pooled Fund Kinshasa, Uvira · 2009'],
+                        ['titre' => 'GPS and smartphones for data collection', 'detail' => 'Training session'],
+                        ['titre' => 'Capacity building for civil society organisations', 'detail' => 'Awareness and training'],
+                        ['titre' => 'SAFE workshops', 'detail' => 'Kigali (Rwanda) · 2016 — Nairobi (Kenya) · 2017'],
+                    ],
+                ],
+                'cta_titre' => [
+                    'fr' => 'Un besoin dans l’un de ces domaines ?',
+                    'en' => 'Need support in one of these areas?',
+                ],
+                'cta_intro' => [
+                    'fr' => 'Décrivez-nous votre projet, parlons-en.',
+                    'en' => 'Tell us about your project — let’s talk.',
+                ],
+            ],
         ];
 
         foreach ($pages as $page) {

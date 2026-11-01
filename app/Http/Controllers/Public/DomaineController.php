@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Models\Domain;
+use App\Models\Page;
 use App\Models\Project;
 use App\Models\Setting;
 
@@ -21,10 +22,15 @@ class DomaineController
             ->count();
         $zonesCount = (int) (Setting::query()->first()?->stat_zones ?? 0);
 
+        // Page CMS « domaines » : SEO, héro, compétences transversales et bandeau
+        // d'appel à l'action sont éditables dans Filament → Pages du site.
+        $pageDomaines = Page::query()->where('slug', 'domaines')->first();
+
         return view('pages.domaines-index', [
             'domaines'     => $domaines,
             'projetsCount' => $projetsCount,
             'zonesCount'   => $zonesCount,
+            'pageDomaines' => $pageDomaines,
             'locale'       => $locale,
         ]);
     }

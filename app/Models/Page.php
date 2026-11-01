@@ -11,8 +11,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones'])]
-#[Translatable('title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones')]
+#[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones', 'competences_titre', 'competences_intro', 'competences', 'cta_titre', 'cta_intro'])]
+#[Translatable('title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones', 'competences_titre', 'competences_intro', 'competences', 'cta_titre', 'cta_intro')]
 class Page extends Model implements HasMedia
 {
     use HasTranslations, InteractsWithMedia;
@@ -24,7 +24,7 @@ class Page extends Model implements HasMedia
      *
      * @var list<string>
      */
-    public const SYSTEM_SLUGS = ['accueil', 'organisation'];
+    public const SYSTEM_SLUGS = ['accueil', 'organisation', 'domaines'];
 
     public function getRouteKeyName(): string
     {
@@ -124,6 +124,65 @@ class Page extends Model implements HasMedia
             $values = $this->getTranslation('zones', 'fr') ?? [];
         }
         return is_array($values) ? $values : [];
+    }
+
+    /**
+     * Les compétences transversales de la page "domaines" (page index des
+     * domaines) : liste d'éléments {@titre, detail}, avec repli sur le français.
+     *
+     * @return list<array{titre?: string, detail?: string}>
+     */
+    public function competencesFor(string $locale): array
+    {
+        $values = $this->getTranslation('competences', $locale) ?? [];
+        if ($values === [] || ! is_array($values)) {
+            $values = $this->getTranslation('competences', 'fr') ?? [];
+        }
+        return array_values(array_filter(is_array($values) ? $values : [], fn ($item) => is_array($item)));
+    }
+
+    /**
+     * Titre du bloc "Compétences transversales" de la page "domaines",
+     * avec repli sur le français puis sur vide.
+     */
+    public function competencesTitreFor(string $locale): string
+    {
+        return $this->pageTextFor('competences_titre', $locale);
+    }
+
+    /**
+     * Introduction du bloc "Compétences transversales" de la page "domaines".
+     */
+    public function competencesIntroFor(string $locale): string
+    {
+        return $this->pageTextFor('competences_intro', $locale);
+    }
+
+    /**
+     * Titre du bandeau d'appel à l'action de la page "domaines".
+     */
+    public function ctaTitreFor(string $locale): string
+    {
+        return $this->pageTextFor('cta_titre', $locale);
+    }
+
+    /**
+     * Introduction du bandeau d'appel à l'action de la page "domaines".
+     */
+    public function ctaIntroFor(string $locale): string
+    {
+        return $this->pageTextFor('cta_intro', $locale);
+    }
+
+    /**
+     * Lecture d'un texte traduit (colonne JSON fr/en) de la page "domaines",
+     * avec repli : langue demandée → français → chaîne vide.
+     */
+    private function pageTextFor(string $key, string $locale): string
+    {
+        $value = trim((string) ($this->getTranslation($key, $locale) ?? ''));
+
+        return $value !== '' ? $value : trim((string) ($this->getTranslation($key, 'fr') ?? ''));
     }
 
 }

@@ -8,10 +8,16 @@
     // $t et $locale doivent être définis avant toute @section qui les utilise (cf. projets-index).
     $locale ??= 'fr';
     $t = fn($fr, $en) => $locale === 'en' ? $en : $fr;
+
+    // Page CMS « domaines » : le SEO (méta) vient de la base, avec repli sur les
+    // libellés de structure quand la page n'est pas (encore) créée.
+    $pg       = $pageDomaines ?? null;
+    $seoTitle = trim((string) ($pg?->getTranslation('meta_title', $locale) ?? ''));
+    $seoDesc  = trim((string) ($pg?->getTranslation('meta_description', $locale) ?? ''));
 @endphp
 
-@section('meta_title', $t("Domaines d'intervention — OAAT", 'Areas of intervention — OAAT'))
-@section('meta_description', $t(
+@section('meta_title', $seoTitle !== '' ? $seoTitle : $t('Domaines d’intervention — OAAT', 'Areas of intervention — OAAT'))
+@section('meta_description', $seoDesc !== '' ? $seoDesc : $t(
     "Les neuf domaines d'intervention de l'OAAT : santé, sécurité alimentaire, logistique, éducation, eau et assainissement, genre, protection, environnement et formation aux métiers.",
     'The nine areas of intervention of OAAT: health, food security, logistics, education, water and sanitation, gender, protection, environment and vocational training.',
 ))
@@ -62,6 +68,37 @@
 
         return $label === '—' ? '' : $label;
     };
+
+    // ─── Contenu CMS de la page (slug 'domaines') : héro, compétences, CTA ───
+    $pg = $pageDomaines ?? null;
+
+    $heroTitre = trim((string) ($pg?->getTranslation('title', $locale) ?? ''))
+        ?: trim((string) ($pg?->getTranslation('title', 'fr') ?? ''))
+        ?: $t('Domaines d’intervention', 'Areas of intervention');
+
+    $heroIntro = trim((string) ($pg?->getTranslation('body', $locale) ?? ''))
+        ?: trim((string) ($pg?->getTranslation('body', 'fr') ?? ''));
+
+    $compTitre = trim((string) ($pg?->getTranslation('competences_titre', $locale) ?? ''))
+        ?: trim((string) ($pg?->getTranslation('competences_titre', 'fr') ?? ''))
+        ?: $t('Compétences transversales', 'Cross-cutting skills');
+
+    $compIntro = trim((string) ($pg?->getTranslation('competences_intro', $locale) ?? ''))
+        ?: trim((string) ($pg?->getTranslation('competences_intro', 'fr') ?? ''))
+        ?: $t('Des formations reçues de nos partenaires et bailleurs, utiles à tous les domaines.', 'Training received from our partners and funders, useful across all areas.');
+
+    $competences = $pg ? (array) ($pg->getTranslation('competences', $locale) ?? []) : [];
+    if ($competences === [] && $pg) {
+        $competences = (array) ($pg->getTranslation('competences', 'fr') ?? []);
+    }
+
+    $ctaTitre = trim((string) ($pg?->getTranslation('cta_titre', $locale) ?? ''))
+        ?: trim((string) ($pg?->getTranslation('cta_titre', 'fr') ?? ''))
+        ?: $t("Un besoin dans l’un de ces domaines ?", 'Need support in one of these areas?');
+
+    $ctaIntro = trim((string) ($pg?->getTranslation('cta_intro', $locale) ?? ''))
+        ?: trim((string) ($pg?->getTranslation('cta_intro', 'fr') ?? ''))
+        ?: $t('Décrivez-nous votre projet, parlons-en.', 'Tell us about your project — let’s talk.');
 @endphp
 
 @section('content')
@@ -78,29 +115,29 @@
 
         <div class="relative z-10 mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
             <nav aria-label="Fil d’Ariane" class="text-sm text-white/60" data-r>
-                <a href="{{ route('accueil', ['locale' => $locale]) }}" class="transition hover:text-ochre">Accueil</a>
+                <a href="{{ route('accueil', ['locale' => $locale]) }}" class="transition hover:text-ochre">{{ $t('Accueil', 'Home') }}</a>
                 <span class="mx-2">›</span>
-                <span class="text-white">Domaines d’intervention</span>
+                <span class="text-white">{{ $t('Domaines d’intervention', 'Areas of intervention') }}</span>
             </nav>
 
-            <h1 class="mt-6 font-serif text-5xl font-semibold leading-tight md:text-6xl" data-r>Domaines d’intervention</h1>
+            <h1 class="mt-6 font-serif text-5xl font-semibold leading-tight md:text-6xl" data-r>{{ $heroTitre }}</h1>
 
-            <p class="mt-5 max-w-2xl text-lg text-white/75" data-r>
-                Neuf domaines d’action pour répondre aux besoins des populations de l’Est de la RD Congo, de la santé à la formation aux métiers.
-            </p>
+            @if ($heroIntro !== '')
+                <p class="mt-5 max-w-2xl text-lg text-white/75" data-r>{{ $heroIntro }}</p>
+            @endif
 
             <dl class="mt-12 grid max-w-3xl grid-cols-3 gap-4 border-t border-white/15 pt-8 sm:gap-8">
                 <div data-r>
                     <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['domaines'] }}">0</span></dd>
-                    <dt class="mt-1 text-sm text-white/65">domaines d’intervention</dt>
+                    <dt class="mt-1 text-sm text-white/65">{{ $t('domaines d’intervention', 'areas of intervention') }}</dt>
                 </div>
                 <div data-r>
                     <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['projets'] }}">0</span></dd>
-                    <dt class="mt-1 text-sm text-white/65">projets répertoriés</dt>
+                    <dt class="mt-1 text-sm text-white/65">{{ $t('projets répertoriés', 'listed projects') }}</dt>
                 </div>
                 <div data-r>
                     <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['zones'] }}">0</span></dd>
-                    <dt class="mt-1 text-sm text-white/65">zones en Sud et Nord-Kivu</dt>
+                    <dt class="mt-1 text-sm text-white/65">{{ $t('zones en Sud et Nord-Kivu', 'zones in South and North Kivu') }}</dt>
                 </div>
             </dl>
         </div>
@@ -172,20 +209,20 @@
 
                         <dl class="mt-6 grid grid-cols-2 gap-px border border-line bg-line">
                             <div class="bg-white p-4">
-                                <dt class="text-xs text-ink/60">Projets réalisés</dt>
+                                <dt class="text-xs text-ink/60">{{ $t('Projets réalisés', 'Completed projects') }}</dt>
                                 <dd class="mt-1 font-serif text-3xl font-semibold text-lake">{{ $realises->count() }}</dd>
                             </div>
                             <div class="bg-white p-4">
-                                <dt class="text-xs text-ink/60">Projets à financer</dt>
+                                <dt class="text-xs text-ink/60">{{ $t('Projets à financer', 'Projects seeking funding') }}</dt>
                                 <dd class="mt-1 font-serif text-3xl font-semibold text-lake">{{ $aFinancer->count() }}</dd>
                             </div>
                         </dl>
 
                         @if ($periode !== '')
-                            <p class="mt-4 text-sm text-ink/70"><b>Période</b> : {{ $periode }}</p>
+                            <p class="mt-4 text-sm text-ink/70"><b>{{ $t('Période', 'Period') }}</b> : {{ $periode }}</p>
                         @endif
                         @if ($bailleurs !== '')
-                            <p class="mt-2 text-sm text-ink/70"><b>Bailleurs et partenaires</b> : {{ $bailleurs }}</p>
+                            <p class="mt-2 text-sm text-ink/70"><b>{{ $t('Bailleurs et partenaires', 'Funders and partners') }}</b> : {{ $bailleurs }}</p>
                         @endif
                     </div>
                 </div>
@@ -209,7 +246,7 @@
                     </figure>
 
                     @if ($interventions !== [])
-                        <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">Nos interventions</h3>
+                        <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Nos interventions', 'Our interventions') }}</h3>
                         <ul class="mt-4 grid gap-3 sm:grid-cols-2">
                             @foreach ($interventions as $intervention)
                                 <li class="flex gap-3 border border-line bg-white p-4 text-sm leading-relaxed">
@@ -225,14 +262,14 @@
                     @endif
 
                     @if ($formations !== [])
-                        <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">Formations reçues de nos partenaires</h3>
+                        <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Formations reçues de nos partenaires', 'Training received from our partners') }}</h3>
                         <ul class="mt-4 space-y-2">
                             @foreach ($formations as $formation)
                                 <li class="border-l-4 border-ochre bg-white px-4 py-3 text-sm leading-relaxed">{{ $formation }}</li>
                             @endforeach
                         </ul>
                     @endif
-                    <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">Projets associés ({{ $projetsDuDomaine->count() }})</h3>
+                    <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Projets associés', 'Related projects') }} ({{ $projetsDuDomaine->count() }})</h3>
                     @if ($projetsDuDomaine->isNotEmpty())
                         <ul class="mt-4 divide-y divide-line border border-line bg-white">
                             @foreach ($parcours as $projet)
@@ -244,7 +281,7 @@
                                 @endphp
                                 <li class="flex items-center gap-4 p-4">
                                     <span class="w-20 shrink-0 text-sm font-bold {{ $aFinP ? 'text-ochreDark' : 'text-ink/60' }}">
-                                        {{ $aFinP ? 'À financer' : $anneeP }}
+                                        {{ $aFinP ? $t('À financer', 'Seeking funding') : $anneeP }}
                                     </span>
                                     <span class="grow">
                                         <b class="block text-lake">{{ $titreP }}</b>
@@ -257,7 +294,7 @@
                         </ul>
                     @else
                         <p class="mt-4 border border-dashed border-line bg-white p-5 text-sm text-ink/65">
-                            Aucun projet de ce domaine n’est répertorié à ce jour dans le portefeuille présenté.
+                            {{ $t('Aucun projet de ce domaine n’est répertorié à ce jour dans le portefeuille présenté.', 'No project in this area is currently listed in the presented portfolio.') }}
                         </p>
                     @endif
                 </div>
@@ -270,31 +307,21 @@
     <section id="transversal" class="scroll-mt-32 bg-deep py-20 text-white">
         <div class="mx-auto max-w-7xl px-5 lg:px-8">
             <div data-r>
-                <h2 class="font-serif text-4xl font-semibold">Compétences transversales</h2>
-                <p class="mt-4 max-w-2xl text-white/70">Des formations reçues de nos partenaires et bailleurs, utiles à tous les domaines.</p>
+                <h2 class="font-serif text-4xl font-semibold">{{ $compTitre }}</h2>
+                @if ($compIntro !== '')
+                    <p class="mt-4 max-w-2xl text-white/70">{{ $compIntro }}</p>
+                @endif
             </div>
 
             <ul class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <li data-r class="border border-white/15 bg-white/5 p-6 transition duration-300 hover:border-ochre hover:bg-white/10">
-                    <h3 class="font-serif text-lg font-semibold">Gestion administrative et financière</h3>
-                    <p class="mt-2 text-sm text-white/65">PNUD COMREC, Uvira · 2008</p>
-                </li>
-                <li data-r class="border border-white/15 bg-white/5 p-6 transition duration-300 hover:border-ochre hover:bg-white/10">
-                    <h3 class="font-serif text-lg font-semibold">Gestion de projet</h3>
-                    <p class="mt-2 text-sm text-white/65">Pooled Fund Kinshasa, Uvira · 2009</p>
-                </li>
-                <li data-r class="border border-white/15 bg-white/5 p-6 transition duration-300 hover:border-ochre hover:bg-white/10">
-                    <h3 class="font-serif text-lg font-semibold">GPS et smartphones pour la collecte de données</h3>
-                    <p class="mt-2 text-sm text-white/65">Session de formation</p>
-                </li>
-                <li data-r class="border border-white/15 bg-white/5 p-6 transition duration-300 hover:border-ochre hover:bg-white/10">
-                    <h3 class="font-serif text-lg font-semibold">Renforcement des capacités des organisations de la société civile</h3>
-                    <p class="mt-2 text-sm text-white/65">Sensibilisation et formation</p>
-                </li>
-                <li data-r class="border border-white/15 bg-white/5 p-6 transition duration-300 hover:border-ochre hover:bg-white/10">
-                    <h3 class="font-serif text-lg font-semibold">Ateliers SAFE</h3>
-                    <p class="mt-2 text-sm text-white/65">Kigali (Rwanda) · 2016 — Nairobi (Kenya) · 2017</p>
-                </li>
+                @foreach ($competences as $item)
+                    <li data-r class="border border-white/15 bg-white/5 p-6 transition duration-300 hover:border-ochre hover:bg-white/10">
+                        <h3 class="font-serif text-lg font-semibold">{{ $item['titre'] ?? '' }}</h3>
+                        @if (! empty($item['detail'] ?? ''))
+                            <p class="mt-2 text-sm text-white/65">{{ $item['detail'] }}</p>
+                        @endif
+                    </li>
+                @endforeach
             </ul>
         </div>
     </section>
@@ -303,17 +330,19 @@
     <section class="bg-lake text-white">
         <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-5 py-16 lg:flex-row lg:items-center lg:px-8">
             <div data-r>
-                <h2 class="font-serif text-3xl font-semibold md:text-4xl">Un besoin dans l’un de ces domaines ?</h2>
-                <p class="mt-3 max-w-xl text-white/80">Décrivez-nous votre projet, parlons-en.</p>
+                <h2 class="font-serif text-3xl font-semibold md:text-4xl">{{ $ctaTitre }}</h2>
+                @if ($ctaIntro !== '')
+                    <p class="mt-3 max-w-xl text-white/80">{{ $ctaIntro }}</p>
+                @endif
             </div>
             <div class="flex flex-wrap gap-3" data-r>
                 <a href="{{ route('contact', ['locale' => $locale]) }}"
                    class="relative overflow-hidden before:absolute before:inset-y-0 before:-left-full before:w-1/2 before:-skew-x-12 before:bg-white/40 before:transition-all before:duration-700 hover:before:left-[150%] bg-ochre px-7 py-3.5 font-semibold text-deep transition hover:-translate-y-0.5 hover:shadow-xl">
-                    Nous contacter
+                    {{ $t('Nous contacter', 'Contact us') }}
                 </a>
                 <a href="{{ route('projets.index', ['locale' => $locale]) }}"
                    class="border border-white/40 px-7 py-3.5 font-semibold transition hover:bg-white hover:text-deep">
-                    Voir les projets
+                    {{ $t('Voir les projets', 'See the projects') }}
                 </a>
             </div>
         </div>
