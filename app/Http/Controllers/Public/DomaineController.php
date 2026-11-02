@@ -26,14 +26,22 @@ class DomaineController
         // d'appel à l'action sont éditables dans Filament → Pages du site.
         $pageDomaines = Page::query()->where('slug', 'domaines')->first();
 
+        $compteurs =[
+            'domaines' => $domaines->count(),
+            'projets'  => (int) $projetsCount,
+            'zones'    => (int) $zonesCount,
+        ];
+
         return view('pages.domaines-index', [
             'domaines'     => $domaines,
             'projetsCount' => $projetsCount,
             'zonesCount'   => $zonesCount,
             'pageDomaines' => $pageDomaines,
             'locale'       => $locale,
+            'compteurs'    => $compteurs
         ]);
     }
+
 
     public function show(string $locale, string $slug): mixed
     {

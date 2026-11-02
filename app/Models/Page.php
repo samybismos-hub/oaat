@@ -11,8 +11,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\Attributes\Translatable;
 use Spatie\Translatable\HasTranslations;
 
-#[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones', 'competences_titre', 'competences_intro', 'competences', 'cta_titre', 'cta_intro'])]
-#[Translatable('title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones', 'competences_titre', 'competences_intro', 'competences', 'cta_titre', 'cta_intro')]
+#[Fillable(['slug', 'title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones', 'competences'])]
+#[Translatable('title', 'body', 'meta_title', 'meta_description', 'timeline', 'recognitions', 'zones', 'competences')]
 class Page extends Model implements HasMedia
 {
     use HasTranslations, InteractsWithMedia;
@@ -139,50 +139,6 @@ class Page extends Model implements HasMedia
             $values = $this->getTranslation('competences', 'fr') ?? [];
         }
         return array_values(array_filter(is_array($values) ? $values : [], fn ($item) => is_array($item)));
-    }
-
-    /**
-     * Titre du bloc "Compétences transversales" de la page "domaines",
-     * avec repli sur le français puis sur vide.
-     */
-    public function competencesTitreFor(string $locale): string
-    {
-        return $this->pageTextFor('competences_titre', $locale);
-    }
-
-    /**
-     * Introduction du bloc "Compétences transversales" de la page "domaines".
-     */
-    public function competencesIntroFor(string $locale): string
-    {
-        return $this->pageTextFor('competences_intro', $locale);
-    }
-
-    /**
-     * Titre du bandeau d'appel à l'action de la page "domaines".
-     */
-    public function ctaTitreFor(string $locale): string
-    {
-        return $this->pageTextFor('cta_titre', $locale);
-    }
-
-    /**
-     * Introduction du bandeau d'appel à l'action de la page "domaines".
-     */
-    public function ctaIntroFor(string $locale): string
-    {
-        return $this->pageTextFor('cta_intro', $locale);
-    }
-
-    /**
-     * Lecture d'un texte traduit (colonne JSON fr/en) de la page "domaines",
-     * avec repli : langue demandée → français → chaîne vide.
-     */
-    private function pageTextFor(string $key, string $locale): string
-    {
-        $value = trim((string) ($this->getTranslation($key, $locale) ?? ''));
-
-        return $value !== '' ? $value : trim((string) ($this->getTranslation($key, 'fr') ?? ''));
     }
 
 }

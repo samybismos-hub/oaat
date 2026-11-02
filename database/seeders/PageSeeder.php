@@ -140,14 +140,7 @@ class PageSeeder extends Seeder
                     'fr' => "Les neuf domaines d'intervention de l'OAAT : santé, sécurité alimentaire, logistique, éducation, eau et assainissement, genre, protection, environnement et formation aux métiers.",
                     'en' => 'The nine areas of intervention of OAAT: health, food security, logistics, education, water and sanitation, gender, protection, environment and vocational training.',
                 ],
-                'competences_titre' => [
-                    'fr' => 'Compétences transversales',
-                    'en' => 'Cross-cutting skills',
-                ],
-                'competences_intro' => [
-                    'fr' => 'Des formations reçues de nos partenaires et bailleurs, utiles à tous les domaines.',
-                    'en' => 'Training received from our partners and funders, useful across all areas.',
-                ],
+
                 'competences' => [
                     'fr' => [
                         ['titre' => 'Gestion administrative et financière', 'detail' => 'PNUD COMREC, Uvira · 2008'],
@@ -164,14 +157,7 @@ class PageSeeder extends Seeder
                         ['titre' => 'SAFE workshops', 'detail' => 'Kigali (Rwanda) · 2016 — Nairobi (Kenya) · 2017'],
                     ],
                 ],
-                'cta_titre' => [
-                    'fr' => 'Un besoin dans l’un de ces domaines ?',
-                    'en' => 'Need support in one of these areas?',
-                ],
-                'cta_intro' => [
-                    'fr' => 'Décrivez-nous votre projet, parlons-en.',
-                    'en' => 'Tell us about your project — let’s talk.',
-                ],
+
             ],
         ];
 

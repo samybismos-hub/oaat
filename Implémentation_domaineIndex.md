@@ -1,66 +1,120 @@
-# Implémentation `domaines-index` — statut & prochaines étapes
+J'ai terminé l'analyse chirurgicale. Voici le diagnostic complet, les solutions que vous pouvez implémenter seul, et le point précis sur ce qui reste vraiment.
 
-> Document de suivi. L'audit initial (vue maquette autonome, shadowing `$domaines`,
-> hardcodé) est **résolu** : la vue est intégrée au layout, bilingue FR/EN, et
-> **100 % pilotée par la base et les Pages du site** (Filament). Références :
-> `docs/domaines-mapping.md` (conventions) et `Divisions_Etape2.md` (découpage en 6 étapes).
+1. État des lieux de domaines-index.blade.php
+La vue fait 295 lignes et enchaîne trois niveaux de logique :
 
----
+en-tête : $t/$locale (pattern correct), SEO depuis la page CMS (correct), CSS d'animation (pattern correct) ;
+bloc @php principal (l.34-73) : 5 closures maison — $anneeProjet, $railLabel, $icone, $teinte, $bailleurProjet + lecture des compétences ;
+boucle par domaine (l.107-248) avec un @php interne (l.109-134) qui recalcule réalisés / à financer / période / bailleurs et un @php par projet (l.220-225) ;
+compétences + bandeau CTA (l.250-289).
+2. Les problèmes, par gravité
+P1 — Le pattern n°1 du projet est rompu : tout le métier est dans la vue
+Le pattern confirmé partout (ProjetController, OrganisationController, AccueilController) : le contrôleur prépare les données, la vue affiche ; les vues pages/* sont minces et délèguent à des partials/.
 
-## ✅ Terminé et vérifié
+Ici, DomaineController::index() ne fait que charger les modèles : tous les calculs sont dans le template — tris, filtres par statut, période min/max, agrégation des bailleurs. Pire : la vue duplique des méthodes qui existent déjà sur Project :
 
-| Point | État | Preuve |
-|---|---|---|
-| Vue intégrée au layout | ✅ `@extends('layouts.app')`, topbar/header/footer du layout, `@push('scripts')` `oaat.js` | — |
-| Shadowing `$domaines` supprimé | ✅ la Collection Eloquent du contrôleur est utilisée | `DomaineController@index` |
-| Boucle domaines | ✅ `slug`, `getTranslation('name'\|'intro'\|'objectives', $locale)`, `interventions`/`formations` (colonnes JSON) | rendu `/fr/domaines` = 200 |
-| Projets par domaine | ✅ `->with('projects', fn($q) => $q->published()->with('partners'))` ; tri réalisés/à financer, année via `end_date`/`start_date`, `statut_court` (d/w), `funderLabel()`/`partnersLabel()` | 38 projets publiés |
-| Teintes + libellés rail + icônes | ✅ design figé dans `config/oaat.php` → `domaine_page.tints/rail/icons` | — |
-| Compteurs héro dynamiques | ✅ `$domaines->count()` = 9, `$projetsCount` = 38, `$zonesCount` = 13 (Setting) | rendu (badges `data-n`) |
-| Écart `wash` (name fr) | ✅ base = « Eau, hygiène et assainissement » (aligné maquette) | probe DB |
-| **Bilingue FR/EN des libellés de structure** | ✅ tous les libellés statiques (fil d'Ariane, compteurs, colonnes, interventions/formations, projets associés, badge « À financer », message vide, CTA boutons) passés dans `$t(...)` | rendu `/en/domaines` vérifié |
-| **Page CMS « domaines » (Filament)** | ✅ Page slug `domaines` seedée : titre, body (héro), `meta_title`/`meta_description`, `competences_titre`/`intro`/`competences` (JSON FR/EN), `cta_titre`/`intro` | `PageSeeder` + colonnes migrées (migration `2026_11_01_000001_add_domaines_index_blocks_to_pages_table`) |
-| **SEO piloté par la base** | ✅ `<title>`/`meta description` lus depuis la page CMS avec repli `$t()` | rendu des deux langues |
-| **Compétences transversales en base** | ✅ 5 items {titre, detail} FR/EN depuis la page CMS, boucle dynamique dans la vue | rendu FR/EN |
-| **CTA piloté par la base** | ✅ titre + intro du bandeau depuis la page CMS (boutons en `$t()`) | rendu FR/EN |
-| Admin Filament | ✅ `PageForm` : nouvelle section « page Domaines uniquement » (Repeater compétences + CTA, onglets FR/EN), page ajoutée aux pages système (slug verrouillé, suppression bloquée) | `php -l` + structure vérifiée |
-| Non-régression | ✅ `ContactPageTest` 3 passed, `ProjetIndexTest` 7 passed (70 assertions) ; rendu kernel `/fr|/en/domaines` HTTP 200 | suite feature |
-| Scripts temporaires nettoyés | ✅ plus aucun helper `_*` à la racine | `git status` |
+Duplication dans la vue	Méthode existante
+$anneeProjet(...) (l.37)	Project::year() (Project.php, l.289 → ?int)
+statut_court === 'd'/'w'	Project::$statutCourt (l.405)
+$bailleurProjet($projet) (l.54)	funderLabel() (l.355) + implementationPartnersLabel() (l.338) + partnersLabel() (l.323)
+P2 — Votre désaccord sur bailleurProjet est pleinement fondé
+Sémantique : $bailleurProjet renvoie les bailleurs OU, si la liste est vide, tous les partenaires. Un projet qui a un bailleur → ses partenaires de mise en œuvre disparaissent. Les partenaires et bailleurs ne sont jamais tous affichés.
+Fragilité : dans le résumé par domaine, $bailleurs (l.120-126) fait preg_split('~[\/,]~', $bailleurProjet($p)) : on concatène les noms en chaîne, puis on re-découpe sur / et ,. Un nom contenant / (ex. « UNFPA/Sud-Kivu », « Baraka/… ») est cassé en deux fragments, un filtre en dur retire « P.F. », puis on rejoint avec , . C'est du chaîne→liste→chaîne qui perd les entités (pas de logo, pas de lien vers /partenaires, pas de déduplication par id).
+Perte du rôle : le site étiquette pourtant les rôles (cellules « Bailleurs » et « Partenaires de mise en œuvre » dans _carte_projet, libellés dans PartnerRole::getLabel()). Tout est fondu dans un suffixe.
+P3 — Réinvention d'une mini-carte projet au lieu de _carte_projet
+Le bloc « Projets associés » (l.216-238) réimplémente une carte maison (année / « À financer » + titre + bailleur). La carte canonique existe : partials/_carte_projet (réutilisée dans projets-index et projets-show). Trouvez aussi : dans cette version actuelle, aucun lien vers la fiche projet (projets.show) dans la liste — or _carte_projet en fournit un.
 
-## ⚠️ Points restants
+P4 — Fake placeholder « Image d'illustration »
+L'illustration de chaque domaine (l.177-190) est un SVG généré portant un texte visible « Image d'illustration ». Le pattern du site pour une image absente est le dégradé propre de _carte_projet ($svghtml : dégradé + nom du domaine, sans légende « placeholder »).
 
-### 1. `domaines-show.blade.php` absent alors que la route existe (casse réelle)
-- La route `/domaines/{slug}` → `DomaineController@show` existe, et le partial
-  `resources/views/partials/_domaines.blade.php` (inclus dans la **page d'accueil**
-  `home.blade.php`) y fait des liens `route('domaines.show', …)`.
-  → **Clic depuis l'accueil = erreur 500** (`firstOrFail` OK mais vue manquante).
-- Décision : créer la vue `domaines-show` (une fois la maquette disponible)
-  **ou** retirer la route/le controller et repasser le partial `_domaines`
-  sur des ancres `#slug` vers `domaines.index`.
+P5 — Incohérence des compteurs
+$compteurs['zones'] vient de Setting::stat_zones (saisie manuelle) alors que ProjetController calcule distinct count(city) des projets publiés → deux sources pour « zones », valeurs divergentes.
+projetsCount et zonesCount sont passés à la vue en plus de $compteurs → variables mortes.
+P6 — La page reste un monolithe (~300 lignes), pas un assemblage de partials
+Le pattern home/organisation est : page mince + @include('partials._xxx', dados). Ici, une seule vue spaghetti.
 
-### 2. Arbitrages de contenu de l'étape 3 (ouverts dans `docs/domaines-mapping.md` §6)
-Impact direct sur ce qu'affiche la page (« Projets associés (n) », bailleurs) :
-- bailleurs maquette absents du pivot (BCZS, COPA, Tearfund, AAP, P.F., SPES,
-  BDOM, Louvain, USAID, PICAGEL…) — base : 25 partenaires / 33 pivots ;
-- `ecole-karhale-kadutu` : statut `ongoing` en base vs « réalisé » maquette ;
-- `jeunes-filles-meres-sake` : domaine `genre` (base) vs `protection` (maquette) ;
-- `formation-informatique-beni` : projet 2010 maquette sans équivalent seeder ;
-- compteur : 38 projets publiés affichés vs les 35 de la maquette (déjà assumé
-  dynamiquement, mais l'alignement 35 vs 37/38 reste à valider).
+P7 — Aucun test pour la page
+Il existe ProjetIndexTest, ContactPageTest… mais rien pour /fr/domaines. La non-régression n'est pas verrouillée.
 
-### 3. Test feature `DomaineIndexTest` (étape 6 du plan)
-À créer (`tests/Feature/DomaineIndexTest.php`) :
-- `GET /fr/domaines` et `GET /en/domaines` → **200** ;
-- compteurs dynamiques (domaines=9, projets = `Project::published()->count()`) ;
-- rendu 100 % base : pas de références `$domaine[` / `$projet[` ; présence des
-  traductions FR/EN selon la langue ;
-- non-régression JS : présence de `data-r`, `data-n`, `#rl` (scrollspy `oaat.js`).
+3. Les patterns du projet à respecter (rappel validé à la lecture du code)
+Contrôleur = préparation, vue = affichage (leitmotiv des 4 contrôleurs publics).
+Pages minces qui assemblent des partials (home en enchaîne 7).
+Cartes projets = _carte_projet, labels portés par le modèle (year(), funderLabel(), implementationPartnersLabel(), statusLabel()).
+Éditorial = base ; design figé = config (domaine_page.tints/rail/icons → Option B déjà en place).
+$t/$locale re-définis en tête de vue (le layout les définit après l'évaluation des sections) — pattern conservé, ne pas le toucher.
+Partenaires = entités (logo, pivot role, enum PartnerRole), jamais des chaînes concaténées.
+4. Solutions proposées (par ordre de mise en œuvre)
+S1 — Déplacer toute la préparation dans DomaineController::index()
+Faire précéder le return view(...) par une passe qui prépare, pour chaque domaine, une structure prête à afficher (sur le modèle des $timeline préparées par OrganisationController) :
 
----
 
-## Ordre de priorité restant
+$sections = $domaines->map(function (Domain $d) use ($locale) {
+    $projets   = $d->projects;                                  // déjà published + partners
+    $realises  = $projets->filter(fn ($p) => $p->statut_court === 'd')
+                         ->sortByDesc(fn ($p) => $p->year() ?? 0)->values();
+    $aFinancer = $projets->filter(fn ($p) => $p->statut_court === 'w')->values();
 
-1. **Réparer `domaines.show`** (casse depuis l'accueil) — en attente de la maquette,
-   sinon désactiver la route et rattacher le partial aux ancres `#slug`.
-2. **Arbitrages de contenu étape 3** (bailleurs, statuts, domaines, 35 vs 38).
-3. **`DomaineIndexTest` + passe complète de non-régression**.
+    $annees    = $realises->map(fn ($p) => $p->year())->filter()->values();
+
+    // Entités partenaires dédupliquées par ID (jamais par split de chaîne)
+    $bailleurs     = $projets->flatMap(fn ($p) => $p->partners)
+                             ->unique('id')
+                             ->values();
+    $implementeurs = /* idem, filtré sur pivot.role->value === 'implementer' */;
+
+    return (object) [
+        'domaine'      => $d,
+        'nom'          => $d->getTranslation('name', $locale) ?: $d->slug,
+        'intro'        => $d->getTranslation('intro', $locale)
+                          ?: $d->getTranslation('objectives', $locale) ?: '',
+        'interventions'=> (array) $d->getTranslation('interventions', $locale) ?? [],
+        'formations'   => (array) $d->getTranslation('formations', $locale) ?? [],
+        'realises'     => $realises,
+        'aFinancer'    => $aFinancer,
+        'periode'      => $annees->isEmpty() ? '' : $annees->min().'–'.$annees->max(),
+        'bailleurs'    => $bailleurs,
+        'implementeurs'=> $implementeurs,
+    ];
+})->values();
+→ Dans la vue, plus aucun @php interne : on boucle sur $sections et on affiche $sec->realises, $sec->bailleurs, etc. Le rail, le hero et les compteurs utilisent les données brutes ($domaines, $compteurs) comme aujourd'hui.
+
+S2 — Répondre à votre exigence : tous les partenaires et bailleurs affichés
+Le modèle a ce qu'il faut — supprimez la closure $bailleurProjet :
+
+Par projet (ligne compacte) : afficher les deux groupes, sans « ou » :
+
+Bailleurs : PNUD, UNICEF   ·   Mise en œuvre : BETING
+c.-à-d. $projet->funderLabel($locale) et $projet->implementationPartnersLabel($locale) (chacun masqué seulement s'il vaut '—').
+Par domaine (colonne gauche) : remplacer le bloc $bailleurs splité par deux lignes étiquetées construites sur les entités (déduplication unique('id'), libellés de PartnerRole::getLabel()) :
+
+Bailleurs : PNUD, UNICEF
+Partenaires de mise en œuvre : BETING, AVEB
+(Un même partenaire peut légitimement apparaître dans les deux lignes s'il a les deux rôles sur des projets de ce domaine — c'est exact, pas un bug.)
+S3 — Réutiliser _carte_projet (ou extraire partials/_projet_liste.blade.php)
+Si « Projets associés » peut prendre la carte standard → @include('partials._carte_projet', ['projet' => $projet]) (avec $gradHsl en variante fournie par le contrôleur, cf. projets-index). Bonus : lien vers projets.show récupéré.
+Si le design maquette impose une liste compacte → extraire un partial _projet_liste.blade.php avec en-tête documenté (comme _carte_projet), qui n'appelle que les méthodes du modèle (S2).
+S4 — Remplacer le placeholder par l'illustration pattern
+Réutiliser le dégradé $teinte($domaine) déjà en config pour le linearGradient, et supprimer les deux <text> dont « Image d'illustration » — ou réutiliser un générateur data-uri identique à $svghtml de _carte_projet.
+
+S5 — Uniformiser les compteurs
+zones : soit distinct count(city) comme ProjetController, soit assumer stat_zones en le documentant — mais une seule source.
+Supprimer projetsCount/zonesCount de la vue (masse morte) ; ne passer que $compteurs.
+S6 — (Dernier) Découper en partials, pattern home/organisation
+pages/domaines-index = _hero_simple + _domaines_index_rail + _domaines_index_section (un bloc par domaine, appelé dans la boucle) + sections compétences/CTA (soit en dur soigneusement, soit 2 micro-partials). La page finale tombe à ~80 lignes sans aucune logique.
+
+Ordre conseillé : S1 → S2 → S3 → S4 → S5 → S6, puis vérif : php artisan test --filter='ProjetIndexTest|ContactPageTest' + php artisan test sur les tests feature, + rendu /fr/domaines et /en/domaines (200, contenus FR/EN, aucun résidu d'anciennes colonnes).
+
+5. Ce qui reste réellement pour finir (y compris hors de cette page)
+#	Sujet	Constat	Action
+1	Logique de la vue	Objet de cette analyse (P1-P6)	À traiter (S1→S6) ; vous pouvez l'implémenter seul avec les codes ci-dessus
+2	/domaines/{slug} (domaines.show)	Route câblée (web.php:51) et liée par les 9 cartes de l'accueil (_domaines.blade.php:48) mais la vue pages/domaines-show n'existe pas (jamais créée dans l'historique) → clic = 500	Créer la fiche domaine (hero + objectifs + projets du domaine en _carte_projet + partenaire list) — ou masquer la route et les liens si hors périmètre
+3	/partenaires	Item du menu header (_header.blade.php:37, « Partenaires ») mais vue pages/partenaires inexistante → clic = 500 (préexistant, jamais dans l'historique)	Créer une page « Partenaires » (logos de tous les partenaires — en phase avec votre exigence « tous les partenaires affichés ») ou retirer l'item du menu
+4	Arbitrages de données (étape 3 du mapping)	Non réalisés : 10 bailleurs manquants au pivot (BCZS, Tearfund, AAP, P.F., PICAGEL…), wash toujours « Hygiène et Assainissement » (maquette : « Eau, hygiène et assainissement »), ecole-karhale-kadutu ongoing (maquette réalisé), jeunes-filles-meres-sake genre (maquette protection), 2 projets surnuméraires	Décisions éditoriales à arbitrer (le doc docs/domaines-mapping.md §6 liste les 5 questions) avant de « finir » la page
+5	Test de non-régression	Aucun DomainesIndexTest	Créer le test (200 FR/EN, présence titre/intro/compétences, absence des anciennes colonnes) pour verrouiller
+6	Compteurs déjà dynamiques	✅ Fait : $compteurs calculés en SQL dans le contrôleur (prévu « étape 5 » du mapping)	Rien à faire
+Ce qui est déjà bon (ne pas casser)
+Rendu 100 % serveur bilingue via $t()/$locale ; héro + SEO pilotés par la page CMS domaines.
+Compétences transversales en base (Repeater FR/EN, repli FR) — propre depuis ma dernière passe.
+Design figé (tints/rail/icons) en config/oaat.php (Option B) ; partenaires eager-loaded ; SYSTEM_SLUGS protège la page.
+Filament PageForm conforme (seulement competences éditable).
+Voulez-vous que j'implémente S1→S6 (et éventuellement #2 et #3 du tableau) pour vous, ou préférez-vous suivre ces étapes vous-même ? Si je dois le faire, passez simplement en mode Act et je le réalise dans cet ordre avec validation à chaque étape.

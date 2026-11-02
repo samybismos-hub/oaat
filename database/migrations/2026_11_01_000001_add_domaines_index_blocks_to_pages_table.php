@@ -5,30 +5,26 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Colonnes de contenu de la page CMS "domaines" (vue publics/domaines-index).
+ * Colonne de contenu de la page CMS "domaines" (vue publique domaines-index).
  *
- * Le bloc "Compétences transversales" et le bandeau d'appel à l'action étaient
- * en dur dans la vue : ils deviennent éditables via les Pages du site (Filament)
- * sous forme de colonnes JSON traduisibles, comme `timeline`/`zones` pour la
- * page "organisation".
+ * Conformément au principe des pages du site, seul le contenu réellement
+ * éditable est stocké ici : la liste des compétences transversales (colonne
+ * JSON traduisible, comme `timeline`/`zones` pour la page "organisation").
+ * Les titres et introductions de bandeaux restent codés en dur dans la vue.
  */
 return new class extends Migration
 {
     public function up(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-            $table->json('competences_titre')->nullable()->after('zones');
-            $table->json('competences_intro')->nullable()->after('competences_titre');
-            $table->json('competences')->nullable()->after('competences_intro');
-            $table->json('cta_titre')->nullable()->after('competences');
-            $table->json('cta_intro')->nullable()->after('cta_titre');
+            $table->json('competences')->nullable()->after('zones');
         });
     }
 
     public function down(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-            $table->dropColumn(['competences_titre', 'competences_intro', 'competences', 'cta_titre', 'cta_intro']);
+            $table->dropColumn('competences');
         });
     }
 };

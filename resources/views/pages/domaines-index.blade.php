@@ -8,19 +8,22 @@
     // $t et $locale doivent être définis avant toute @section qui les utilise (cf. projets-index).
     $locale ??= 'fr';
     $t = fn($fr, $en) => $locale === 'en' ? $en : $fr;
-
-    // Page CMS « domaines » : le SEO (méta) vient de la base, avec repli sur les
-    // libellés de structure quand la page n'est pas (encore) créée.
-    $pg       = $pageDomaines ?? null;
-    $seoTitle = trim((string) ($pg?->getTranslation('meta_title', $locale) ?? ''));
-    $seoDesc  = trim((string) ($pg?->getTranslation('meta_description', $locale) ?? ''));
 @endphp
 
-@section('meta_title', $seoTitle !== '' ? $seoTitle : $t('Domaines d’intervention — OAAT', 'Areas of intervention — OAAT'))
-@section('meta_description', $seoDesc !== '' ? $seoDesc : $t(
+
+{{-- ─── SEO : titre & description dynamiques ─────────────────── --}}
+@section('meta_title')
+    {{ $pageDomaines?->seoTitle($locale) ?: $t('Domaines d’intervention — OAAT', 'Areas of intervention — OAAT') }}
+@endsection
+
+@section('meta_description')
+    {{ $pageDomaines?->seoDescription($locale) ?: $t(
     "Les neuf domaines d'intervention de l'OAAT : santé, sécurité alimentaire, logistique, éducation, eau et assainissement, genre, protection, environnement et formation aux métiers.",
     'The nine areas of intervention of OAAT: health, food security, logistics, education, water and sanitation, gender, protection, environment and vocational training.',
-))
+    )
+}}
+@endsection
+
 @push('head')
     <style>
         .animate-dash { animation: dash 5s ease-out forwards; }
@@ -29,17 +32,6 @@
 @endpush
 
 @php
-    // ────────────────────────────────────────────────────────────────────────
-    //  Données de la page pilotées par la base de données (aucune donnée en dur).
-    //  `$domaines` (Domain, avec relation `projects` publiés + partenaires) et les
-    //  compteurs viennent du contrôleur. Les valeurs de style figé (teinte, rail,
-    //  icône) vivent dans config/oaat.php — indexées par slug de domaine.
-    // ────────────────────────────────────────────────────────────────────────
-    $counters = [
-        'domaines' => $domaines->count(),
-        'projets'  => (int) $projetsCount,
-        'zones'    => (int) $zonesCount,
-    ];
 
     // Année d'un projet (réalisation), sinon null.
     $anneeProjet = static fn ($p) => $p->end_date?->year ?? $p->start_date?->year;
@@ -72,76 +64,28 @@
     // ─── Contenu CMS de la page (slug 'domaines') : héro, compétences, CTA ───
     $pg = $pageDomaines ?? null;
 
-    $heroTitre = trim((string) ($pg?->getTranslation('title', $locale) ?? ''))
-        ?: trim((string) ($pg?->getTranslation('title', 'fr') ?? ''))
-        ?: $t('Domaines d’intervention', 'Areas of intervention');
-
-    $heroIntro = trim((string) ($pg?->getTranslation('body', $locale) ?? ''))
-        ?: trim((string) ($pg?->getTranslation('body', 'fr') ?? ''));
-
-    $compTitre = trim((string) ($pg?->getTranslation('competences_titre', $locale) ?? ''))
-        ?: trim((string) ($pg?->getTranslation('competences_titre', 'fr') ?? ''))
-        ?: $t('Compétences transversales', 'Cross-cutting skills');
-
-    $compIntro = trim((string) ($pg?->getTranslation('competences_intro', $locale) ?? ''))
-        ?: trim((string) ($pg?->getTranslation('competences_intro', 'fr') ?? ''))
-        ?: $t('Des formations reçues de nos partenaires et bailleurs, utiles à tous les domaines.', 'Training received from our partners and funders, useful across all areas.');
 
     $competences = $pg ? (array) ($pg->getTranslation('competences', $locale) ?? []) : [];
     if ($competences === [] && $pg) {
         $competences = (array) ($pg->getTranslation('competences', 'fr') ?? []);
     }
 
-    $ctaTitre = trim((string) ($pg?->getTranslation('cta_titre', $locale) ?? ''))
-        ?: trim((string) ($pg?->getTranslation('cta_titre', 'fr') ?? ''))
-        ?: $t("Un besoin dans l’un de ces domaines ?", 'Need support in one of these areas?');
-
-    $ctaIntro = trim((string) ($pg?->getTranslation('cta_intro', $locale) ?? ''))
-        ?: trim((string) ($pg?->getTranslation('cta_intro', 'fr') ?? ''))
-        ?: $t('Décrivez-nous votre projet, parlons-en.', 'Tell us about your project — let’s talk.');
 @endphp
 
 @section('content')
+    {{-- ═══════════════════════════════════════════════════════════════════
+    H E R O
+═══════════════════════════════════════════════════════════════════ --}}
+@include('partials._hero_simple', [
+    'page'   => $pageDomaines,
+    'stats'  => [
+        ['valeur' => $compteurs['domaines'] ?? 0,   'fr' => 'domaines d’intervention',          'en' => 'areas of intervention'],
+        ['valeur' => $compteurs['projets'] ?? 0, 'fr' => 'projets répertoriés',  'en' => 'listed projects'],
+        ['valeur' => $compteurs['zones'] ?? 0,      'fr' => 'zones en Sud et Nord-Kivu',           'en' => 'zones in South and North Kivu'],
 
-    {{-- ═══ Héro ═════════════════════════════════════════════════════════ --}}
-    <section id="top" class="relative overflow-hidden bg-gradient-to-br from-deep via-deep to-[#123d6e] text-white">
-        <svg class="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-20" viewBox="0 0 1440 800"
-             preserveAspectRatio="none" fill="none" stroke="#E3A82B" stroke-width="1.3" aria-hidden="true">
-            <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" d="M-20 600C220 520 380 690 640 600S1060 470 1460 560"/>
-            <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" style="animation-delay:.5s" d="M-20 650C240 580 400 730 680 650S1080 530 1460 610"/>
-            <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" style="animation-delay:1s" d="M-20 700C260 640 420 770 700 700S1100 590 1460 660"/>
-            <path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" class="animate-dash motion-reduce:animate-none" style="animation-delay:1.5s" d="M-20 550C200 470 360 640 620 550S1040 420 1460 510"/>
-        </svg>
-
-        <div class="relative z-10 mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
-            <nav aria-label="Fil d’Ariane" class="text-sm text-white/60" data-r>
-                <a href="{{ route('accueil', ['locale' => $locale]) }}" class="transition hover:text-ochre">{{ $t('Accueil', 'Home') }}</a>
-                <span class="mx-2">›</span>
-                <span class="text-white">{{ $t('Domaines d’intervention', 'Areas of intervention') }}</span>
-            </nav>
-
-            <h1 class="mt-6 font-serif text-5xl font-semibold leading-tight md:text-6xl" data-r>{{ $heroTitre }}</h1>
-
-            @if ($heroIntro !== '')
-                <p class="mt-5 max-w-2xl text-lg text-white/75" data-r>{{ $heroIntro }}</p>
-            @endif
-
-            <dl class="mt-12 grid max-w-3xl grid-cols-3 gap-4 border-t border-white/15 pt-8 sm:gap-8">
-                <div data-r>
-                    <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['domaines'] }}">0</span></dd>
-                    <dt class="mt-1 text-sm text-white/65">{{ $t('domaines d’intervention', 'areas of intervention') }}</dt>
-                </div>
-                <div data-r>
-                    <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['projets'] }}">0</span></dd>
-                    <dt class="mt-1 text-sm text-white/65">{{ $t('projets répertoriés', 'listed projects') }}</dt>
-                </div>
-                <div data-r>
-                    <dd class="font-serif text-4xl font-semibold"><span data-n="{{ $counters['zones'] }}">0</span></dd>
-                    <dt class="mt-1 text-sm text-white/65">{{ $t('zones en Sud et Nord-Kivu', 'zones in South and North Kivu') }}</dt>
-                </div>
-            </dl>
-        </div>
-    </section>
+    ],
+    'locale' => $locale,
+])
 
     {{-- ═══ Barre de navigation interne (ancres par domaine) ══════════════ --}}
     <div class="sticky top-[60px] z-30 border-b border-line bg-white/95 backdrop-blur">
@@ -307,10 +251,8 @@
     <section id="transversal" class="scroll-mt-32 bg-deep py-20 text-white">
         <div class="mx-auto max-w-7xl px-5 lg:px-8">
             <div data-r>
-                <h2 class="font-serif text-4xl font-semibold">{{ $compTitre }}</h2>
-                @if ($compIntro !== '')
-                    <p class="mt-4 max-w-2xl text-white/70">{{ $compIntro }}</p>
-                @endif
+                <h2 class="font-serif text-4xl font-semibold">{{ $t('Compétences transversales', 'Cross-cutting skills') }}</h2>
+                    <p class="mt-4 max-w-2xl text-white/70">{{ $t('Des formations reçues de nos partenaires et bailleurs, utiles à tous les domaines.', 'Training received from our partners and funders, useful across all areas.') }}</p>
             </div>
 
             <ul class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -330,10 +272,8 @@
     <section class="bg-lake text-white">
         <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-5 py-16 lg:flex-row lg:items-center lg:px-8">
             <div data-r>
-                <h2 class="font-serif text-3xl font-semibold md:text-4xl">{{ $ctaTitre }}</h2>
-                @if ($ctaIntro !== '')
-                    <p class="mt-3 max-w-xl text-white/80">{{ $ctaIntro }}</p>
-                @endif
+                <h2 class="font-serif text-3xl font-semibold md:text-4xl">{{ $t('Un besoin dans l’un de ces domaines ?', 'Need support in one of these areas?') }}</h2>
+                    <p class="mt-3 max-w-xl text-white/80">{{ $t('Décrivez-nous votre projet, parlons-en.', 'Tell us about your project — let’s talk.') }}</p>
             </div>
             <div class="flex flex-wrap gap-3" data-r>
                 <a href="{{ route('contact', ['locale' => $locale]) }}"

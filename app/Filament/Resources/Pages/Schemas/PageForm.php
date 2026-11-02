@@ -206,24 +206,17 @@ class PageForm
                             ->columnSpanFull(),
                     ]),
 
-// ─── Section réservée à la page Domaines (Compétences / CTA) ─
-                Section::make("Données structurées (page Domaines uniquement)")
-                    ->description('Ces champs ne sont affichés que pour la page "Domaines d\'intervention". Remplissez les onglets Français ET Anglais.')
+                // ─── Section réservée à la page Domaines (Compétences transversales) ───
+                Section::make('Données structurées (page Domaines uniquement)')
+                    ->description('Ces champs ne sont affichés que pour la page "Domaines d\'intervention". Saisissez les compétences transversales dans les onglets Français ET Anglais.')
                     ->hidden(fn (?Page $record) => $record?->slug !== 'domaines')
                     ->schema([
-                        // ─── Compétences transversales ────────────────────────────────
+                        // ─── Compétences transversales ─────────────────────────────────
                         Tabs::make('Compétences transversales')
                             ->tabs([
                                 Tab::make('Français')
                                     ->icon('heroicon-m-language')
                                     ->schema([
-                                        TextInput::make('competences_titre.fr')
-                                            ->label('Titre du bloc')
-                                            ->maxLength(255),
-                                        Textarea::make('competences_intro.fr')
-                                            ->label('Introduction')
-                                            ->rows(2)
-                                            ->maxLength(255),
                                         Repeater::make('competences.fr')
                                             ->label('Compétences')
                                             ->schema([
@@ -242,13 +235,6 @@ class PageForm
                                 Tab::make('English')
                                     ->icon('heroicon-m-globe-alt')
                                     ->schema([
-                                        TextInput::make('competences_titre.en')
-                                            ->label('Section title')
-                                            ->maxLength(255),
-                                        Textarea::make('competences_intro.en')
-                                            ->label('Introduction')
-                                            ->rows(2)
-                                            ->maxLength(255),
                                         Repeater::make('competences.en')
                                             ->label('Skills')
                                             ->schema([
@@ -265,35 +251,8 @@ class PageForm
                                     ]),
                             ])
                             ->columnSpanFull(),
-
-                        // ─── Bandeau d'appel à l'action ───────────────────────────────
-                        Tabs::make('Bandeau d\'appel à l\'action')
-                            ->tabs([
-                                Tab::make('Français')
-                                    ->icon('heroicon-m-language')
-                                    ->schema([
-                                        TextInput::make('cta_titre.fr')
-                                            ->label('Titre du bandeau')
-                                            ->maxLength(255),
-                                        Textarea::make('cta_intro.fr')
-                                            ->label('Introduction')
-                                            ->rows(2)
-                                            ->maxLength(255),
-                                    ]),
-                                Tab::make('English')
-                                    ->icon('heroicon-m-globe-alt')
-                                    ->schema([
-                                        TextInput::make('cta_titre.en')
-                                            ->label('Banner title')
-                                            ->maxLength(255),
-                                        Textarea::make('cta_intro.en')
-                                            ->label('Introduction')
-                                            ->rows(2)
-                                            ->maxLength(255),
-                                    ]),
-                            ])
-                            ->columnSpanFull(),
                     ]),
+
                 // 2. Images du carrousel (héros) : plusieurs images possibles,
                 //    visibles dans l'ordre de leur numéro de fichier.
                 Section::make('Images du carrousel (héros)')
@@ -326,13 +285,13 @@ class PageForm
                         Textarea::make('meta_description.fr')
                             ->label('Description SEO (FR)')
                             ->rows(3)
-                            ->maxLength(160)
-                            ->helperText('160 caractères maximum : c\'est le résumé cliquable affiché sous le titre dans les résultats Google.'),
+                            ->maxLength(200)
+                            ->helperText('200 caractères maximum : c\'est le résumé cliquable affiché sous le titre dans les résultats Google.'),
 
                         Textarea::make('meta_description.en')
                             ->label('SEO Description (EN)')
                             ->rows(3)
-                            ->maxLength(160),
+                            ->maxLength(200),
                     ]),
 
                 // 3. Identifiant technique : l'adresse de la page sur le site public.
