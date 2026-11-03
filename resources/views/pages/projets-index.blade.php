@@ -23,18 +23,6 @@
 
 @php
     $t   = fn($fr, $en) => $locale === 'en' ? $en : $fr;
-    $gMap = [
-        'sante'                      => '0,45%,26%|50,50%,44%',
-        'education'                  => '200,45%,26%|240,50%,44%',
-        'eau-hygiene-assainissement' => '195,45%,26%|210,50%,44%',
-        'alimentation'               => '95,45%,26%|135,50%,44%',
-        'logistique'                 => '30,45%,26%|70,70%,44%',
-        'genre'                      => '330,45%,26%|370,50%,44%',
-        'protection'                 => '280,45%,26%|310,50%,44%',
-        'formation-professionnelle'  => '0,45%,26%|20,50%,44%',
-        'environnement'              => '160,45%,26%|185,50%,44%',
-    ];
-    $gradHsl = fn($slug) => $gMap[$slug] ?? '0,45%,26%|50,50%,44%';
     $qP = array_filter(['statut' => $statut, 'domaine' => $domaine, 'q' => $recherche]);
     $mk = fn($ov) => route('projets.index', ['locale' => $locale] + array_merge($qP, $ov));
     $enAtt = $projets->filter(fn($p) => $p->status->value === 'awaiting_funding');

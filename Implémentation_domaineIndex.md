@@ -78,6 +78,7 @@ $sections = $domaines->map(function (Domain $d) use ($locale) {
 })->values();
 → Dans la vue, plus aucun @php interne : on boucle sur $sections et on affiche $sec->realises, $sec->bailleurs, etc. Le rail, le hero et les compteurs utilisent les données brutes ($domaines, $compteurs) comme aujourd'hui.
 
+✅ **Fait — 02/11/2026.** S1 implémenté : la préparation est déplacée dans `DomaineController::index()` (structure `$sections`). La vue boucle sur `$sections` — plus aucun `@php` interne (filtres, période, agrégation). Au passage : `parcours` (lignes prêtes du bloc « Projets associés », avec `url`), `bailleursLabel` / `implementeursLabel`, et `$competences` via `Page::competencesFor($locale)`.
 S2 — Répondre à votre exigence : tous les partenaires et bailleurs affichés
 Le modèle a ce qu'il faut — supprimez la closure $bailleurProjet :
 
@@ -90,9 +91,11 @@ Par domaine (colonne gauche) : remplacer le bloc $bailleurs splité par deux lig
 Bailleurs : PNUD, UNICEF
 Partenaires de mise en œuvre : BETING, AVEB
 (Un même partenaire peut légitimement apparaître dans les deux lignes s'il a les deux rôles sur des projets de ce domaine — c'est exact, pas un bug.)
+✅ **Fait — 02/11/2026.** S2 implémenté : suppression de la closure `$bailleurProjet` et du `preg_split` (plus de « chaîne → liste → chaîne »). Dans le contrôleur, entités partenaires dédupliquées par `id` et filtrées sur `pivot.role` (`bailleurs` / `implementeurs`). Colonne gauche : deux lignes étiquetées « Bailleurs » et « Partenaires de mise en œuvre » (masquées si vides) ; ligne par projet : `Bailleurs : …` et `Mise en œuvre : …` affichées ensemble, chacune masquée seulement si « — ».
 S3 — Réutiliser _carte_projet (ou extraire partials/_projet_liste.blade.php)
 Si « Projets associés » peut prendre la carte standard → @include('partials._carte_projet', ['projet' => $projet]) (avec $gradHsl en variante fournie par le contrôleur, cf. projets-index). Bonus : lien vers projets.show récupéré.
 Si le design maquette impose une liste compacte → extraire un partial _projet_liste.blade.php avec en-tête documenté (comme _carte_projet), qui n'appelle que les méthodes du modèle (S2).
+✅ **Fait — 02/11/2026.** S3 implémenté en version « liens seulement » (pas de partial pour l'instant) : chaque titre du bloc « Projets associés » pointe vers `projets.show` (`route('projets.show', ['locale' => $locale, 'slug' => $p->slug])`, propriété `url` de `$sec->parcours`).
 S4 — Remplacer le placeholder par l'illustration pattern
 Réutiliser le dégradé $teinte($domaine) déjà en config pour le linearGradient, et supprimer les deux <text> dont « Image d'illustration » — ou réutiliser un générateur data-uri identique à $svghtml de _carte_projet.
 
@@ -102,16 +105,24 @@ Supprimer projetsCount/zonesCount de la vue (masse morte) ; ne passer que $compt
 S6 — (Dernier) Découper en partials, pattern home/organisation
 pages/domaines-index = _hero_simple + _domaines_index_rail + _domaines_index_section (un bloc par domaine, appelé dans la boucle) + sections compétences/CTA (soit en dur soigneusement, soit 2 micro-partials). La page finale tombe à ~80 lignes sans aucune logique.
 
-Ordre conseillé : S1 → S2 → S3 → S4 → S5 → S6, puis vérif : php artisan test --filter='ProjetIndexTest|ContactPageTest' + php artisan test sur les tests feature, + rendu /fr/domaines et /en/domaines (200, contenus FR/EN, aucun résidu d'anciennes colonnes).
+**Statut (02/11/2026) : S1 ✅ · S2 ✅ · S3 ✅ — reste S4 → S5 → S6.** Prévoir : php artisan test --filter='ProjetIndexTest|ContactPageTest' + php artisan test sur les tests feature, + rendu /fr/domaines et /en/domaines (200, contenus FR/EN, aucun résidu d'anciennes colonnes).
 
+**État d'avancement (02/11/2026)** — points 1 à 3 de la section 4 traités :
+
+- ✅ **S1** — toute la logique de préparation vit dans `DomaineController::index()` ; la vue ne calcule plus rien.
+- ✅ **S2** — les deux groupes (bailleurs et mise en œuvre) sont affichés, sans « ou », par domaine et par projet ; entités dédupliquées par `id`.
+- ✅ **S3** — liens vers `projets.show` ajoutés sur les titres du bloc « Projets associés » (pas de partial, liens seulement).
+- ⏳ **S4** (illustration placeholder) · **S5** (compteurs) · **S6** (partials) restent à faire.
+
+Vérification effectuée : rendu `/fr/domaines` et `/en/domaines` → 200 (liens vers les fiches projets et libellés bailleurs/mise en œuvre présents), `ProjetIndexTest` + `ContactPageTest` au vert (10 tests).
 5. Ce qui reste réellement pour finir (y compris hors de cette page)
 #	Sujet	Constat	Action
-1	Logique de la vue	Objet de cette analyse (P1-P6)	À traiter (S1→S6) ; vous pouvez l'implémenter seul avec les codes ci-dessus
-2	/domaines/{slug} (domaines.show)	Route câblée (web.php:51) et liée par les 9 cartes de l'accueil (_domaines.blade.php:48) mais la vue pages/domaines-show n'existe pas (jamais créée dans l'historique) → clic = 500	Créer la fiche domaine (hero + objectifs + projets du domaine en _carte_projet + partenaire list) — ou masquer la route et les liens si hors périmètre
-3	/partenaires	Item du menu header (_header.blade.php:37, « Partenaires ») mais vue pages/partenaires inexistante → clic = 500 (préexistant, jamais dans l'historique)	Créer une page « Partenaires » (logos de tous les partenaires — en phase avec votre exigence « tous les partenaires affichés ») ou retirer l'item du menu
-4	Arbitrages de données (étape 3 du mapping)	Non réalisés : 10 bailleurs manquants au pivot (BCZS, Tearfund, AAP, P.F., PICAGEL…), wash toujours « Hygiène et Assainissement » (maquette : « Eau, hygiène et assainissement »), ecole-karhale-kadutu ongoing (maquette réalisé), jeunes-filles-meres-sake genre (maquette protection), 2 projets surnuméraires	Décisions éditoriales à arbitrer (le doc docs/domaines-mapping.md §6 liste les 5 questions) avant de « finir » la page
-5	Test de non-régression	Aucun DomainesIndexTest	Créer le test (200 FR/EN, présence titre/intro/compétences, absence des anciennes colonnes) pour verrouiller
-6	Compteurs déjà dynamiques	✅ Fait : $compteurs calculés en SQL dans le contrôleur (prévu « étape 5 » du mapping)	Rien à faire
+1)	Logique de la vue	Objet de cette analyse (P1-P6)	À traiter (S1→S6) ; S1 ✅ S2 ✅ S3 ✅ faits le 02/11/2026 — reste S4 → S6 (voir bloc « État d'avancement »)
+2)	/domaines/{slug} (domaines.show)	Route câblée (web.php:51) et liée par les 9 cartes de l'accueil (_domaines.blade.php:48) mais la vue pages/domaines-show n'existe pas (jamais créée dans l'historique) → clic = 500	Créer la fiche domaine (hero + objectifs + projets du domaine en _carte_projet + partenaire list) — ou masquer la route et les liens si hors périmètre
+3)	/partenaires	Item du menu header (_header.blade.php:37, « Partenaires ») mais vue pages/partenaires inexistante → clic = 500 (préexistant, jamais dans l'historique)	Créer une page « Partenaires » (logos de tous les partenaires — en phase avec votre exigence « tous les partenaires affichés ») ou retirer l'item du menu
+4)	Arbitrages de données (étape 3 du mapping)	Non réalisés : 10 bailleurs manquants au pivot (BCZS, Tearfund, AAP, P.F., PICAGEL…), wash toujours « Hygiène et Assainissement » (maquette : « Eau, hygiène et assainissement »), ecole-karhale-kadutu ongoing (maquette réalisé), jeunes-filles-meres-sake genre (maquette protection), 2 projets surnuméraires	Décisions éditoriales à arbitrer (le doc docs/domaines-mapping.md §6 liste les 5 questions) avant de « finir » la page
+5)	Test de non-régression	Aucun DomainesIndexTest (rendu FR/EN validé ponctuellement le 02/11/2026)	Créer le test (200 FR/EN, présence titre/intro/compétences, absence des anciennes colonnes) pour verrouiller
+6)	Compteurs déjà dynamiques	✅ Fait : $compteurs calculés en SQL dans le contrôleur (prévu « étape 5 » du mapping)	Rien à faire
 Ce qui est déjà bon (ne pas casser)
 Rendu 100 % serveur bilingue via $t()/$locale ; héro + SEO pilotés par la page CMS domaines.
 Compétences transversales en base (Repeater FR/EN, repli FR) — propre depuis ma dernière passe.

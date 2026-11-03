@@ -1,7 +1,8 @@
 {{-- pages/domaines-index.blade.php — « Domaines d'intervention ».
-     Vue intégrée au layout commun : topbar, en-tête et pied de page proviennent
-     de layouts/app.blade.php. Contenu rendu côté serveur (Blade), sans injection
-     HTML ni traduction par JavaScript. --}}
+     Données préparées par DomaineController@index : $sections (une structure par
+     domaine : nom, intro, interventions, formations, realises, aFinancer, periode,
+     bailleursLabel, implementeursLabel, parcours), $domaines (rail), $compteurs,
+     $competences (CMS), $pageDomaines (SEO/héro), $locale, $teinte, $icone, $railLabel . --}}
 @extends('layouts.app')
 
 @php
@@ -30,47 +31,6 @@
         .motion-reduce .animate-dash { animation: none; }
     </style>
 @endpush
-
-@php
-
-    // Année d'un projet (réalisation), sinon null.
-    $anneeProjet = static fn ($p) => $p->end_date?->year ?? $p->start_date?->year;
-
-    // Libellé court du rail pour un domaine (fallback = nom traduit, puis slug).
-    $railLabel = static function ($d) use ($locale) {
-        $label = config('oaat.domaine_page.rail.'.$d->slug);
-
-        return $label ?: (string) ($d->getTranslation('name', $locale) ?: $d->slug);
-    };
-
-    // Pictogramme SVG (design figé dans config), chaîne vide si jamais absent.
-    $icone = static fn ($d) => (string) (config('oaat.domaine_page.icons.'.$d->slug) ?? '');
-
-    // Teinte HSL (design figé), défaut 200 si jamais absent.
-    $teinte = static fn ($d) => (int) (config('oaat.domaine_page.tints.'.$d->slug) ?? 200);
-
-    // Libellé des bailleurs d'un projet (funder puis, à défaut, tous les
-    // partenaires) ; chaîne vide si aucun partenaire.
-    $bailleurProjet = static function ($p) use ($locale) {
-        $label = trim((string) $p->funderLabel($locale));
-
-        if ($label === '' || $label === '—') {
-            $label = trim((string) $p->partnersLabel($locale));
-        }
-
-        return $label === '—' ? '' : $label;
-    };
-
-    // ─── Contenu CMS de la page (slug 'domaines') : héro, compétences, CTA ───
-    $pg = $pageDomaines ?? null;
-
-
-    $competences = $pg ? (array) ($pg->getTranslation('competences', $locale) ?? []) : [];
-    if ($competences === [] && $pg) {
-        $competences = (array) ($pg->getTranslation('competences', 'fr') ?? []);
-    }
-
-@endphp
 
 @section('content')
     {{-- ═══════════════════════════════════════════════════════════════════
@@ -105,35 +65,9 @@
     </div>
 
     {{-- ═══ Sections par domaine ═════════════════════════════════════════ --}}
-    @foreach ($domaines as $domaine)
-        @php
-            $projetsDuDomaine = $domaine->projects; // publiés + partenaires (chargés par le contrôleur)
+    @foreach ($sections as $sec)
 
-            $realises  = $projetsDuDomaine->filter(fn ($p) => $p->statut_court === 'd')
-                ->sortByDesc(fn ($p) => $anneeProjet($p) ?? 0);
-            $aFinancer = $projetsDuDomaine->filter(fn ($p) => $p->statut_court === 'w')->values();
-            $parcours  = $realises->concat($aFinancer);
-
-            $annees    = $realises->map(fn ($p) => $anneeProjet($p))->filter()->values();
-            $periode   = $annees->isNotEmpty() ? $annees->min() . '–' . $annees->max() : '';
-
-            $bailleurs = collect($projetsDuDomaine)
-                ->flatMap(fn ($p) => preg_split('~[\/,]~', $bailleurProjet($p)))
-                ->map(fn ($seg) => trim($seg))
-                ->filter(fn ($seg) => $seg !== '' && $seg !== 'P.F.')
-                ->unique()
-                ->values()
-                ->join(', ');
-
-            $nom           = (string) ($domaine->getTranslation('name', $locale) ?: $domaine->slug);
-            $intro         = (string) ($domaine->getTranslation('intro', $locale)
-                ?: $domaine->getTranslation('objectives', $locale)
-                ?: '');
-            $interventions = (array) ($domaine->getTranslation('interventions', $locale) ?? []);
-            $formations    = (array) ($domaine->getTranslation('formations', $locale) ?? []);
-        @endphp
-
-        <section id="{{ $domaine->slug }}" class="scroll-mt-32 {{ $loop->odd ? 'bg-mist' : 'bg-white' }} py-20">
+        <section id="{{ $sec->domaine->slug }}" class="scroll-mt-32 {{ $loop->odd ? 'bg-mist' : 'bg-white' }} py-20">
             <div class="mx-auto grid max-w-7xl gap-12 px-5 lg:grid-cols-12 lg:px-8">
 
                 {{-- ▸ Colonne gauche : résumé sticky --}}
@@ -141,58 +75,74 @@
                     <div class="lg:sticky lg:top-40">
                         <span class="grid h-16 w-16 place-items-center bg-lake text-white">
                             <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="{{ $icone($domaine) }}"/>
+                                <path d="{{ $icone($sec->domaine) }}"/>
                             </svg>
                         </span>
 
-                        <h2 class="mt-6 font-serif text-3xl font-semibold text-lake md:text-4xl">{{ $nom }}</h2>
-
-                        @if ($intro !== '')
-                            <p class="mt-3 leading-relaxed text-ink/70">{{ $intro }}</p>
-                        @endif
+                        <h2 class="mt-6 font-serif text-3xl font-semibold text-lake md:text-4xl">{{ $sec->nom }}</h2>
 
                         <dl class="mt-6 grid grid-cols-2 gap-px border border-line bg-line">
                             <div class="bg-white p-4">
                                 <dt class="text-xs text-ink/60">{{ $t('Projets réalisés', 'Completed projects') }}</dt>
-                                <dd class="mt-1 font-serif text-3xl font-semibold text-lake">{{ $realises->count() }}</dd>
+                                <dd class="mt-1 font-serif text-3xl font-semibold text-lake">{{ $sec->realises->count() }}</dd>
                             </div>
                             <div class="bg-white p-4">
                                 <dt class="text-xs text-ink/60">{{ $t('Projets à financer', 'Projects seeking funding') }}</dt>
-                                <dd class="mt-1 font-serif text-3xl font-semibold text-lake">{{ $aFinancer->count() }}</dd>
+                                <dd class="mt-1 font-serif text-3xl font-semibold text-lake">{{ $sec->aFinancer->count() }}</dd>
                             </div>
                         </dl>
 
-                        @if ($periode !== '')
-                            <p class="mt-4 text-sm text-ink/70"><b>{{ $t('Période', 'Period') }}</b> : {{ $periode }}</p>
+                        @if ($sec->periode !== '')
+                            <p class="mt-4 text-sm text-ink/70"><b>{{ $t('Période', 'Period') }}</b> : {{ $sec->periode }}</p>
                         @endif
-                        @if ($bailleurs !== '')
-                            <p class="mt-2 text-sm text-ink/70"><b>{{ $t('Bailleurs et partenaires', 'Funders and partners') }}</b> : {{ $bailleurs }}</p>
+
+                        {{-- S2 — les deux groupes, sans « ou » --}}
+                        @if ($sec->bailleursLabel !== '')
+                            <p class="mt-2 text-sm text-ink/70"><b>{{ $t('Bailleurs', 'Funders') }}</b> : {{ $sec->bailleursLabel }}</p>
                         @endif
+                        @if ($sec->implementeursLabel !== '')
+                            <p class="mt-2 text-sm text-ink/70"><b>{{ $t('Partenaires de mise en œuvre', 'Implementing Partners') }}</b> : {{ $sec->implementeursLabel }}</p>
+                        @endif
+                        {{-- ▸ Lien vers la fiche du domaine --}}
+                        <a href="{{ route('domaines.show', [$locale, $sec->domaine->slug]) }}"
+                        class="mt-6 inline-flex w-full items-center justify-center gap-2 bg-lake px-6 py-3.5 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-ochre hover:shadow-xl"
+                        aria-label="{{ $t('Voir la page du domaine : ', 'View the domain page: ') }}{{ $sec->nom }}">
+                            {{ $t('Voir la page du domaine', 'View the domain page') }} <span aria-hidden="true">→</span>
+                        </a>
+
                     </div>
                 </div>
 
                 {{-- ▸ Colonne droite : illustration, interventions, formations, projets --}}
                 <div class="lg:col-span-8" data-r>
-                    {{-- Illustration (dégradé + libellé, rendu côté serveur) --}}
-                    <figure class="overflow-hidden" data-r>
-                        <svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" class="h-56 w-full md:h-72"
-                             role="img" aria-label="{{ $nom }}">
-                            <defs>
-                                <linearGradient id="degrade-{{ $domaine->slug }}" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0" stop-color="hsl({{ $teinte($domaine) }} 45% 26%)"/>
-                                    <stop offset="1" stop-color="hsl({{ $teinte($domaine) }} 50% 44%)"/>
-                                </linearGradient>
-                            </defs>
-                            <rect width="800" height="300" fill="url(#degrade-{{ $domaine->slug }})"/>
-                            <text x="400" y="156" fill="#fff" fill-opacity=".85" font-family="sans-serif" font-size="24" text-anchor="middle">{{ $nom }}</text>
-                            <text x="400" y="182" fill="#fff" fill-opacity=".6" font-family="sans-serif" font-size="15" text-anchor="middle">Image d’illustration</text>
-                        </svg>
-                    </figure>
 
-                    @if ($interventions !== [])
+
+
+
+                {{-- ▸ Bandeau : objectif du domaine sur fond dégradé --}}
+                <div class="relative flex min-h-56 items-center justify-center overflow-hidden md:min-h-72" data-r>
+                    <div class="absolute inset-0" aria-hidden="true"
+                        style="background-image: linear-gradient(to bottom right, hsl({{ $teinte($sec->domaine) }} 45% 26%), hsl({{ $teinte($sec->domaine) }} 50% 44%));">
+                    </div>
+                    {{-- Ligne décoratives --}}
+                    <svg class="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 800 300"
+                        preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                        <path d="M0 220c120-60 200 40 340-10s220-80 460 0v90H0z" fill="#fff" opacity=".08"/>
+                        <path d="M0 260c150-50 260 30 400-10s250-40 400 10v40H0z" fill="#fff" opacity=".1"/>
+                    </svg>
+                    @if ($sec->objectives !== '')
+                        <p class="relative max-w-3xl p-8 font-serif text-xl leading-relaxed text-white md:p-10 md:text-2xl text-center">
+                            {{ $sec->objectives }}
+                        </p>
+                    @endif
+
+                </div>
+
+
+                    @if ($sec->interventions !== [])
                         <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Nos interventions', 'Our interventions') }}</h3>
                         <ul class="mt-4 grid gap-3 sm:grid-cols-2">
-                            @foreach ($interventions as $intervention)
+                            @foreach ($sec->interventions as $intervention)
                                 <li class="flex gap-3 border border-line bg-white p-4 text-sm leading-relaxed">
                                     <span class="mt-0.5 shrink-0 text-moss">
                                         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -205,32 +155,39 @@
                         </ul>
                     @endif
 
-                    @if ($formations !== [])
+                    @if ($sec->formations !== [])
                         <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Formations reçues de nos partenaires', 'Training received from our partners') }}</h3>
                         <ul class="mt-4 space-y-2">
-                            @foreach ($formations as $formation)
+                            @foreach ($sec->formations as $formation)
                                 <li class="border-l-4 border-ochre bg-white px-4 py-3 text-sm leading-relaxed">{{ $formation }}</li>
                             @endforeach
                         </ul>
                     @endif
-                    <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Projets associés', 'Related projects') }} ({{ $projetsDuDomaine->count() }})</h3>
-                    @if ($projetsDuDomaine->isNotEmpty())
+                    <h3 class="mt-10 text-sm font-semibold uppercase tracking-wider text-moss">{{ $t('Projets associés', 'Related projects') }} ({{ $sec->realises->count() + $sec->aFinancer->count() }})</h3>
+                    @if ($sec->parcours->isNotEmpty())
                         <ul class="mt-4 divide-y divide-line border border-line bg-white">
-                            @foreach ($parcours as $projet)
-                                @php
-                                    $anneeP    = (string) $anneeProjet($projet);
-                                    $aFinP     = $projet->statut_court === 'w';
-                                    $titreP    = trim((string) $projet->getTranslation('title', $locale));
-                                    $bailleurP = $bailleurProjet($projet);
-                                @endphp
+                            @foreach ($sec->parcours as $row)
                                 <li class="flex items-center gap-4 p-4">
-                                    <span class="w-20 shrink-0 text-sm font-bold {{ $aFinP ? 'text-ochreDark' : 'text-ink/60' }}">
-                                        {{ $aFinP ? $t('À financer', 'Seeking funding') : $anneeP }}
+                                    <span class="w-20 shrink-0 text-sm font-bold {{ $row->afinancer ? 'text-ochreDark' : 'text-ink/60' }}">
+                                        {{ $row->afinancer ? $t('À financer', 'Seeking funding') : $row->annee }}
                                     </span>
                                     <span class="grow">
-                                        <b class="block text-lake">{{ $titreP }}</b>
-                                        @if ($bailleurP !== '')
-                                            <span class="text-xs text-ink/60">{{ $bailleurP }}</span>
+                                        {{-- S3 — lien vers la fiche projet --}}
+                                        <a href="{{ $row->url }}" class="block transition hover:opacity-75">
+                                            <b class="block text-lake">{{ $row->titre }}</b>
+                                        </a>
+                                        @if ($row->funderLabel !== '—' || $row->implLabel !== '—')
+                                            <span class="mt-0.5 block text-xs text-ink/60">
+                                                @if ($row->funderLabel !== '—')
+                                                    {{ $t('Bailleurs', 'Funders') }} : {{ $row->funderLabel }}
+                                                @endif
+                                                @if ($row->funderLabel !== '—' && $row->implLabel !== '—')
+                                                    ·
+                                                @endif
+                                                @if ($row->implLabel !== '—')
+                                                    {{ $t('Mise en œuvre', 'Implementation') }} : {{ $row->implLabel }}
+                                                @endif
+                                            </span>
                                         @endif
                                     </span>
                                 </li>
