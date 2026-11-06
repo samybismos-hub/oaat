@@ -116,9 +116,6 @@
                 {{-- ▸ Colonne droite : illustration, interventions, formations, projets --}}
                 <div class="lg:col-span-8" data-r>
 
-
-
-
                 {{-- ▸ Bandeau : objectif du domaine sur fond dégradé --}}
                 <div class="relative flex min-h-56 items-center justify-center overflow-hidden md:min-h-72" data-r>
                     <div class="absolute inset-0" aria-hidden="true"

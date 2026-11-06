@@ -39,7 +39,8 @@ Exemple canonique : `pages/home.blade.php` (8 partials).
 `_header`, `_topbar`.
 
 **Règle d'or** : si une vue dépasse ~80 lignes, c'est qu'elle contient de la
-logique ou qu'il manque des partials.
+logique ou qu'il manque des partials. (Exception documentée :
+`pages/domaines-index`, §10.)
 
 ---
 
@@ -198,6 +199,13 @@ public function registerMediaConversions(?Media $media = null): void
 **Toujours `useDisk('public')`** : le disk par défaut `local` casse l'affichage
 public (cf. commentaire dans `Page.php`).
 
+### Médias galerie (Album)
+
+`Album` expose la collection **`photos`** (disque `public`) avec deux
+conversions `nonQueued()` : `thumb` (200×150) et `card` (800×600). C'est le
+contrat d'image de la page galerie (à venir) — les vues n'utiliseront que ces
+deux conversions. Relation `belongsTo(Project)`.
+
 ---
 
 ## 7. Les libellés d'affichage vivent dans le modèle
@@ -293,14 +301,44 @@ sous-titre = extrait du `body`. **100 % CMS.** Utilisé par `projets-index`,
 
 ### `_carte_projet` (la carte projet canonique)
 
+Carte **100 % textuelle** (plus aucune image ni SVG — décision du 03/11/2026) :
+le badge de statut (« À financer / En cours / Réalisé ») vit dans la ligne meta
+(année + domaine), en tête de contenu.
+
 Variables documentées en tête : `$projet` (avec `domain` et `partners`
-chargés), `$locale`, `$t`, `$gradHsl`. 6 cellules fixes (`Budget`, `Durée`,
+chargés), `$locale`, `$t`. 6 cellules fixes (`Budget`, `Durée`,
 `Bénéficiaires`, `Bailleurs`, `Partenaires de mise en œuvre`, `Statut`) —
 chacune = un **label de modèle**, valeur « — » si absente. Bouton →
 `projets.show`.
 
-`$gradHsl` : `fn($slug) => $gMap[$slug] ?? '0,45%,26%|50,50%,44%'` définie dans
-l'appelant (dupliquée dans `projets-index`, à centraliser dans la config).
+### `pages/domaines-index` — la page hub (référence)
+
+Page longue **assumée** (9 sections de domaine assemblées inline) : toute la
+logique vit dans `DomaineController@index` (structure `$sections` prête à
+afficher, compteurs en SQL — §9). La vue ne garde que des helpers de
+présentation lisant la config :
+
+```php
+$railLabel = fn($d) => config('oaat.domaine_page.rail.'.$d->slug) ?: …;
+$icone     = fn($d) => (string) config('oaat.domaine_page.icons.'.$d->slug);
+$teinte    = fn($d) => (int) config('oaat.domaine_page.tints.'.$d->slug);
+```
+
+Conventions posées par cette page (à réutiliser) :
+
+- **Illustration de section = fond CSS + vrai HTML, jamais de texte dans un
+  SVG.** Le bandeau est un `div.relative` avec `background-image:
+  linear-gradient(to bottom right, hsl(teinte 45% 26%), hsl(teinte 50% 44%))`
+  (les 2 teintes de la config) ; l'objectif est un `<p>` HTML par-dessus
+  (`relative max-w-*`) → retour à la ligne automatique à chaque breakpoint.
+  Décoration éventuelle = SVG `aria-hidden` + `pointer-events-none`, sans texte.
+- **Champ éventuellement vide** : `@if ($sec->objectives !== '')` (le contrôleur
+  renvoie `''` si absent) — repli possible sur `$sec->intro`.
+- **Lien hub → fiche** : CTA dans la colonne gauche **sticky**
+  (`lg:sticky lg:top-40`), en bas du résumé →
+  `route('domaines.show', [$locale, $sec->domaine->slug])`. Bouton `bg-lake`
+  pleine largeur, `aria-label` incluant `$sec->nom` (9 liens visibles
+  identiques → nom accessible distinct).
 
 ---
 
@@ -358,6 +396,9 @@ settings → pages → membres → **partenaires → domaines → projets** (piv
 `project_partner`) → actualités → documents → albums → admin. C'est un jeu de
 démo **remis en état à chaque `migrate:fresh --seed`** — jamais de donnée
 éditoriale « à la main » en base de production.
+
+`AlbumSeeder` est **idempotent** : il ne crée rien si un album existe déjà
+(slug unique `album-de-demonstration`).
 
 ---
 
@@ -420,13 +461,18 @@ class XxxController
 
 ## 16. Dettes & pièges connus
 
-- `pages/domaines-show` et `pages/partenaires` **n'existent pas** (routes
-  câblées) → clic depuis l'accueil / le menu header = **500**. À créer ou
-  désactiver.
-- `domaines-index` contient encore de la logique inline (`@php`, closures
-  `anneeProjet`, `bailleurProjet`, `preg_split` des bailleurs…) → refactor à
-  basculer dans `DomaineController@index` selon les patterns §2 / §9.
-- `$gradHsl` / `$gMap` dupliqués dans `projets-index` → à centraliser dans
-  `config/oaat.php` (`domaine_page.tints`).
+- **`pages/domaines-show` n'existe pas — saut volontaire** (décision du
+  03/11/2026, la galerie passe devant). La page `domaines-index` y pointe
+  pourtant (9 CTA « Voir la page du domaine ») ainsi que les 9 cartes de
+  l'accueil (`_domaines.blade.php:48`) → **clic = 500**. Dette assumée : créer
+  la fiche ou neutraliser les liens.
+- `pages/partenaires` **n'existe pas** (route câblée, item du menu header) →
+  clic = **500**. À créer ou désactiver.
+- **Galerie : vues absentes.** Routes (`galerie.index`, `galerie.show`),
+  `GalerieController`, modèle `Album` (médias OK) et `AlbumResource` (Filament)
+  existent, mais `pages/galerie-index` / `pages/galerie-show` manquent →
+  clic = **500**. Prochaine étape d'implémentation.
+- Commentaire d'en-tête de `_carte_projet` obsolète : mentionne encore
+  `$gradHsl` (supprimé avec la zone image) → à nettoyer.
 - L'ordre de lecture : **toujours lire ce fichier + le commentaire d'en-tête
   du partial ciblé + le contrôleur qui le nourrit** avant d'écrire du code.

@@ -1,6 +1,6 @@
 {{-- ═══════════════════════════════════════════════════════════════════
     _carte_projet.blade.php — Carte projet pour la grille des projets.
-    Variables : $projet (Project avec domain, partners chargés), $locale, $t, $gradHsl
+    Variables : $projet (Project avec domain, partners chargés), $locale, $t,
     --}}
 @php
     $st = $projet->status->value;
