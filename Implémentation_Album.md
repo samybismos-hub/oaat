@@ -144,3 +144,216 @@ Raccourcis : `/` recherche, `?` aide, `G` vue, `F` filtres, `Échap` ferme, `+/�
 - **`data-en`** de la maquette : ignoré (rendu serveur localisé). Le JS le lit quand présent (compatible fichier statique).
 - **Isolation** : le module §23 ne s'active que si `#gr` + `figure.ph` existent — aucun effet sur les autres pages.
 - **Interdépendance layout** : `#pg`, `#up`, `#rg`, `#ts` existent déjà dans `layouts/app.blade.php` ; la page galerie n'a qu'à les laisser en place.
+---
+
+## 5. Étape 3 — Logique métier : analyse du terrain
+
+> Analyse produite **avant** l'implémentation du contrôleur. Elle fixe le
+> périmètre, les dettes et l'ordre de travail de l'étape 3.
+
+### 5.1 Périmètre et état des lieux
+
+**Ce qui existe déjà (fonctionnel)**
+
+| Pièce | État | Remarque |
+|---|---|---|
+| Modèle `Album` | ✅ | `title` (traduisible), `slug`, `project_id`, collection `photos` |
+| Modèle `Media` (vendor) | ✅ | `custom_properties` JSON, `getUrl($conversion)`, conversions `thumb`/`card` |
+| `GalerieController@index()` | ⚠️ | Ne passe que `albums` + `locale` → **à réécrire** |
+| Route `GET /galerie` | ✅ | Pointe sur `GalerieController@index` |
+| `pages/galerie-index.blade.php` | ✅ | Attend `$medias`, `$categories`, `$facettes`, `$annees`, `$collections`, `$qs`, `$tags`, `$stats`, `$settings`, `$locale` |
+| 10 partials `_galerie_*` | ✅ | Rendu validé : 81/81 hooks DOM, 11/11 compilation |
+| `oaat.js` §23 | ✅ | Lit les `data-*`, filtre, trie, visionneuse |
+| `AlbumSeeder` | ⚠️ | 1 album vide, sans photo → **à enrichir** |
+| `SettingResource` (Filament) | ✅ | Identité, contacts, réseaux, chiffres — aucune section galerie |
+| `AlbumResource` (Filament) | ✅ | Création d'album + upload photos, **sans métadonnées par média** |
+
+### 5.2 Dettes et trous identifiés
+
+#### D1 — Aucune métadonnée par photo
+
+`AlbumForm` téléverse des photos mais ne collecte **aucune** métadonnée par
+fichier : ni année, ni titre, ni lieu, ni catégorie, ni thème, ni tags. Or
+`_galerie_media.blade.php` attend **20+ `data-*`** par `<figure>` :
+
+`data-y`, `data-tf`, `data-te`, `data-pfr`, `data-pen`, `data-cat`, `data-th`,
+`data-lieu`, `data-ori`, `data-par`, `data-col`, `data-use`, `data-tags`,
+`data-src`, `data-sfr`, `data-sen`, `data-q`, `data-thumb`, `data-card`,
+`data-dl`, `data-catLabel`, `data-catLabelEn`, `data-lieuLabel`.
+
+**Conséquence** : les `<figure>` sortent vides, le JS ne peut ni filtrer ni
+trier → page inutilisable.
+
+**Emplacement retenu** : la colonne `custom_properties` (JSON) de la table
+`media` — déjà présente, déjà castée en `array` par le modèle `Media`, mais
+actuellement vide (`{}`).
+
+#### D2 — Aucune UI pour remplir `custom_properties`
+
+Enrichir `SpatieMediaLibraryFileUpload` avec des champs par fichier
+(`withCustomProperties([...])`) n'est pas trivial : la librairie n'offre pas
+nativement de formulaire par média.
+
+**Solution MVP** : métadonnées posées par `AlbumSeeder` (démo) et, côté
+contrôleur, dérivation de ce qui est déductible du contexte
+(Album → Projet → domaine pour `cat` / `th`). L'admin des métadonnées sera une
+étape ultérieure dédiée.
+
+#### D3 — `GalerieController@index()` quasi vide
+
+Le contrôleur actuel se limite à `Album::query()->latest('created_at')->get()`
+et ne transmet que `albums`. Il doit :
+
+1. charger tous les albums **avec** leurs médias ;
+2. transformer chaque média en hash `$m` conforme au contrat §3.1 ;
+3. calculer `$categories`, `$facettes`, `$collections`, `$annees`, `$stats`,
+   `$tags`, `$qs`.
+
+#### D4 — `$settings` non transmis
+
+La vue et le layout lisent `$settings ?? null` ; les autres contrôleurs
+(`Accueil`, `Projet`, `Organisation`) passent `Setting::current()`.
+`GalerieController` doit faire de même (topbar, footer, e-mail du dock).
+
+#### D5 — `AlbumSeeder` sans photo
+
+Un seul album vide : impossible de démontrer facettes, tris et visionneuse.
+Minimum : 2-3 albums et quelques photos factices portant leurs
+`custom_properties`.
+
+### 5.3 Plan d'implémentation (4 phases)
+
+#### Phase A — Réécrire `GalerieController@index`
+
+Fichier : `app/Http/Controllers/Public/GalerieController.php`
+
+```php
+class GalerieController
+{
+    public function index(string $locale): mixed
+    {
+        $settings = Setting::current();
+
+        // 1. Albums + médias (eager) : évite le N+1 sur getMedia('photos')
+        $albums = Album::query()
+            ->with('media')
+            ->with('project')
+            ->latest('created_at')
+            ->get();
+
+        // 2. Catalogue plat : un hash par média
+        $medias = collect();
+        foreach ($albums as $album) {
+            foreach ($album->getMedia('photos') as $media) {
+                $medias->push($this->buildMediaHash($media, $album, $locale));
+            }
+        }
+
+        // 3. Catégories (onglets .tb)
+        $categories = $medias->groupBy('cat')->map(...)->values();
+
+        // 4. Facettes (thème, lieu, partenaires, collections, orientation…)
+        $facettes = [...];
+
+        // 5. Collections (bandeau #cs)
+        $collections = [...];
+
+        // 6. Années (min / max / histogramme #yr)
+        $annees = [...];
+
+        // 7. Statistiques du héro
+        $stats = [...];
+
+        // 8. Vocabulaire des tags (panneau infos)
+        $tags = [...];
+
+        // 9. Recherches fréquentes
+        $qs = config('oaat.galerie.quick_searches', []);
+
+        return view('pages.galerie-index', compact(
+            'medias', 'categories', 'facettes', 'collections',
+            'annees', 'stats', 'tags', 'qs', 'settings', 'locale'
+        ));
+    }
+}
+```
+
+#### Phase A1 — Helper `buildMediaHash()`
+
+Méthode privée du contrôleur (une fois stabilisée, elle pourra migrer vers un
+service) :
+
+- lit `$media->custom_properties` ;
+- remplit les 20+ clés du contrat §3.1 ;
+- replis : `tf`/`te` ← titre de l'album, `cat`/`th`/`y` ← projet rattaché ;
+- construit `id`, `ref` = `OAAT-` + `str_pad(id, 4, '0')`, `q` normalisé,
+  `thumb`/`card`/`dl` via les conversions.
+
+#### Phase B — Enrichir `AlbumSeeder`
+
+- 2-3 albums, titres FR/EN et slugs distincts ;
+- 2-3 photos par album, chacune avec ses `custom_properties` (année, titres,
+  lieu, catégorie, thème, tags) ;
+- visuels de démo (mêmes SVG placeholders que la maquette) : aucune dépendance
+  à un fichier binaire.
+
+#### Phase C — Test `tests/Feature/GalerieIndexTest.php`
+
+Calqué sur `ProjetIndexTest` (§14 des PATTERNS) :
+
+- mock de `ViewFactory` pour capturer les données passées au rendu ;
+- vérifie la présence et le typage des 10 variables ;
+- vérifie les compteurs (`$stats`), la structure d'un hash média (clés
+  obligatoires) et la cohérence des facettes avec le catalogue.
+
+#### Phase D — Dettes à consigner
+
+Reporter D1 → D5 dans `PATTERNS.md` §16 (dettes & pièges connus) à la clôture
+de l'étape.
+
+### 5.4 Décisions d'architecture
+
+| Question | Décision |
+|---|---|
+| Stockage des métadonnées par photo | `custom_properties` (JSON sur `media`) — **pas de nouvelle table** |
+| UI admin de saisie des métadonnées | **Hors périmètre** de l'étape 3 (seeder + dérivation) |
+| Calcul des facettes | En PHP, dans le contrôleur, à partir du catalogue |
+| Source des catégories | Champ `cat` de `custom_properties` (libellé via config) |
+| Source des collections | Champ `col[]` de `custom_properties` |
+| Source des années | `custom_properties.year`, repli `album.project.start_date` |
+| Source des tags | `custom_properties.tags[]` |
+| Recherches fréquentes | `config('oaat.galerie.quick_searches')` |
+| URL des images | `Media::getUrl('thumb')`, `Media::getUrl('card')`, `Media::getUrl()` |
+| Référence affichée | `OAAT-` + `media.id` sur 4 chiffres |
+| Chaîne de recherche `q` | `tf` + `te` + référence, normalisée |
+| Transmission de `$settings` | Oui, comme tous les contrôleurs publics |
+
+### 5.5 Points ouverts
+
+**1. `data-mailto` du dock de sélection (`#treq`)**
+
+La maquette pose `data-mailto` sur `<body>` ; notre JS §23.5 le lit pour
+construire le lien de demande. Deux options :
+
+- poser `data-mailto="{{ $settings?->email ?? 'contact@oaat.cd' }}"` sur le
+  conteneur de la page galerie ;
+- laisser le JS construire le `mailto:` depuis `$settings->email`.
+
+**Reco** : première option (un attribut, aucune logique en JS), valeur fournie
+par le contrôleur.
+
+**2. Métadonnées photo dans le formulaire Album, maintenant ?**
+
+Non pour cette étape : chantier Filament conséquent (champs par fichier
+téléversé). Le contrôleur fonctionne avec `custom_properties` et le seeder
+fournit la démo. L'admin des métadonnées fera l'objet d'une étape dédiée.
+
+### 5.6 Ordre d'exécution de l'étape 3
+
+1. **`GalerieController@index`** — réécriture complète + helper
+   `buildMediaHash()` (catalogue, catégories, facettes, collections, années,
+   stats, tags).
+2. **`AlbumSeeder`** — photos de démonstration + `custom_properties`.
+3. **`GalerieIndexTest`** — capture du contrat de données et validation des
+   compteurs.
+4. **`PATTERNS.md` §16** — consignation des dettes D1 → D5.
