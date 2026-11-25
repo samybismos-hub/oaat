@@ -3,8 +3,8 @@
     ────────────────────────────────────────────────────────────────────────
     Bloc clair (cf. maquette Galerie.html l.26-29) : fil d'Ariane, grand titre,
     compteurs, boutons « Lancer le diaporama » (#sl0) et « Raccourcis clavier »
-    (#hlp), puis recherches fréquentes ([data-qs]).
-    Variables : $stats, $qs, $locale, $t. Hooks : Implémentation_Album.md §3.2.
+    (#hlp).
+    Variables : $stats, $locale, $t. Hooks : Implémentation_Album.md §3.2.
 --}}
 <section id="top" class="relative overflow-hidden border-b border-line bg-white">
     {{-- Liseré pointillé supérieur (décor maquette) --}}
@@ -26,7 +26,7 @@
     <div class="relative z-10 mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-8 lg:pb-16">
 
         {{-- Fil d'Ariane --}}
-        <nav aria-label="{{ $t('Fil d’Ariane', 'Breadcrumb') }}" class="flex flex-wrap items-center gap-2 text-sm text-ink/60">
+        <nav aria-label="{{ $t('Fil d'Ariane', 'Breadcrumb') }}" class="flex flex-wrap items-center gap-2 text-sm text-ink/60">
             <a href="{{ route('accueil', ['locale' => $locale]) }}" class="transition hover:text-lake">{{ $t('Accueil', 'Home') }}</a>
             <span aria-hidden="true">›</span>
             <span class="text-ink">{{ $t('Galerie', 'Gallery') }}</span>
@@ -75,17 +75,5 @@
             </div>
         </div>
 
-        {{-- Recherches fréquentes : une puce déclenche la recherche (§23.7) --}}
-        @if ($qs->isNotEmpty())
-            <div class="mt-8 flex flex-wrap items-center gap-2">
-                <span class="mr-1 text-sm text-ink/55">{{ $t('Recherches fréquentes', 'Popular searches') }} :</span>
-                @foreach ($qs as $s)
-                    <button type="button" data-qs="{{ $s['q'] ?? ($s['fr'] ?? '') }}"
-                            class="border border-line bg-white px-3.5 py-1.5 text-sm text-ink/70 transition hover:border-lake hover:bg-lake hover:text-white">
-                        {{ $s['fr'] ?? $s['q'] ?? '' }}
-                    </button>
-                @endforeach
-            </div>
-        @endif
     </div>
 </section>

@@ -1,19 +1,18 @@
 {{--
     pages/galerie-index.blade.php — Page « Galerie » (médiathèque).
-    ──────────────────────────────────────────────────────────────────────────
+    ─────────────────────────────────────────────────────────────────────────
     Assemblage des partials _galerie_* (cf. PATTERNS §2 : une page = une carte
     de visite). Les briques communes (topbar, header, footer, #pg, #up, #ts)
     viennent du layout `layouts.app`. Le JS (oaat.js §23) est poussé dans la
     stack `scripts`. Contrat DOM : Implémentation_Album.md §3.
 
-    Variables (préparées par GalerieController@index, étape suivante) :
+    Variables (préparées par GalerieController@index) :
         $medias      : [{id,y,w,h,cat,th,lieu,ori,par[],col[],use[],tf,te,pfr,pen,
                         src,sfr,sen,tags[{fr,en}],q,thumb,card,dl}]
         $categories  : [{code,fr,en,count}]        // onglets .tb
         $collections : [{code,fr,en,count,hue}]    // bandeau collections (#cs)
         $facettes    : [{f,fr,en,open,scroll,values[{v,fr,en,count}]}]
         $annees      : {min,max,bars{y:hauteur%}}  // histogramme + curseurs
-        $qs          : [{q,fr,en}]                 // recherches fréquentes
         $tags        : [{fr,en}]                   // vocabulaire .vtg (visionneuse)
         $stats       : [{valeur(int|string),fr,en}]// compteurs du héro
         $locale      : (string)
@@ -30,16 +29,6 @@
     $collections ??= collect();
     $facettes    ??= collect();
     $annees      ??= ['min' => null, 'max' => null, 'bars' => []];
-    $qs          ??= collect([
-        ['q' => 'route',     'fr' => 'route',     'en' => 'road'],
-        ['q' => 'pont',      'fr' => 'pont',      'en' => 'bridge'],
-        ['q' => 'école',     'fr' => 'école',     'en' => 'school'],
-        ['q' => 'riz',       'fr' => 'riz',       'en' => 'rice'],
-        ['q' => 'formation', 'fr' => 'formation', 'en' => 'training'],
-        ['q' => 'forum',     'fr' => 'forum',     'en' => 'forum'],
-        ['q' => 'jeunes',    'fr' => 'jeunes',    'en' => 'youth'],
-        ['q' => 'femmes',    'fr' => 'femmes',    'en' => 'women'],
-    ]);
     $tags        ??= collect();
     $stats       ??= [
         ['valeur' => 0,    'fr' => 'médias',      'en' => 'media'],
@@ -61,10 +50,9 @@
 
 @section('content')
 
-    {{-- ═══════ HÉRO : titre, compteurs, actions, recherches fréquentes ═════ --}}
+    {{-- ═══════ HÉRO : titre, compteurs, actions ═════════════════════════════ --}}
     @include('partials._galerie_hero', [
         'stats'  => $stats,
-        'qs'     => $qs,
         'locale' => $locale,
     ])
 

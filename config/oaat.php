@@ -1,47 +1,23 @@
-<?php
+﻿<?php
 
 return [
     /*
     |--------------------------------------------------------------------------
-    | Données institutionnelles statiques
+    | DonnÃ©es institutionnelles statiques
     |--------------------------------------------------------------------------
     |
     | Ces valeurs ne changent pas : elles n'ont donc pas leur place en base
-    | de données (pas de colonne, pas de champ à remplir dans l'admin).
+    | de donnÃ©es (pas de colonne, pas de champ Ã  remplir dans l'admin).
     |
     */
 
-    // Date de création de l'organisation (source : presentation OAAT, I. Identification).
     'founded_at' => '1995-05-10',
 
-    /*
-    | Compteurs des blocs « Expérience comparable » et « Autres projets »
-    | de la fiche projet (pages.projets-show). Configurables un jour côté
-    | administration, sans toucher au template.
-    */
     'projects' => [
         'experience_count' => 4,
         'related_count'    => 3,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Page « Domaines d'intervention » (publiée)
-    |--------------------------------------------------------------------------
-    |
-    | Données de présentation (design figé — décision du 31/10/2026, option B) :
-    |  - `tints` : teinte HSL de chaque domaine, indexée par slug de la table
-    |    `domains`. Sert aux dégradés d'illustration de la page domaines-index.
-    |  - `rail`  : libellés courts de la barre de navigation interne, indexés
-    |    par slug. (ex. « Alimentation » vs « Sécurité alimentaire »).
-    |  - `icons` : chemins SVG (24×24, trait fin) des pictogrammes couleur
-    |    « lac » du rail et des cartes, indexés par slug.
-    |
-    | Ces valeurs relèvent du style et ne changent pas : elles n'ont PAS leur
-    | place en base de données. Les contenus éditoriaux, eux (interventions,
-    | formations), vivent dans `domains` (étape 2).
-    |
-    */
     'domaine_page' => [
         'tints' => [
             'sante'                     => 350,
@@ -55,15 +31,15 @@ return [
             'formation-professionnelle' => 45,
         ],
         'rail' => [
-            'sante'                     => 'Santé',
+            'sante'                     => 'SantÃ©',
             'securite-alimentaire'      => 'Alimentation',
             'logistique'                => 'Logistique',
-            'education'                 => 'Éducation',
+            'education'                 => 'Ã‰ducation',
             'wash'                      => 'Eau',
             'genre'                     => 'Genre',
             'protection'                => 'Protection',
             'environnement'             => 'Environnement',
-            'formation-professionnelle' => 'Métiers',
+            'formation-professionnelle' => 'MÃ©tiers',
         ],
         'icons' => [
             'sante'                     => 'M12 8v8M8 12h8M12 3a9 9 0 100 18 9 9 0 000-18z',
@@ -76,5 +52,14 @@ return [
             'environnement'             => 'M5 19c0-9 5-14 15-14 0 10-5 15-14 15M5 19c2-5 5-8 9-10',
             'formation-professionnelle' => 'M14 6l4 4M4 20l8-8M13 5l6 6-3 3-6-6z',
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Galerie — palette des collections (bandeau #cs)
+    |--------------------------------------------------------------------------
+    */
+    'galerie' => [
+        'collection_palette' => [205, 350, 95, 30, 215, 190, 285, 330, 150, 45],
     ],
 ];
